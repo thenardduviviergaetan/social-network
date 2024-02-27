@@ -13,7 +13,6 @@ func main() {
 		rw.Header().Set("Content-Length", fmt.Sprint(len(resp)))
 		rw.Write(resp)
 	})
-
 	log.Println("Server is available at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }

@@ -1,15 +1,8 @@
-import Link from 'next/link'
-
-
-async function getData(){
-  const res = await fetch('http://localhost:8080/');
-  const data = res.json();
-  return data;
-
-}
+import Link from 'next/link';
+import {getStatus } from '@/app/lib/data'
 
 export default async function Page(){
-  const status = await getData();
+  const status = await getStatus();
     return (
       <main>
         <h1>Social Network</h1>

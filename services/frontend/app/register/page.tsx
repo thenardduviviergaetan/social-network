@@ -1,3 +1,5 @@
-export default function Page(){
-    return <h1>Register Page</h1>
+import RegisterForm from "@/app/ui/register-form";
+
+export default function Page() {
+  return <RegisterForm />;
 }

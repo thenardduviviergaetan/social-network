@@ -1,3 +1,5 @@
-export default function Page(){
-    return <h1>Login Page</h1>
+import LoginForm from "@/app/ui/login-form";
+
+export default function Page() {
+  return <LoginForm />;
 }

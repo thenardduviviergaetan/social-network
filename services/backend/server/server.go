@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"server/app"
 )
@@ -15,5 +16,6 @@ func NewServer(app *app.App) *Server {
 
 func (s *Server) Start() {
 
+	log.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }

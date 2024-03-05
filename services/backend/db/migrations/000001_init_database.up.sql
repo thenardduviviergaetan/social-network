@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    birthday TEXT NOT NULL,
+    date_of_birth TEXT NOT NULL,
     nickname TEXT,
     avatar TEXT,
     about TEXT,

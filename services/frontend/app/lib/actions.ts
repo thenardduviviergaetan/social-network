@@ -10,6 +10,7 @@ const registerFormSchema = z.object({
   password: z.string().min(6),
   firstName: z.string(),
   lastName: z.string(),
+  dateOfBirth: z.string(),
 });
 
 export type State = {
@@ -18,6 +19,7 @@ export type State = {
     password?: string;
     firstName?: string;
     lastName?: string;
+    dateOfBirth?: string;
   };
   message?: string | null;
 };
@@ -31,7 +33,7 @@ export async function register(
     password: formData.get("password"),
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
-    birthDate: formData.get("birthDate"),
+    dateOfBirth: formData.get("dateOfBirth"),
   });
 
   if (!validatedData.success) {
@@ -41,6 +43,7 @@ export async function register(
         password: "error password",
         firstName: "error firstName",
         lastName: "error lastName",
+        dateOfBirth: "error dateOfBirth",
             },
       message: "Error in form...",
     };

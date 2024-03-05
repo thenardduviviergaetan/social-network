@@ -10,27 +10,14 @@ import {
   UserCircleIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { register } from "@/app/lib/actions";
 
 
   
 export default function RegisterForm() {
 
-  const initState = {
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    avatar: "",
-    nickname: "",
-    about: "",
-  }
-
   const [state, setFormState] = useFormState(register, undefined);
-
-
   return (
     <form action={setFormState} className="space-y-3 grid place-items-center h-screen mt-4">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 shadow-xl">
@@ -118,16 +105,16 @@ export default function RegisterForm() {
             <div className="mt-4">
               <label
                 className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-                htmlFor="birthDate"
+                htmlFor="dateOfBirth"
               >
                 Date of Birth*
               </label>
               <div className="relative">
                 <input
                   className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                  id="birthDate"
+                  id="dateOfBirth"
                   type="date"
-                  name="birthDate"
+                  name="dateOfBirth"
                   placeholder="mm/dd/yyyy"
                   required
                 />
@@ -207,8 +194,9 @@ export default function RegisterForm() {
 }
 
 function RegisterButton() {
+  const { pending } = useFormStatus();
   return (
-    <Button className="w-full mt-4">
+    <Button className="w-full mt-4" aria-disabled={pending}>
       Register
     </Button>
   );

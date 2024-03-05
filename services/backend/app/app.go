@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+	"database/sql"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
@@ -14,7 +16,15 @@ func NewApp(db *db.DB) *App {
 	return &App{db: db}
 }
 
-func (a *App) ServeHTTP() {
-	http.HandleFunc("/api/status", h.HandleStatus)
-	http.HandleFunc("/api/register", h.HandleRegister)
+func (a *App) ServeHTTP(database *sql.DB) {
+	http.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleStatus(w, r)
+	})
+
+	http.HandleFunc("/api/register", func(w http.ResponseWriter, r *http.Request) {
+
+		ctx := context.WithValue(r.Context(), "database", database)
+
+		h.HandleRegister(w, r.WithContext(ctx))
+	})
 }

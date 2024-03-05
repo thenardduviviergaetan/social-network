@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL,
     password TEXT NOT NULL,
@@ -8,6 +8,6 @@ CREATE TABLE users (
     nickname TEXT,
     avatar TEXT,
     about TEXT,
-    session_token TEXT
-    created_at DATETIME NOT NULL,
+    session_token TEXT,
+    created_at DATETIME NOT NULL
 );

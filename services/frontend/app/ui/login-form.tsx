@@ -55,7 +55,7 @@ export default function LoginForm() {
         <LoginButton />
         <p className="text-center mt-4 text-gray-900 text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-blue-500">
+          <Link href="/register" className="text-purple-700">
             Sign up
           </Link>
         </p>

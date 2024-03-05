@@ -1,5 +1,4 @@
-"use client";
-
+'use client'
 import { Button } from "@/app/ui/button";
 import Link from "next/link";
 import {
@@ -11,10 +10,29 @@ import {
   UserCircleIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { useFormState } from "react-dom";
+import { register } from "@/app/lib/actions";
 
+
+  
 export default function RegisterForm() {
+
+  const initState = {
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    avatar: "",
+    nickname: "",
+    about: "",
+  }
+
+  const [state, setFormState] = useFormState(register, undefined);
+
+
   return (
-    <form action="" className="space-y-3 grid place-items-center h-screen mt-4">
+    <form action={setFormState} className="space-y-3 grid place-items-center h-screen mt-4">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 shadow-xl">
         <h1 className={`text-gray-900 mb-3 text-2xl`}>
           Register
@@ -108,7 +126,7 @@ export default function RegisterForm() {
                 <input
                   className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
                   id="birthDate"
-                  type="text"
+                  type="date"
                   name="birthDate"
                   placeholder="mm/dd/yyyy"
                   required
@@ -173,7 +191,7 @@ export default function RegisterForm() {
         <RegisterButton />
         <p className="text-center mt-4 text-gray-900 text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-500">
+          <Link href="/login" className="text-purple-700">
             Sign in
           </Link>
         </p>

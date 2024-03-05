@@ -1,5 +1,5 @@
 :8000 {
 	file_server /static/*
-	reverse_proxy /api/* http://localhost:8080
-	reverse_proxy /* http://localhost:3000
+	reverse_proxy /api/* backend:8080
+	reverse_proxy /* frontend:3000
 }

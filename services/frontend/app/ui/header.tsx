@@ -2,23 +2,23 @@ import Link from "next/link";
 
 export function Header() {
   return (
-    <header className="bg-gray-950">
+    <header className="bg-white-950 shadow-xl">
       <nav className="flex items-center justify-between px-10 py-8">
-        <h1 className="text-white text-2xl font-bold">Social Network</h1>
+        <h1 className="text-purple-700 text-4xl font-bold">Social Network</h1>
         <ul className="flex space-x-4">
           <li>
             <Link href="/">
-              <span className="text-white hover:text-gray-300">Home</span>
+              <span className="text-grey-950 hover:text-purple-700">Home</span>
             </Link>
           </li>
           <li>
-            <Link href="/about">
-              <span className="text-white hover:text-gray-300">About</span>
+            <Link href="/login">
+              <span className="text-grey-950 hover:text-purple-700">Login</span>
             </Link>
           </li>
           <li>
-            <Link href="/contact">
-              <span className="text-white hover:text-gray-300">Contact</span>
+            <Link href="/register">
+              <span className="text-grey-950 hover:text-purple-700">Register</span>
             </Link>
           </li>
         </ul>

@@ -1,20 +1,11 @@
-import Link from 'next/link';
-import {getStatus } from '@/app/lib/data'
+import Link from "next/link";
 
-export default async function Page(){
-  const status = await getStatus();
-    return (
-      <main>
-        <h1>Social Network</h1>
-        <nav>
-          <Link href="/login">
-            <span>Login</span>
-          </Link>
-          <Link href="/register">
-            <span>Register</span>
-          </Link>
-        </nav>
-                <div>Status is: {status.status}</div>
-      </main>
-    )
+export default function Page() {
+
+  return (
+    <main>
+      <Link href="/login">Login</Link>
+      <Link href="/register">Register</Link>
+    </main>
+  );
 }

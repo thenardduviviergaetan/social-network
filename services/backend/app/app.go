@@ -1,8 +1,8 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
+	h "server/app/handlers"
 	"server/db"
 )
 
@@ -15,10 +15,6 @@ func NewApp(db *db.DB) *App {
 }
 
 func (a *App) ServeHTTP() {
-	http.HandleFunc("/api/status", func(rw http.ResponseWriter, req *http.Request) {
-		resp := []byte(`{"status": "ok"}`)
-		rw.Header().Set("Content-Type", "application/json")
-		rw.Header().Set("Content-Length", fmt.Sprint(len(resp)))
-		rw.Write(resp)
-	})
+	http.HandleFunc("/api/status", h.HandleStatus)
+	http.HandleFunc("/api/register", h.HandleRegister)
 }

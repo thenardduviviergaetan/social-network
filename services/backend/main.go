@@ -7,8 +7,9 @@ import (
 )
 
 func main() {
-	db := db.Connect()
-	app := app.NewApp(db)
+	database := db.Connect()
+	// db.ApplyMigrations(database.DB)
+	app := app.NewApp(database)
 	server := server.NewServer(app)
 	server.Start()
 }

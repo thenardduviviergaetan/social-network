@@ -15,7 +15,7 @@ func NewServer(app *app.App) *Server {
 }
 
 func (s *Server) Start() {
-
+	s.app.ServeHTTP()
 	log.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }

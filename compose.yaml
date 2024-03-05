@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./services/backend
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: ./services/frontend
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "8000:8000"

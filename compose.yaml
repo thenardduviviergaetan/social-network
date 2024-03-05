@@ -4,12 +4,16 @@ services:
   backend:
     build:
       context: ./services/backend
+    volumes:
+      - ./services/backend:/app
     expose:
       - "8080"
 
   frontend:
     build:
       context: ./services/frontend
+    volumes:
+      - ./services/frontend:/app
     expose:
       - "3000"
 

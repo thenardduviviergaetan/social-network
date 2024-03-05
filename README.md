@@ -3,23 +3,6 @@
 ### Getting Started
 
 - With docker: `docker compose up -d` and navigate to `localhost:8000`
-
-- Localhost:
-    Modify API URL in frontend application:
-    from `"http://caddy:8000/api/[path_to_handler]"`
-    to`"http://localhost:8000/api/[path_to_handler]"`
-
-
-    Run caddy deamon from the root with ` caddy start ` ( run `caddy adapt` if necessary)
-
-    - In services/frontend/ :
-      Run Node server with `npm run dev`
-
-    - In services/backend/:
-      Run Go server with `go run main.go`
-
-    Navigate to `localhost:8000`
-
 ### Objectives
 
 You will have to create a Facebook-like social network that will contain the following features:

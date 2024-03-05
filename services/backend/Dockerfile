@@ -1,11 +1,11 @@
 FROM golang:1.22
 
-WORKDIR /
+WORKDIR /app
 
-COPY . .
+COPY . ./
 
-RUN go build -o backend
+# RUN go build -o backend 
 
 EXPOSE 8080
 
-CMD [ "./backend" ]
+CMD [ "go", "run", "main.go" ]

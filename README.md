@@ -3,6 +3,14 @@
 ### Getting Started
 
 - With docker: `docker compose up -d` and navigate to `localhost:8000`
+
+### Migrations
+
+- Create a new migration:
+
+  `migrate create -ext sql -dir services/backend/db/migrations -seq [name_of_migration]`
+
+
 ### Objectives
 
 You will have to create a Facebook-like social network that will contain the following features:

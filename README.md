@@ -2,7 +2,14 @@
 
 ### Getting Started
 
-- With docker: `docker compose up -d` and navigate to `localhost:8000`
+- With script: 
+```cmd
+chmod +x run.sh
+
+./run.sh
+```
+
+- Manually with Docker: `docker compose up -d` and navigate to `localhost:8000`
 
 ### Migrations
 

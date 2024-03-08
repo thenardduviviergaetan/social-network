@@ -16,15 +16,20 @@ func NewApp(db *db.DB) *App {
 	return &App{db: db}
 }
 
+// type contextKey string
+
+// const (
+// 	databaseKey contextKey = "database"
+// )
+
 func (a *App) ServeHTTP(database *sql.DB) {
-	http.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
-		h.HandleStatus(w, r)
-	})
 
 	http.HandleFunc("/api/register", func(w http.ResponseWriter, r *http.Request) {
-
 		ctx := context.WithValue(r.Context(), "database", database)
-
 		h.HandleRegister(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/upload", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleUploadImage(w, r)
 	})
 }

@@ -6,20 +6,34 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const registerFormSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  firstName: z.string(),
-  lastName: z.string(),
-  dateOfBirth: z.string(),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+  firstName: z.string().refine((value) => value.trim() !== "", {
+    message: "First name is required",
+  }),
+  lastName: z.string().refine((value) => value.trim() !== "", {
+    message: "Last name is required",
+  }),
+  dateOfBirth: z.string().refine((value) => value.trim() !== "", {
+    message: "Date of birth is required",
+  }),
+  nickname: z.string().optional(),
+  about: z.string().optional(),
+  avatar: z.custom((v) => v instanceof File && v.size < 20000, {
+    message: "Invalid file or file size too large",
+  }).optional(),
 });
 
 export type State = {
   errors?: {
-    email?: string;
-    password?: string;
-    firstName?: string;
-    lastName?: string;
-    dateOfBirth?: string;
+    email?: string[];
+    password?: string[];
+    firstName?: string[];
+    lastName?: string[];
+    dateOfBirth?: string[];
+    nickname?: string[];
+    about?: string[];
+    avatar?: string[];
   };
   message?: string | null;
 };
@@ -34,27 +48,63 @@ export async function register(
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     dateOfBirth: formData.get("dateOfBirth"),
+    nickname: formData.get("nickname"),
+    about: formData.get("about"),
+    avatar: formData.get("avatar"),
   });
 
   if (!validatedData.success) {
     const state: State = {
-      errors: {
-        email: "error email",
-        password: "error password",
-        firstName: "error firstName",
-        lastName: "error lastName",
-        dateOfBirth: "error dateOfBirth",
-            },
-      message: "Error in form...",
+      errors: validatedData.error.flatten().fieldErrors,
+      message: "Invalid form",
     };
     return state;
   }
 
+  if (validatedData.data.avatar !== undefined) {
+    const f = new FormData();
+    f.append("email", validatedData.data.email);
+    f.append("avatar", validatedData.data.avatar as Blob);
+    try {
+      const upload = await axios.post(
+        "http://caddy:8000/api/upload",
+        f,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      console.log("file uploaded successfully");
+    } catch (error) {
+      const state: State = {
+        errors: { avatar: ["Failed to upload avatar"] },
+        message: "Failed to upload avatar",
+      };
+      return state;
+    }
+  }
+
+  const userData = {
+    email: validatedData.data.email,
+    password: validatedData.data.password,
+    firstName: validatedData.data.firstName,
+    lastName: validatedData.data.lastName,
+    dateOfBirth: validatedData.data.dateOfBirth,
+    nickname: validatedData.data.nickname,
+    about: validatedData.data.about,
+    avatar: validatedData.data.avatar
+      ? validatedData.data.email.split("@")[0] +
+        (validatedData.data.avatar as File).name
+      : null,
+  };
+
   try {
     const res = await axios.post(
       "http://caddy:8000/api/register",
-      validatedData.data,
+      userData,
     );
+
     console.log("form submitted successfully");
     revalidatePath("/login");
     redirect("/login");

@@ -21,12 +21,14 @@ func CheckRegister(u *models.User, db *sql.DB) error {
 }
 
 func CreateUser(u *models.User, db *sql.DB) error {
-	_, err := db.Exec("INSERT INTO users (email, password, first_name, last_name, date_of_birth, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+	_, err := db.Exec("INSERT INTO users (email, password, first_name, last_name, date_of_birth,nickname ,about ,created_at) VALUES (?, ?, ?, ?,?,?, ?, ?)",
 		u.Email,
 		u.Password,
 		u.FirstName,
 		u.LastName,
 		u.DateOfBirth,
+		u.Nickname,
+		u.About,
 		time.Now())
 	if err != nil {
 		return err

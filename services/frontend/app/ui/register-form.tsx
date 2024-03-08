@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Button } from "@/app/ui/button";
 import Link from "next/link";
 import {
@@ -13,13 +13,14 @@ import {
 import { useFormState, useFormStatus } from "react-dom";
 import { register } from "@/app/lib/actions";
 
-
-  
 export default function RegisterForm() {
-
-  const [state, setFormState] = useFormState(register, undefined);
+  const initialState = { message: null, errors: {} };
+  const [state, setFormState] = useFormState(register, initialState);
   return (
-    <form action={setFormState} className="space-y-3 grid place-items-center h-screen mt-4">
+    <form
+      action={setFormState}
+      className="space-y-3 grid place-items-center h-screen mt-4"
+    >
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 shadow-xl">
         <h1 className={`text-gray-900 mb-3 text-2xl`}>
           Register
@@ -36,14 +37,23 @@ export default function RegisterForm() {
               <input
                 className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
                 id="email"
-                type="email"
                 name="email"
+                type="email"
                 placeholder="Enter your email address"
-                required
+                aria-describedby="email-error"
               />
               <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
+            <div id="email-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.email &&
+                state.errors.email.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
           </div>
+
           <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
@@ -58,12 +68,21 @@ export default function RegisterForm() {
                 type="password"
                 name="password"
                 placeholder="Enter password"
-                required
                 minLength={6}
+                aria-describedby="password-error"
               />
               <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
+            <div id="password-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.password &&
+                state.errors.password.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
           </div>
+
           <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
@@ -78,11 +97,19 @@ export default function RegisterForm() {
                 type="text"
                 name="firstName"
                 placeholder="Enter your first name"
-                required
               />
               <UserIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
+            <div id="firstName-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.firstName &&
+                state.errors.firstName.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
           </div>
+
           <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
@@ -97,84 +124,112 @@ export default function RegisterForm() {
                 type="text"
                 name="lastName"
                 placeholder="Enter your last name"
-                required
               />
               <UserIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
-
-            <div className="mt-4">
-              <label
-                className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-                htmlFor="dateOfBirth"
-              >
-                Date of Birth*
-              </label>
-              <div className="relative">
-                <input
-                  className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                  id="dateOfBirth"
-                  type="date"
-                  name="dateOfBirth"
-                  placeholder="mm/dd/yyyy"
-                  required
-                />
-                <CakeIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-              </div>
+            <div id="lastName-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.lastName &&
+                state.errors.lastName.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
             </div>
-            <div className="mt-4">
-              <label
-                className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-                htmlFor="avatar"
-              >
-                Avatar/Image
-              </label>
-              <div className="relative">
-                <input
-                  className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                  id="avatar"
-                  type="file"
-                  name="avatar"
-                />
-                <CameraIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-              </div>
-              <div className="mt-4">
-                <label
-                  className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-                  htmlFor="nickname"
-                >
-                  Nickname
-                </label>
-                <div className="relative">
-                  <input
-                    className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                    id="nickname"
-                    type="text"
-                    name="nickname"
-                    placeholder="Enter your nickname"
-                  />
-                  <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                </div>
-              </div>
-              <div className="mt-4">
-                <label
-                  className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-                  htmlFor="about"
-                >
-                  About Me
-                </label>
-                <div className="relative">
-                  <textarea
-                    className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                    id="about"
-                    name="about"
-                    placeholder="Tell us about yourself..."
-                  />
-                  <IdentificationIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                </div>
-              </div>
+          </div>
+
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="dateOfBirth"
+            >
+              Date of Birth*
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="dateOfBirth"
+                type="date"
+                name="dateOfBirth"
+                placeholder="mm/dd/yyyy"
+              />
+              <CakeIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+            <div id="dateOfBirth-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.dateOfBirth &&
+                state.errors.dateOfBirth.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="nickname"
+            >
+              Nickname
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="nickname"
+                type="text"
+                name="nickname"
+                placeholder="Enter your nickname"
+              />
+              <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="about"
+            >
+              About Me
+            </label>
+            <div className="relative">
+              <textarea
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="about"
+                name="about"
+                placeholder="Tell us about yourself..."
+              />
+              <IdentificationIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
         </div>
+
+        
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="avatar"
+            >
+              Avatar/Image
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="avatar"
+                type="file"
+                name="avatar"
+                accept="image/*"
+              />
+              <CameraIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+            <div id="avatar-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.avatar &&
+                state.errors.avatar.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
+          </div>
+
         <RegisterButton />
         <p className="text-center mt-4 text-gray-900 text-sm">
           Already have an account?{" "}

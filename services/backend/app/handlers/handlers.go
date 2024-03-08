@@ -3,39 +3,79 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"server/app/middleware/auth"
 	"server/db/models"
 )
 
-func HandleStatus(w http.ResponseWriter, r *http.Request) {
-	resp := []byte(`{"status": "ok"}`)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", fmt.Sprint(len(resp)))
-	w.Write(resp)
-}
-
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
-
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	db := r.Context().Value("database").(*sql.DB)
+
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
 	if err := auth.CheckRegister(user, db); err != nil {
 		http.Error(w, "Credentials already exist", http.StatusConflict)
 		return
 	}
+
 	if err := auth.CreateUser(user, db); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusCreated)
+}
+
+func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	email := r.FormValue("email")
+
+	file, handler, err := r.FormFile("avatar")
+	if err != nil {
+		http.Error(w, "Failed to get uploaded file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	uploadDir := "./static/uploads"
+	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+		err := os.Mkdir(uploadDir, 0755)
+		if err != nil {
+			http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	fileName := email + "_" + handler.Filename
+	filePath := filepath.Join(uploadDir, fileName)
+	newFile, err := os.Create(filePath)
+	if err != nil {
+		http.Error(w, "Failed to create new file", http.StatusInternalServerError)
+		return
+	}
+	defer newFile.Close()
+
+	_, err = io.Copy(newFile, file)
+	if err != nil {
+		http.Error(w, "Failed to save uploaded file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

@@ -1,3 +1,4 @@
 sqlite.db
 
-/static/uploads/avatars
+/static/uploads/avatars/*
+!/static/uploads/avatars/default.jpg

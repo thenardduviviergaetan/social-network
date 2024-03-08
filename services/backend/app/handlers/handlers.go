@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -13,36 +12,27 @@ import (
 )
 
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("in handle register")
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	db := r.Context().Value("database").(*sql.DB)
-
-	fmt.Println("before decode")
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println("after decode")
 	if err := auth.CheckRegister(user, db); err != nil {
 		http.Error(w, "Credentials already exist", http.StatusConflict)
 		return
 	}
 
-	fmt.Println("after check register")
-
 	if err := auth.CreateUser(user, db); err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println("after create user")
-
 	w.WriteHeader(http.StatusCreated)
 }
 

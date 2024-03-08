@@ -21,7 +21,8 @@ func CheckRegister(u *models.User, db *sql.DB) error {
 }
 
 func CreateUser(u *models.User, db *sql.DB) error {
-	_, err := db.Exec("INSERT INTO users (email, password, first_name, last_name, date_of_birth,nickname ,about ,created_at) VALUES (?, ?, ?, ?,?,?, ?, ?)",
+	_, err := db.Exec("INSERT INTO users (uuid, email, password, first_name, last_name, date_of_birth, nickname ,about ,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		u.UUID,
 		u.Email,
 		u.Password,
 		u.FirstName,

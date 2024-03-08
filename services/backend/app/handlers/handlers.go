@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 )
 
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("in handle register")
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -19,21 +21,27 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 
 	db := r.Context().Value("database").(*sql.DB)
 
+	fmt.Println("before decode")
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
+	fmt.Println("after decode")
 	if err := auth.CheckRegister(user, db); err != nil {
 		http.Error(w, "Credentials already exist", http.StatusConflict)
 		return
 	}
 
+	fmt.Println("after check register")
+
 	if err := auth.CreateUser(user, db); err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
+
+	fmt.Println("after create user")
 
 	w.WriteHeader(http.StatusCreated)
 }
@@ -44,7 +52,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := r.FormValue("email")
+	uuid := r.FormValue("uuid")
 
 	file, handler, err := r.FormFile("avatar")
 	if err != nil {
@@ -53,7 +61,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	uploadDir := "./static/uploads"
+	uploadDir := "./static/uploads/avatars"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		err := os.Mkdir(uploadDir, 0755)
 		if err != nil {
@@ -62,7 +70,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fileName := email + "_" + handler.Filename
+	fileName := uuid + "_avatar" + filepath.Ext(handler.Filename)
 	filePath := filepath.Join(uploadDir, fileName)
 	newFile, err := os.Create(filePath)
 	if err != nil {

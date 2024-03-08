@@ -4,6 +4,7 @@ import axios from "axios";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
 const registerFormSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -61,9 +62,11 @@ export async function register(
     return state;
   }
 
-  if (validatedData.data.avatar !== undefined) {
+  const uuid = uuidv4();
+
+  if ((validatedData.data.avatar as File).size > 0) {
     const f = new FormData();
-    f.append("email", validatedData.data.email);
+    f.append("uuid", uuid);
     f.append("avatar", validatedData.data.avatar as Blob);
     try {
       const upload = await axios.post(
@@ -86,6 +89,7 @@ export async function register(
   }
 
   const userData = {
+    uuid: uuid,
     email: validatedData.data.email,
     password: validatedData.data.password,
     firstName: validatedData.data.firstName,
@@ -93,12 +97,9 @@ export async function register(
     dateOfBirth: validatedData.data.dateOfBirth,
     nickname: validatedData.data.nickname,
     about: validatedData.data.about,
-    avatar: validatedData.data.avatar
-      ? validatedData.data.email.split("@")[0] +
-        (validatedData.data.avatar as File).name
-      : null,
   };
 
+  console.log("submitting form ", userData );
   try {
     const res = await axios.post(
       "http://caddy:8000/api/register",

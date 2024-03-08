@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 const registerFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
+  confirmation: z.string().min(6),
   firstName: z.string().refine((value) => value.trim() !== "", {
     message: "First name is required",
   }),
@@ -23,12 +24,16 @@ const registerFormSchema = z.object({
   avatar: z.custom((v) => v instanceof File && v.size < 20000, {
     message: "Invalid file or file size too large",
   }).optional(),
-});
+}).refine((data) => data.password === data.confirmation, {
+  message: "Passwords do not match",
+  path: ["confirmation"],
+})
 
 export type State = {
   errors?: {
     email?: string[];
     password?: string[];
+    confirmation?: string[];
     firstName?: string[];
     lastName?: string[];
     dateOfBirth?: string[];
@@ -46,6 +51,7 @@ export async function register(
   const validatedData = registerFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmation: formData.get("confirmation"),
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     dateOfBirth: formData.get("dateOfBirth"),
@@ -99,7 +105,7 @@ export async function register(
     about: validatedData.data.about,
   };
 
-  console.log("submitting form ", userData );
+  console.log("submitting form ", userData);
   try {
     const res = await axios.post(
       "http://caddy:8000/api/register",

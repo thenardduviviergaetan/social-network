@@ -5,6 +5,8 @@ import (
 	"errors"
 	"server/db/models"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func CheckRegister(u *models.User, db *sql.DB) error {
@@ -21,10 +23,14 @@ func CheckRegister(u *models.User, db *sql.DB) error {
 }
 
 func CreateUser(u *models.User, db *sql.DB) error {
-	_, err := db.Exec("INSERT INTO users (uuid, email, password, first_name, last_name, date_of_birth, nickname ,about ,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO users (uuid, email, password, first_name, last_name, date_of_birth, nickname ,about ,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		u.UUID,
 		u.Email,
-		u.Password,
+		string(hashPass),
 		u.FirstName,
 		u.LastName,
 		u.DateOfBirth,

@@ -86,6 +86,35 @@ export default function RegisterForm() {
           <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="password"
+            >
+              Password Confirmation*
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="confirmation"
+                type="password"
+                name="confirmation"
+                placeholder="Confirm password"
+                minLength={6}
+                aria-describedby="confirmation-error"
+              />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+            <div id="confirmation-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.confirmation &&
+                state.errors.confirmation.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
               htmlFor="firstName"
             >
               First Name*

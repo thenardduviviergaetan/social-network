@@ -6,8 +6,6 @@ import (
 	"server/server"
 )
 
-type contextKey string
-
 func main() {
 	database := db.Connect()
 	db.ApplyMigrations(database.DB)

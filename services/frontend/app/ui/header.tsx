@@ -1,5 +1,10 @@
+import { signOut } from "@/auth";
 import Link from "next/link";
 
+/**
+ * Renders the header component for the social network application.
+ * @returns The JSX element representing the header component.
+ */
 export function Header() {
   return (
     <header className="bg-white-950 shadow-xl">
@@ -7,7 +12,7 @@ export function Header() {
         <h1 className="text-purple-700 text-4xl font-bold">Social Network</h1>
         <ul className="flex space-x-4">
           <li>
-            <Link href="/">
+            <Link href="/home">
               <span className="text-grey-950 hover:text-purple-700">Home</span>
             </Link>
           </li>
@@ -20,6 +25,14 @@ export function Header() {
             <Link href="/register">
               <span className="text-grey-950 hover:text-purple-700">Register</span>
             </Link>
+          </li>
+          <li>
+              <form action={async () =>{
+                'use server'
+                await signOut();
+              } }>
+                <button className="text-grey-950 hover:text-purple-700">Logout</button>
+              </form>
           </li>
         </ul>
       </nav>

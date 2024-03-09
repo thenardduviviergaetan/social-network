@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
@@ -23,3 +23,6 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
     ports:
       - "8000:8000"
+    depends_on:
+      - backend
+      - frontend

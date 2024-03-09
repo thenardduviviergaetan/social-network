@@ -6,6 +6,16 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * Schema for the registration form data.
+ *
+ * @remarks
+ * This schema defines the validation rules for the registration form fields.
+ * It includes validation for email, password, confirmation, first name, last name,
+ * date of birth, nickname, about, and avatar.
+ *
+ * @type {import("zod").ZodObject<...>}
+ */
 const registerFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
@@ -29,6 +39,9 @@ const registerFormSchema = z.object({
   path: ["confirmation"],
 })
 
+/**
+ * Represents the state object for the registration actions.
+ */
 export type State = {
   errors?: {
     email?: string[];
@@ -44,6 +57,13 @@ export type State = {
   message?: string | null;
 };
 
+/**
+ * Registers a user with the provided form data.
+ * 
+ * @param prevState - The previous state of the application.
+ * @param formData - The form data containing user information.
+ * @returns The state object with errors and a message if the form is invalid, or undefined if the registration is successful.
+ */
 export async function register(
   prevState: State | undefined,
   formData: FormData,

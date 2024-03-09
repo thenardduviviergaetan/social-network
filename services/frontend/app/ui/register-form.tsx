@@ -11,8 +11,12 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import { useFormState, useFormStatus } from "react-dom";
-import { register } from "@/app/lib/actions";
+import { register } from "@/app/lib/actions-register";
 
+/**
+ * Renders a registration form component.
+ * @returns JSX.Element
+ */
 export default function RegisterForm() {
   const initialState = { message: null, errors: {} };
   const [state, setFormState] = useFormState(register, initialState);
@@ -277,6 +281,10 @@ export default function RegisterForm() {
   );
 }
 
+/**
+ * Renders a Register button component.
+ * @returns JSX.Element representing the Register button.
+ */
 function RegisterButton() {
   const { pending } = useFormStatus();
   return (

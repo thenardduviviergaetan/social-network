@@ -1,6 +1,6 @@
 "use server";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -136,6 +136,13 @@ export async function register(
     revalidatePath("/login");
     redirect("/login");
   } catch (error) {
+    if ((error as AxiosError).response && (error as AxiosError).response?.status === 409) {
+      const state: State = {
+        errors: { email: ["Email already exists"] },
+        message: "Email already exists",
+      };
+      return state;
+    }
     throw error;
   }
 }

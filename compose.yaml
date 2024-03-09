@@ -16,6 +16,8 @@ services:
       - ./services/frontend:/app
     expose:
       - "3000"
+    depends_on:
+      - backend
 
   caddy:
     image: caddy:2-alpine

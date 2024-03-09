@@ -104,7 +104,6 @@ export async function register(
           },
         },
       );
-      console.log("file uploaded successfully");
     } catch (error) {
       const state: State = {
         errors: { avatar: ["Failed to upload avatar"] },
@@ -125,14 +124,11 @@ export async function register(
     about: validatedData.data.about,
   };
 
-  console.log("submitting form ", userData);
   try {
     const res = await axios.post(
       "http://caddy:8000/api/register",
       userData,
     );
-
-    console.log("form submitted successfully");
     revalidatePath("/login");
     redirect("/login");
   } catch (error) {

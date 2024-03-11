@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import type { User } from "@/app/lib/definitions";
 import axios from "axios";
 import { z } from "zod";
+import { getToken } from "next-auth/jwt";
+import { cookies } from "next/headers";
 
 /**
  * Authentication function that handles signing in and signing out.
@@ -27,11 +29,8 @@ export const { auth, signIn, signOut } = NextAuth({
             password: password,
           });
           if (res) {
-            const userData = {
-              uuid: res.data.uuid,
-              email: res.data.email,
-            };
-            return Promise.resolve(userData);
+            const user = res.data as User;
+            return Promise.resolve(user);
           }
         } catch (error) {
           console.log("Error in credentials");
@@ -42,4 +41,13 @@ export const { auth, signIn, signOut } = NextAuth({
       return null;
     },
   })],
+  callbacks:{
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    }
+  }
 });

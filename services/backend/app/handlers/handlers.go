@@ -111,5 +111,15 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(user)
+
+	safeUser := map[string]interface{}{
+		"uuid":          user.UUID,
+		"email":         user.Email,
+		"first_name":    user.FirstName,
+		"last_name":     user.LastName,
+		"date_of_birth": user.DateOfBirth,
+		"nickname":      user.Nickname,
+		"about":         user.About,
+	}
+	json.NewEncoder(w).Encode(safeUser)
 }

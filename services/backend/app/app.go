@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
@@ -31,5 +32,9 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/login", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleLogin(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/t", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r)
 	})
 }

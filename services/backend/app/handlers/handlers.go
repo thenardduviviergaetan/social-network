@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"server/app/middleware/auth"
+	"server/app/middleware/session"
 	"server/db/models"
 )
 
@@ -113,13 +114,34 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	safeUser := map[string]interface{}{
-		"uuid":          user.UUID,
-		"email":         user.Email,
-		"first_name":    user.FirstName,
-		"last_name":     user.LastName,
-		"date_of_birth": user.DateOfBirth,
-		"nickname":      user.Nickname,
-		"about":         user.About,
+		"uuid":  user.UUID,
+		"email": user.Email,
+	}
+	json.NewEncoder(w).Encode(safeUser)
+}
+
+func HandleGetUser(w http.ResponseWriter, r *http.Request, email string) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+	user := &models.User{}
+	user, err := session.GetUserByEmail(db, email)
+	if err != nil {
+		http.Error(w, "Failed to get user", http.StatusInternalServerError)
+		return
+	}
+
+	safeUser := map[string]interface{}{
+		"uuid":        user.UUID,
+		"email":       user.Email,
+		"firstName":   user.FirstName,
+		"lastName":    user.LastName,
+		"dateOfBirth": user.DateOfBirth,
+		"nickname":    user.Nickname,
+		"about":       user.About,
 	}
 	json.NewEncoder(w).Encode(safeUser)
 }

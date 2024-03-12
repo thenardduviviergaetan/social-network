@@ -11,16 +11,18 @@ export const authConfig = {
   callbacks:{
     authorized({ auth, request: {nextUrl}}){
         const isLoggedIn = !!auth?.user;
-        const isOnHomePage = nextUrl.pathname.startsWith("/home");
-        if (isOnHomePage){
-            if (isLoggedIn){
+        const isOnLoginPage = nextUrl.pathname.startsWith("/login");
+        const isOnRegisterPage = nextUrl.pathname.startsWith("/register");
+        const isOnAllowedPages = isOnLoginPage || isOnRegisterPage;
+        if (isOnAllowedPages){
+            if (!isLoggedIn){
                 return true;
             }
-            return false;
-        } else if (isLoggedIn){
             return Response.redirect(new URL('/home', nextUrl));
+        } else if (isLoggedIn){
+          return true;
         }
-        return true
+        return Response.redirect(new URL('/login', nextUrl));
     }
   },
   providers: [],

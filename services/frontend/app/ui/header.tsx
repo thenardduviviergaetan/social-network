@@ -23,6 +23,13 @@ export async function Header() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/profile">
+                    <span className="text-grey-950 hover:text-purple-700">
+                      Profile
+                    </span>
+                  </Link>
+                </li>
+                <li>
                   <form
                     action={async () => {
                       "use server";

@@ -1,12 +1,9 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
 import type { User } from "@/app/lib/definitions";
 import axios from "axios";
 import { z } from "zod";
-import { getToken } from "next-auth/jwt";
-import { cookies } from "next/headers";
 
 /**
  * Authentication function that handles signing in and signing out.
@@ -48,6 +45,6 @@ export const { auth, signIn, signOut } = NextAuth({
         token.email = user.email;
       }
       return token;
-    }
+    },
   }
 });

@@ -18,7 +18,7 @@ func GetAvatar(db *sql.DB, uuid string) string {
 	var path string
 	err := db.QueryRow("SELECT path FROM avatars WHERE uuid = ?", uuid).Scan(&path)
 	if err != nil {
-		return ""
+		return "static/uploads/avatars/0_default.jpg"
 	}
 	return path
 }

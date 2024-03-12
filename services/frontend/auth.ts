@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
-import type { User } from "@/app/lib/definitions";
+import type { TokenUser } from "@/app/lib/definitions";
 import axios from "axios";
 import { z } from "zod";
 
@@ -26,7 +26,7 @@ export const { auth, signIn, signOut } = NextAuth({
             password: password,
           });
           if (res) {
-            const user = res.data as User;
+            const user = res.data as TokenUser;
             return Promise.resolve(user);
           }
         } catch (error) {
@@ -43,8 +43,21 @@ export const { auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.name = (user as TokenUser).name
+        token.uuid = (user as TokenUser).uuid;
       }
       return token;
+    },
+    async session({ session, token }) {
+      session.id = token.id;
+      session.user = {
+        id: token.id as string,
+        email: token.email as string,
+        name: token.name,
+        picture: "http://caddy:8000/api/avatar?id=" + token.uuid ,
+      };
+      console.log(session.user);
+      return session;
     },
   }
 });

@@ -1,5 +1,4 @@
 export type User = {
-    id: string
     uuid: string
     email: string
     firstName: string
@@ -7,4 +6,11 @@ export type User = {
     dateOfBirth: string
     nickname?: string
     about?: string
+}
+
+export type TokenUser = {
+    id: string
+    email: string
+    name: string
+    uuid: string
 }

@@ -1,14 +1,24 @@
 import Image from "next/image";
 import { fetchUser } from "@/app/lib/data";
+import { auth } from "@/auth";
+
 export default async function Page() {
       const user = await fetchUser();
+  const session = await auth();
+      
 
   return (
     <div className="flex flex-col w-2/3 m-auto mt-10 ">
         test
       <h1 className="text-2xl font-bold">Profile</h1>
       <div className="flex justify-around">
-        <Image src="/default.png" alt="profile" width={200} height={200} />
+       <Image
+                src={`${session?.user?.picture}`}
+                alt="Profile Picture"
+                width={200}
+                height={200}
+                className="rounded-full"
+              />
       </div>
       <div>
         <p>UUID: {user?.uuid}</p>

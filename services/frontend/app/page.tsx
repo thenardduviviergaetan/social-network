@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
+export default async function Page() {
+
+  const session = await auth()
+
+  if (session) {
+    redirect('/dashboard')
+  }
+
   return (
     <main className="bg-gray-100 min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full mx-auto p-8 bg-white shadow-md rounded-md">

@@ -96,7 +96,7 @@ export async function register(
     f.append("avatar", validatedData.data.avatar as Blob);
     try {
       const upload = await axios.post(
-        "http://caddy:8000/api/upload",
+        "http://caddy:8000/api/avatar",
         f,
         {
           headers: {

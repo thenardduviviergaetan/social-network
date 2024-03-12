@@ -24,8 +24,16 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		h.HandleRegister(w, r.WithContext(ctx))
 	})
 
-	http.HandleFunc("/api/upload", func(w http.ResponseWriter, r *http.Request) {
-		h.HandleUploadImage(w, r)
+	http.HandleFunc("/api/avatar", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+
+		if r.Method == http.MethodPost {
+			h.HandleUploadAvatar(w, r.WithContext(ctx))
+		}
+
+		if r.Method == http.MethodGet {
+			h.HandleGetAvatar(w, r.WithContext(ctx))
+		}
 	})
 
 	http.HandleFunc("/api/login", func(w http.ResponseWriter, r *http.Request) {

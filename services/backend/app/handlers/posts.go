@@ -3,9 +3,9 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"server/db/models"
+	"strconv"
 	"time"
 )
 
@@ -38,10 +38,14 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 
 func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("IN HANDLE GET POSTS")
+	limit := r.URL.Query().Get("limit")
+	page := r.URL.Query().Get("page")
+	l, _ := strconv.Atoi(limit)
+	p, _ := strconv.Atoi(page)
+	offset := (p - 1) * l
 
 	db := r.Context().Value("database").(*sql.DB)
-	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT 5")
+	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT (?) OFFSET (?)", limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

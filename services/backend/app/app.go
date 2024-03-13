@@ -64,4 +64,9 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/posts/upload-image", func(w http.ResponseWriter, r *http.Request) {
 		h.HandleUploadImage(w, r)
 	})
+
+	http.HandleFunc("/api/posts/page-number", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetPageNumber(w, r.WithContext(ctx))
+	})
 }

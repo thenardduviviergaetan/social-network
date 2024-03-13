@@ -52,6 +52,11 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		h.HandleGetPosts(w, r.WithContext(ctx))
 	})
 
+	http.HandleFunc("/api/post", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetPost(w, r.WithContext(ctx))
+	})
+
 	http.HandleFunc("/api/post/image", func(w http.ResponseWriter, r *http.Request) {
 		h.HandleGetImage(w, r)
 	})

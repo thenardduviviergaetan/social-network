@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -63,4 +64,25 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 		posts = append(posts, post)
 	}
 	json.NewEncoder(w).Encode(posts)
+}
+
+func HandleGetPost(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("HandleGetPost")
+
+	id := r.URL.Query().Get("id")
+
+	fmt.Println(id)
+
+	db := r.Context().Value("database").(*sql.DB)
+	row := db.QueryRow("SELECT * FROM posts WHERE id = ?", id)
+
+	post := models.Post{}
+	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Date)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(post)
+	json.NewEncoder(w).Encode(post)
 }

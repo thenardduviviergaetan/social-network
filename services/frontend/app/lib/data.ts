@@ -16,6 +16,18 @@ export const fetchUser = async () => {
     }
 }
 
+export const fetchPageNumber = async () => {
+    noStore()
+    try {
+        const res = await axios.get('http://caddy:8000/api/posts/page-number');
+        const totalPages = Math.ceil(res.data / ITEMS_PER_PAGE);
+        return totalPages;
+    } catch (error) {
+        console.error('Error fetching page number');
+        return null;
+    }
+}
+
 export const fetchPosts = async (pageNumber: number) => {
     try {
         const res = await axios.get(`http://caddy:8000/api/posts?page=${pageNumber}&&limit=${ITEMS_PER_PAGE}`);
@@ -25,14 +37,13 @@ export const fetchPosts = async (pageNumber: number) => {
         return null;
     }
 }
-export const fetchPageNumber = async () => {
-    noStore()
+
+export const fetchPost = async (postID: string) => {
     try {
-        const res = await axios.get('http://caddy:8000/api/posts/page-number');
-        const totalPages = Math.ceil(res.data / ITEMS_PER_PAGE);
-        return totalPages;
+        const res = await axios.get(`http://caddy:8000/api/post?id=${postID}`);
+        return res.data;
     } catch (error) {
-        console.error('Error fetching page number');
+        console.error('Error fetching post');
         return null;
     }
 }

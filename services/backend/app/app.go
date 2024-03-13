@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
@@ -45,6 +46,14 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		email := r.URL.Query().Get("email")
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetUser(w, r.WithContext(ctx), email)
+	})
+
+	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+
+		fmt.Println("GET /api/posts")
+
+		h.HandleGetPosts(w, r.WithContext(ctx))
 	})
 
 	http.HandleFunc("/api/posts/create", func(w http.ResponseWriter, r *http.Request) {

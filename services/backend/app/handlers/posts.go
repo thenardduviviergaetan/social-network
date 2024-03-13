@@ -3,8 +3,10 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
+	"time"
 )
 
 func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -27,9 +29,34 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		img = post.Image
 	}
 
-	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.Content, post.Status, img, post.Date)
+	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.Content, post.Status, img, time.Now())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("IN HANDLE GET POSTS")
+
+	db := r.Context().Value("database").(*sql.DB)
+	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at ASC")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	posts := []models.Post{}
+	for rows.Next() {
+		post := models.Post{}
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Date)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		posts = append(posts, post)
+	}
+	json.NewEncoder(w).Encode(posts)
 }

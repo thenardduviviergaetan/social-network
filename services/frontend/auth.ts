@@ -55,8 +55,8 @@ export const { auth, signIn, signOut } = NextAuth({
         email: token.email as string,
         name: token.name,
         picture: "http://caddy:8000/api/avatar?id=" + token.uuid ,
+        uuid: token.uuid,
       };
-      console.log(session.user);
       return session;
     },
   }

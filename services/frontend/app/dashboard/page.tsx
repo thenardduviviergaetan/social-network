@@ -1,17 +1,16 @@
-import { fetchUser } from '@/app/lib/data';
+import Link from 'next/link';
+import { Button } from '@/app/ui/button';
+import Posts from '@/app/ui/posts/posts';
 
 export default async function Page() {
-  // const user = await fetchUser(); 
 
   return (
 
     <main>
-      <h1 className='mb-4 text-xl md:text-2xl'>Home Page</h1>
+      <Link href="/dashboard/posts/create">
+        <Button>Create Post</Button>
+      </Link>
+      <Posts />
     </main>
-    // <div>
-    //   <h1>You are logged in!</h1>
-    //   <p>Name: {user?.nickname}</p> 
-    //   <p>Email: {user?.email}</p> 
-    // </div>
   );
 }

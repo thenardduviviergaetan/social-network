@@ -5,5 +5,6 @@ type Post struct {
 	Author   string `json:"author"`
 	Content  string `json:"content"`
 	Status   string `json:"status"`
+	Image    string `json:"image"`
 	Date     string `json:"date"`
 }

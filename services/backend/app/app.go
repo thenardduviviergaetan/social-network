@@ -51,4 +51,8 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleCreatePost(w, r.WithContext(ctx))
 	})
+
+	http.HandleFunc("/api/posts/upload-image", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleUploadImage(w, r)
+	})
 }

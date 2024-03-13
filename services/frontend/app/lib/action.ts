@@ -65,9 +65,6 @@ export async function createPost(
     date,
     image: await uploadImage(imageFile),
   };
-
-  console.log(post);
-
   try {
     const res = await axios.post("http://caddy:8000/api/posts/create", post);
   } catch (error) {

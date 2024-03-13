@@ -16,7 +16,6 @@ export const fetchUser = async () => {
 export const fetchPosts = async () => {
     try {
         const res = await axios.get('http://caddy:8000/api/posts');
-        console.log("IN DATA",res);
         return res.data;
     } catch (error) {
         console.error('Error fetching posts');

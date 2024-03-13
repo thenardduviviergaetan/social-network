@@ -2,14 +2,14 @@ import Image from "next/image";
 import { formatDateToLocal } from "@/app/lib/utils";
 
 export default async function Posts({
-  key,
+  postID,
   post,
 }: {
-  key: string;
+  postID: string;
   post: any;
 }) {
   return (
-    <div id={key} className="bg-white rounded-lg shadow-md p-4 mt-5">
+    <div id={postID} className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto ">
       <div className="flex items-center">
         <Image
           className="w-10 h-10 rounded-full mr-2"
@@ -27,16 +27,18 @@ export default async function Posts({
         </div>
       </div>
       <p className="mt-2">{post.content}</p>
-      {
-        /* {post.image && (
-                <Image
-                    className="mt-4"
-                    src={post.image}
-                    alt="Post Image"
-                    width={600}
-                    height={400} />
-            )} */
-      }
+
+        {post.image && (
+            <div className="mt-4">
+            <Image
+                src={`http://caddy:8000/api/post/image?path=${post.image}`}
+                alt="Post image"
+                width={500}
+                height={500}
+            />
+            </div>
+        )}
+     
       <div className="flex justify-between mt-4">
         <button className="text-purple-700">Like</button>
         <button className="text-purple-700">Comment</button>

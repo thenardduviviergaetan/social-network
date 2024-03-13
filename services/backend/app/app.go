@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
@@ -50,10 +49,11 @@ func (a *App) ServeHTTP(database *sql.DB) {
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
-
-		fmt.Println("GET /api/posts")
-
 		h.HandleGetPosts(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/post/image", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleGetImage(w, r)
 	})
 
 	http.HandleFunc("/api/posts/create", func(w http.ResponseWriter, r *http.Request) {

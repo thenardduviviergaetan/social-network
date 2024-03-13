@@ -41,7 +41,7 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("IN HANDLE GET POSTS")
 
 	db := r.Context().Value("database").(*sql.DB)
-	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at ASC")
+	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT 5")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

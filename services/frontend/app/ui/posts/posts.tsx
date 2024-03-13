@@ -6,7 +6,7 @@ export default async function Posts() {
     return (
         posts.map((post: any) => {
             return (
-                <Post key={post.id} post={post} />
+                <Post key={post.id} post={post} postID={post.id} />
             );
         })
     );

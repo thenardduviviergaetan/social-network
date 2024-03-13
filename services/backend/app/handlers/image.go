@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -90,9 +91,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fileName := handler.Filename
-
 	if fileName != "undefined" {
-
 		filePath := filepath.Join(uploadDir, fileName)
 		newFile, err := os.Create(filePath)
 		if err != nil {
@@ -106,9 +105,18 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to save uploaded file", http.StatusInternalServerError)
 			return
 		}
-
 		w.Write([]byte(filePath))
 	} else {
 		w.Write([]byte(""))
 	}
+}
+
+func HandleGetImage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	path := r.URL.Query().Get("path")
+	fmt.Println(path)
+	http.ServeFile(w, r, path)
 }

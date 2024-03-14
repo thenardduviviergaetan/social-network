@@ -1,6 +1,8 @@
 sqlite.db
 
 /static/uploads/avatars/*
+/static/uploads/comments/*
+/static/uploads/posts/*
 !/static/uploads/avatars/default.jpg
 
 backend

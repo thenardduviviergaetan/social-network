@@ -1,10 +1,18 @@
-import Image from 'next/image'
-import { formatDateToLocal } from '@/app/lib/utils'
+import Image from "next/image";
+import { formatDateToLocal } from "@/app/lib/utils";
+import Link from "next/link";
+import { Button } from "@/app/ui/button";
 
-export function Post({ post }: { post: any }) {
+export default async function PostsCard({
+  postID,
+  post,
+}: {
+  postID: string;
+  post: any;
+}) {
   return (
     <div
-      id={post.id}
+      id={postID}
       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto "
     >
       <div className="flex items-center">
@@ -39,7 +47,11 @@ export function Post({ post }: { post: any }) {
       <div className="flex justify-between mt-4">
         <button className="text-purple-700">Like</button>
         <button className="text-purple-700">Comment</button>
+        {/* <Link href={`/dashboard/posts/${postID}/view`}> */}
+        <Link href={{ pathname: 'dashboard/posts', query: { id: postID } }}>
+          <Button>View Post</Button>
+        </Link>
       </div>
     </div>
-  )
+  );
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -79,4 +80,49 @@ func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(post)
+}
+
+func HandleLikePost(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	db := r.Context().Value("database").(*sql.DB)
+
+	if r.Method == http.MethodPost {
+		type u struct {
+			UserID string `json:"user"`
+		}
+
+		user := u{}
+		json.NewDecoder(r.Body).Decode(&user)
+
+		var exists bool
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM likes WHERE post_id = ? AND user_uuid = ?)", id, user.UserID).Scan(&exists)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if exists {
+			_, err := db.Exec("DELETE FROM likes WHERE post_id = ? AND user_uuid = ?", id, user.UserID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		} else {
+			fmt.Println("USER ID: " + user.UserID + " POST ID: " + id)
+			_, err = db.Exec("INSERT INTO likes ( post_id, user_uuid) VALUES (?, ?)", id, user.UserID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+
+	count := 0
+	err := db.QueryRow("SELECT COUNT(*) FROM likes WHERE post_id = ?", id).Scan(&count)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(count)
 }

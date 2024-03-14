@@ -87,4 +87,15 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/comment/image", func(w http.ResponseWriter, r *http.Request) {
 		h.HandleGetImage(w, r)
 	})
+
+	http.HandleFunc("/api/comments/count", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetCommentsCount(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/post/likes", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleLikePost(w, r.WithContext(ctx))
+	})
+
 }

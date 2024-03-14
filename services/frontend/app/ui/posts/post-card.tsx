@@ -4,8 +4,7 @@ import Image from "next/image";
 import { formatDateToLocal } from "@/app/lib/utils";
 import Link from "next/link";
 import { Button } from "@/app/ui/button";
-import { useEffect, useState } from "react";
-import { auth } from "@/auth";
+import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 import { HeartIcon as Empty_heart } from "@heroicons/react/24/outline";
@@ -25,7 +24,7 @@ export default function PostsCard({
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
-  const { data: likesData, error: likesError, mutate: mutateLikes } = useSWR(
+  const { data: likesData, mutate: mutateLikes } = useSWR(
     `http://localhost:8000/api/post/likes?id=${postID}`,
     fetcher,
   );
@@ -76,7 +75,7 @@ export default function PostsCard({
       <p className="mt-2">{post.content}</p>
 
       {post.image && (
-        <div className="mt-4">
+        <div className="mt-4 flex justify-center">
           <Image
             src={`http://caddy:8000/api/post/image?path=${post.image}`}
             alt="Post image"
@@ -88,7 +87,7 @@ export default function PostsCard({
 
       <div className="flex justify-between mt-4">
         <button className="text-purple-700" onClick={handleLike}>
-          {!isLiked
+          {isLiked
             ? <Fill_heart className="w-6 h-6" />
             : <Empty_heart className="w-6 h-6" />}
           (likes{likesData | 0})
@@ -99,9 +98,11 @@ export default function PostsCard({
           </Link>
         </button>
 
-        <Link href={{ pathname: "dashboard/posts", query: { id: postID } }}>
-          <Button>View Post</Button>
-        </Link>
+        <Button>
+          <Link href={{ pathname: "dashboard/posts", query: { id: postID } }}>
+            View Post
+          </Link>
+        </Button>
       </div>
     </div>
   );

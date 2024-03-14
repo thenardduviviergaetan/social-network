@@ -37,7 +37,7 @@ export function Post({ post }: { post: any }) {
         <p className="mt-2">{post.content}</p>
 
         {post.image && (
-          <div className="mt-4">
+          <div className="mt-4 flex justify-center">
             <Image
               src={`http://caddy:8000/api/post/image?path=${post.image}`}
               alt="Post image"

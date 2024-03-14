@@ -1,5 +1,8 @@
 import Image from 'next/image'
 import { formatDateToLocal } from '@/app/lib/utils'
+import { Button } from '@/app/ui/button'
+import CommentForm from '@/app/ui/posts/comment-form'
+import Comments from '@/app/ui/posts/comments'
 
 export function Post({ post }: { post: any }) {
   return (
@@ -38,8 +41,13 @@ export function Post({ post }: { post: any }) {
 
       <div className="flex justify-between mt-4">
         <button className="text-purple-700">Like</button>
-        <button className="text-purple-700">Comment</button>
       </div>
+     
+     <CommentForm postID={post.id} />
+
+      <div className="mt-4">
+      <Comments postID={post.id} />
     </div>
+  </div>
   )
 }

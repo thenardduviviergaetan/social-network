@@ -48,3 +48,13 @@ export const fetchPost = async (postID: string) => {
         return null;
     }
 }
+
+export const fetchComments = async (postID: string) => {
+    try {
+        const res = await axios.get(`http://caddy:8000/api/comments?post_id=${postID}`);
+        return res.data;
+    } catch (error) {
+        console.error('Error fetching comments');
+        return null;
+    }
+}

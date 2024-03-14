@@ -1,9 +1,7 @@
-"use client";
+'use client';
 import { useFormState, useFormStatus } from "react-dom";
 import { createPost } from "@/app/lib/action";
 import { Button } from "@/app/ui/button";
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 export default function Form() {
   const initialState = { message: "", error: {} };

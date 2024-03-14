@@ -74,4 +74,17 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetPageNumber(w, r.WithContext(ctx))
 	})
+
+	http.HandleFunc("/api/comments/create", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleCreateComment(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/comments", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetComments(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/comment/image", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleGetImage(w, r)
+	})
 }

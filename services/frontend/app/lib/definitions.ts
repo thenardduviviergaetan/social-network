@@ -14,3 +14,14 @@ export type TokenUser = {
     name: string
     uuid: string
 }
+
+export type Comment = {
+    id: number
+    author_id: string
+    author: string
+    post_id: number
+    content: string
+    image: File | null
+    date: string
+    
+}

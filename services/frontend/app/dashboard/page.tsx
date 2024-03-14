@@ -17,9 +17,11 @@ export default async function Page(
   const totalPages = await fetchPageNumber();
   return (
     <main>
-      <Link href="/dashboard/posts/create">
-        <Button>Create Post</Button>
-      </Link>
+      <Button>
+        <Link href="/dashboard/posts/create">
+          Create Post
+        </Link>
+      </Button>
       <Posts page={currentPage} />
       <Pagination totalPages={totalPages ?? 0} />
     </main>

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -74,6 +73,8 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	path := r.FormValue("path")
+
 	file, handler, err := r.FormFile("image")
 	if err != nil {
 		http.Error(w, "Failed to get uploaded file", http.StatusBadRequest)
@@ -81,7 +82,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	uploadDir := "./static/uploads/images"
+	uploadDir := "./static/uploads/" + path + "/"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		err := os.Mkdir(uploadDir, 0755)
 		if err != nil {
@@ -117,6 +118,5 @@ func HandleGetImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	path := r.URL.Query().Get("path")
-	fmt.Println(path)
 	http.ServeFile(w, r, path)
 }

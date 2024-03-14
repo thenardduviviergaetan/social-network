@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
-import type { TokenUser } from "@/app/lib/definitions";
+import type { TokenUser, User } from "@/app/lib/definitions";
 import axios from "axios";
 import { z } from "zod";
 

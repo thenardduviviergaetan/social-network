@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -43,8 +42,6 @@ func HandleGetComments(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.Atoi(post_id)
 
-	fmt.Println(id)
-
 	db := r.Context().Value("database").(*sql.DB)
 	rows, err := db.Query("SELECT * FROM comments WHERE post_id = (?) ORDER BY created_at DESC", id)
 	if err != nil {
@@ -53,7 +50,6 @@ func HandleGetComments(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	fmt.Println("BEFORE")
 	comments := []models.Comment{}
 	for rows.Next() {
 		comment := models.Comment{}
@@ -64,8 +60,6 @@ func HandleGetComments(w http.ResponseWriter, r *http.Request) {
 		}
 		comments = append(comments, comment)
 	}
-	fmt.Println("AFTER")
-	fmt.Println(comments)
 	json.NewEncoder(w).Encode(comments)
 }
 

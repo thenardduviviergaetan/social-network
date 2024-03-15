@@ -3,13 +3,10 @@
 import Image from "next/image";
 import { formatDateToLocal } from "@/app/lib/utils";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 import { HeartIcon as Empty_heart } from "@heroicons/react/24/outline";
 import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
-
-const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
 export default function PostsCard({
   postID,
@@ -20,19 +17,17 @@ export default function PostsCard({
   post: any;
   user: string;
 }) {
-  
-  
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+
   const { data: commentsCounter } = useSWR(
     `http://localhost:8000/api/comments/count?post_id=${postID}`,
     fetcher,
-    );
-    
-  const { data: likesData, mutate: mutateLikes} = useSWR(
+  );
+
+  const { data: likesData, mutate: mutateLikes } = useSWR(
     `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
     fetcher,
-    { revalidateOnMount: true,
-      revalidateOnFocus: false,
-      }
+    { revalidateOnMount: true, revalidateOnFocus: false },
   );
 
   const handleLike = async () => {
@@ -43,7 +38,7 @@ export default function PostsCard({
           user,
         },
       );
-      mutateLikes({ liked: res.data.liked, likecount: res.data.likecount});
+      mutateLikes({ liked: res.data.liked, likecount: res.data.likecount });
     } catch (error) {
       console.error(error);
     }
@@ -55,20 +50,22 @@ export default function PostsCard({
       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto "
     >
       <div className="flex items-center">
-        <Image
-          className="w-10 h-10 rounded-full mr-2"
-          src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
-          alt={post.author}
-          width={40}
-          height={40}
-        />
+        <Link href={{ pathname: "dashboard/profile", query: { user: encodeURIComponent(post.author) } }}>
+          <Image
+            className="w-10 h-10 rounded-full mr-2"
+            src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+            alt={post.author}
+            width={40}
+            height={40}
+          />
 
-        <div>
-          <p className="font-semibold">{post.author}</p>
-          <p className="text-gray-500 text-sm">
-            {formatDateToLocal(post.date)}
-          </p>
-        </div>
+          <div>
+            <p className="font-semibold">{post.author}</p>
+            <p className="text-gray-500 text-sm">
+              {formatDateToLocal(post.date)}
+            </p>
+          </div>
+        </Link>
       </div>
       <p className="mt-2">{post.content}</p>
 
@@ -89,8 +86,8 @@ export default function PostsCard({
           onClick={handleLike}
         >
           {likesData?.liked
-            ? <Fill_heart className="w-6 h-6" />
-            : <Empty_heart className="w-6 h-6" />}
+            ? <Fill_heart className="w-10 h-10" />
+            : <Empty_heart className="w-10 h-10" />}
           <span className="text-sm">
             {likesData?.likecount | 0}
           </span>

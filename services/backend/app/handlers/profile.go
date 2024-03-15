@@ -8,11 +8,12 @@ import (
 	"server/db/models"
 )
 
-func HandleGetUser(w http.ResponseWriter, r *http.Request, email string) {
+func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+	email := r.URL.Query().Get("email")
 
 	db := r.Context().Value("database").(*sql.DB)
 	user := &models.User{}

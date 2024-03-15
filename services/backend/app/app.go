@@ -42,9 +42,8 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	})
 
 	http.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
-		email := r.URL.Query().Get("email")
 		ctx := context.WithValue(r.Context(), "database", database)
-		h.HandleGetUser(w, r.WithContext(ctx), email)
+		h.HandleGetUser(w, r.WithContext(ctx))
 	})
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {

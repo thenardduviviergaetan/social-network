@@ -8,9 +8,7 @@ import axios from "axios";
 import useSWR from "swr";
 import { HeartIcon as Empty_heart } from "@heroicons/react/24/outline";
 import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
-import { revalidateEvents } from "swr/_internal";
 
-// const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
 export default function PostsCard({
@@ -22,14 +20,19 @@ export default function PostsCard({
   post: any;
   user: string;
 }) {
+  
+  
   const { data: commentsCounter } = useSWR(
     `http://localhost:8000/api/comments/count?post_id=${postID}`,
     fetcher,
     );
     
-  const { data: likesData} = useSWR(
-    `http://localhost:8000/api/post/likes?id=${postID}`,
+  const { data: likesData, mutate: mutateLikes} = useSWR(
+    `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
     fetcher,
+    { revalidateOnMount: true,
+      revalidateOnFocus: false,
+      }
   );
 
   const handleLike = async () => {
@@ -40,6 +43,7 @@ export default function PostsCard({
           user,
         },
       );
+      mutateLikes({ liked: res.data.liked, likecount: res.data.likecount});
     } catch (error) {
       console.error(error);
     }

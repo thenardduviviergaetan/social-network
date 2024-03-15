@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -83,15 +82,26 @@ func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleLikePost(w http.ResponseWriter, r *http.Request) {
+
 	id := r.URL.Query().Get("id")
 	db := r.Context().Value("database").(*sql.DB)
+	likeStatus := struct {
+		LikeCount int  `json:"likecount"`
+		Liked     bool `json:"liked"`
+	}{}
 
 	type u struct {
 		UserID string `json:"user"`
 	}
-
 	user := u{}
-	json.NewDecoder(r.Body).Decode(&user)
+
+	switch r.Method {
+	case http.MethodPost:
+		json.NewDecoder(r.Body).Decode(&user)
+	case http.MethodGet:
+		user.UserID = r.URL.Query().Get("user")
+	}
+
 	var exists bool
 
 	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM likes WHERE post_id = ? AND user_uuid = ?)", id, user.UserID).Scan(&exists)
@@ -107,15 +117,14 @@ func HandleLikePost(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			exists = false
+			likeStatus.Liked = false
 		} else {
-			fmt.Println("USER ID: " + user.UserID + " POST ID: " + id)
 			_, err = db.Exec("INSERT INTO likes ( post_id, user_uuid) VALUES (?, ?)", id, user.UserID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			exists = true
+			likeStatus.Liked = true
 		}
 	}
 
@@ -126,15 +135,9 @@ func HandleLikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	likeStatus := struct {
-		LikeCount int  `json:"likecount"`
-		Liked     bool `json:"liked"`
-	}{}
-
 	likeStatus.LikeCount = count
 	likeStatus.Liked = exists
 
-	fmt.Println(likeStatus)
-
 	json.NewEncoder(w).Encode(likeStatus)
+
 }

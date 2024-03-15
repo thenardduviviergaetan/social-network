@@ -4,14 +4,14 @@ import { Button } from "@/app/ui/button";
 import CommentForm from "@/app/ui/posts/comment-form";
 import Comments from "@/app/ui/posts/comments";
 import Link from "next/link";
-import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export function Post({ post }: { post: any }) {
   return (
     <>
       <Link href={`/dashboard/`}>
         <Button className="font-semibold">
-          <ArrowLeftCircleIcon className="h-8 w-8 inline-block -mt-1" />
+          <ArrowLeftIcon className="h-5 w-5 inline-block -mt-1" />
         </Button>
       </Link>
       <div

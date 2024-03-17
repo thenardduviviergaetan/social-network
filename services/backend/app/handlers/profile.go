@@ -34,3 +34,33 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(safeUser)
 }
+
+func HandleFollowUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	type ctx struct {
+		User     string `json:"user"`
+		Follower string `json:"follower"`
+	}
+
+	newCtx := &ctx{}
+
+	err := json.NewDecoder(r.Body).Decode(&newCtx)
+	if err != nil {
+		http.Error(w, "Failed to follow user", http.StatusInternalServerError)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	_, err = db.Exec("INSERT INTO followers (user_uuid, follower_uuid) VALUES (?, ?)", newCtx.User, newCtx.Follower)
+	if err != nil {
+		http.Error(w, "Failed to follow user", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

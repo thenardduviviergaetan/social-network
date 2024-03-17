@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS followers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_uuid VARCHAR(255) NOT NULL,
+    follower_uuid VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_uuid) REFERENCES users(uuid) ON DELETE CASCADE
+);

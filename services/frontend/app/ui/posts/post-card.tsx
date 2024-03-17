@@ -5,8 +5,14 @@ import { formatDateToLocal } from "@/app/lib/utils";
 import Link from "next/link";
 import axios from "axios";
 import useSWR from "swr";
-import { HeartIcon as Empty_heart } from "@heroicons/react/24/outline";
+import {
+  HeartIcon as Empty_heart,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
+import { Button } from "@/app/ui/button";
+import { followUser } from "@/app/lib/action";
+import clsx from "clsx";
 
 export default function PostsCard({
   postID,
@@ -49,23 +55,41 @@ export default function PostsCard({
       id={postID}
       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto "
     >
-      <div className="flex items-center">
-        <Link href={{ pathname: "dashboard/profile", query: { user: encodeURIComponent(post.author) } }}>
-          <Image
-            className="w-10 h-10 rounded-full mr-2"
-            src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
-            alt={post.author}
-            width={40}
-            height={40}
-          />
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          <Link
+            href={{
+              pathname: "dashboard/profile",
+              query: { user: encodeURIComponent(post.author) },
+            }}
+          >
+            <Image
+              className="w-10 h-10 rounded-full mr-2"
+              src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+              alt={post.author}
+              width={40}
+              height={40}
+            />
 
-          <div>
-            <p className="font-semibold">{post.author}</p>
-            <p className="text-gray-500 text-sm">
-              {formatDateToLocal(post.date)}
-            </p>
-          </div>
-        </Link>
+            <div>
+              <p className="font-semibold">{post.author}</p>
+              <p className="text-gray-500 text-sm">
+                {formatDateToLocal(post.date)}
+              </p>
+            </div>
+          </Link>
+        </div>
+        <Button
+          onClick={() => {
+            followUser(user, post.author_id);
+          }}
+          className={clsx(
+            post.author_id === user ? "hidden" : "block",
+          )}
+                  >
+          <span>Follow</span>
+          <PlusIcon className="w-4 h-4" />
+        </Button>
       </div>
       <p className="mt-2">{post.content}</p>
 

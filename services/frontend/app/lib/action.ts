@@ -178,3 +178,18 @@ export async function createComment(
   revalidatePath(`dashboard/posts?id=${post_id}`);
   redirect(`/dashboard/posts?id=${post_id}`);
 }
+
+
+export async function followUser(user: string, authorID: string) {
+  try {
+    const res = await axios.post(
+      `http://caddy:8000/api/user/follow`,
+      {
+        user : authorID,
+        follower: user,
+      },
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}

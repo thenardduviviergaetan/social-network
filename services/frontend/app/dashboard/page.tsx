@@ -16,7 +16,7 @@ export default async function Page(
   const currentPage = Number(searchParams?.page) || 1;
   const totalPages = await fetchPageNumber();
   return (
-    <main>
+    <div className="w-auto">
       <Button>
         <Link href="/dashboard/posts/create">
           Create Post
@@ -24,6 +24,6 @@ export default async function Page(
       </Button>
       <Posts page={currentPage} />
       <Pagination totalPages={totalPages ?? 0} />
-    </main>
+    </div>
   );
 }

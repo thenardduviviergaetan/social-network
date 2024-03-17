@@ -39,7 +39,6 @@ export const fetchPosts = async (pageNumber: number) => {
 }
 
 export const fetchPost = async (postID: string) => {
-    console.log('fetching post ' + postID);
     try {
         const res = await axios.get(`http://caddy:8000/api/post?id=${postID}`);
         return res.data;

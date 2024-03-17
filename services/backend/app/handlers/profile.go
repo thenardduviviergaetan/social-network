@@ -36,7 +36,7 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleFollowUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodPost && r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -46,21 +46,55 @@ func HandleFollowUser(w http.ResponseWriter, r *http.Request) {
 		Follower string `json:"follower"`
 	}
 
+	followStatus := struct {
+		Followed bool `json:"followed"`
+	}{}
+
 	newCtx := &ctx{}
 
-	err := json.NewDecoder(r.Body).Decode(&newCtx)
-	if err != nil {
-		http.Error(w, "Failed to follow user", http.StatusInternalServerError)
+	switch r.Method {
+	case http.MethodPost:
+		err := json.NewDecoder(r.Body).Decode(&newCtx)
+		if err != nil {
+			http.Error(w, "Failed to follow user", http.StatusInternalServerError)
+			return
+		}
+	case http.MethodGet:
+		newCtx.Follower = r.URL.Query().Get("user")
+		newCtx.User = r.URL.Query().Get("author")
+	}
+
+	if newCtx.User == newCtx.Follower {
 		return
 	}
 
 	db := r.Context().Value("database").(*sql.DB)
 
-	_, err = db.Exec("INSERT INTO followers (user_uuid, follower_uuid) VALUES (?, ?)", newCtx.User, newCtx.Follower)
+	var exists bool
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM followers WHERE user_uuid = ? AND follower_uuid = ?)", newCtx.User, newCtx.Follower).Scan(&exists)
 	if err != nil {
 		http.Error(w, "Failed to follow user", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	followStatus.Followed = exists
+	if r.Method == http.MethodPost {
+		if exists {
+			_, err := db.Exec("DELETE FROM followers WHERE user_uuid = ? AND follower_uuid = ?", newCtx.User, newCtx.Follower)
+			if err != nil {
+				http.Error(w, "Failed to unfollow user", http.StatusInternalServerError)
+				return
+			}
+			followStatus.Followed = false
+		} else {
+			_, err = db.Exec("INSERT INTO followers (user_uuid, follower_uuid) VALUES (?, ?)", newCtx.User, newCtx.Follower)
+			if err != nil {
+				http.Error(w, "Failed to follow user", http.StatusInternalServerError)
+				return
+			}
+			followStatus.Followed = true
+		}
+	}
+
+	json.NewEncoder(w).Encode(followStatus)
 }

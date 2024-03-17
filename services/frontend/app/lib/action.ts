@@ -189,6 +189,7 @@ export async function followUser(user: string, authorID: string) {
         follower: user,
       },
     );
+    return res.data;
   } catch (error) {
     console.error(error);
   }

@@ -7,6 +7,7 @@ import axios from "axios";
 import useSWR from "swr";
 import {
   HeartIcon as Empty_heart,
+  MinusIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
@@ -36,6 +37,12 @@ export default function PostsCard({
     { revalidateOnMount: true, revalidateOnFocus: false },
   );
 
+  const { data: followStatus, mutate: mutateFollow } = useSWR(
+    `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
+    fetcher,
+    { revalidateOnMount: true, revalidateOnFocus: false },
+  );
+
   const handleLike = async () => {
     try {
       const res = await axios.post(
@@ -45,6 +52,15 @@ export default function PostsCard({
         },
       );
       mutateLikes({ liked: res.data.liked, likecount: res.data.likecount });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const res = await followUser(user, post.author_id);
+      mutateFollow({ followed: res.followed });
     } catch (error) {
       console.error(error);
     }
@@ -80,15 +96,25 @@ export default function PostsCard({
           </Link>
         </div>
         <Button
-          onClick={() => {
-            followUser(user, post.author_id);
-          }}
+          onClick={handleFollow}
           className={clsx(
             post.author_id === user ? "hidden" : "block",
+            followStatus?.followed
+              ? "bg-gray-600 text-white"
+              : "bg-purple-500 text-white",
           )}
-                  >
-          <span>Follow</span>
-          <PlusIcon className="w-4 h-4" />
+        >
+          {followStatus?.followed ? (
+            <>
+              <span className="mr-2">Unfollow</span>
+              <MinusIcon className="w-5 h-5" />
+            </>
+          ) : (
+            <>
+              <span className="mr-2">Follow</span>
+              <PlusIcon className="w-5 h-5" />
+            </>
+          )}
         </Button>
       </div>
       <p className="mt-2">{post.content}</p>

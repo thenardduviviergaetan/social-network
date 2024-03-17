@@ -81,7 +81,7 @@ export default function PostsCard({
         />
       );
     case "private":
-      if (post.author_id === user || followStatus.followed) {
+      if (post.author_id === user || followStatus?.followed) {
         return (
           <PublicPost
             postID={postID}

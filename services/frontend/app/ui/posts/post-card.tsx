@@ -66,6 +66,142 @@ export default function PostsCard({
     }
   };
 
+  switch (post.status) {
+    case "public":
+      return (
+        <PublicPost
+          postID={postID}
+          post={post}
+          user={user}
+          followStatus={followStatus}
+          handleFollow={handleFollow}
+          likesData={likesData}
+          commentsCounter={commentsCounter}
+          handleLike={handleLike}
+        />
+      );
+    case "private":
+      if (post.author_id === user || followStatus.followed) {
+        return (
+          <PublicPost
+            postID={postID}
+            post={post}
+            user={user}
+            followStatus={followStatus}
+            handleFollow={handleFollow}
+            likesData={likesData}
+            commentsCounter={commentsCounter}
+            handleLike={handleLike}
+          />
+        );
+      }
+      return (
+        <PrivatePost
+          postID={postID}
+          post={post}
+          user={user}
+          followStatus={followStatus}
+          handleFollow={handleFollow}
+        />
+      );
+    default:
+      return null;
+  }
+}
+
+export function PrivatePost({
+  postID,
+  post,
+  user,
+  followStatus,
+  handleFollow,
+}: {
+  postID: string;
+  post: any;
+  user: string;
+  followStatus: any;
+  handleFollow: () => void;
+}) {
+  return (
+    <div
+      id={postID}
+      className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto"
+    >
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          <Link
+            href={{
+              pathname: "dashboard/profile",
+              query: { user: encodeURIComponent(post.author) },
+            }}
+          >
+            <Image
+              className="w-10 h-10 rounded-full mr-2"
+              src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+              alt={post.author}
+              width={40}
+              height={40}
+            />
+
+            <div>
+              <p className="font-semibold">{post.author}</p>
+              <p className="text-gray-500 text-sm">
+                {formatDateToLocal(post.date)}
+              </p>
+            </div>
+          </Link>
+        </div>
+        <Button
+          onClick={handleFollow}
+          className={clsx(
+            post.author_id === user ? "hidden" : "block",
+            followStatus?.followed
+              ? "bg-gray-600 text-white"
+              : "bg-purple-500 text-white",
+          )}
+        >
+          {followStatus?.followed
+            ? (
+              <>
+                <span className="mr-2">Unfollow</span>
+                <MinusIcon className="w-5 h-5" />
+              </>
+            )
+            : (
+              <>
+                <span className="mr-2">Follow</span>
+                <PlusIcon className="w-5 h-5" />
+              </>
+            )}
+        </Button>
+      </div>
+      <p className="text-center text-gray-500">This post is private</p>
+      <p className="text-center text-gray-500 mb-5">
+        Follow {post.author} to see this post
+      </p>
+    </div>
+  );
+}
+
+export function PublicPost({
+  postID,
+  post,
+  user,
+  followStatus,
+  handleFollow,
+  likesData,
+  commentsCounter,
+  handleLike,
+}: {
+  postID: string;
+  post: any;
+  user: string;
+  followStatus: any;
+  handleFollow: () => void;
+  likesData: any;
+  commentsCounter: number;
+  handleLike: () => void;
+}) {
   return (
     <div
       id={postID}
@@ -104,17 +240,19 @@ export default function PostsCard({
               : "bg-purple-500 text-white",
           )}
         >
-          {followStatus?.followed ? (
-            <>
-              <span className="mr-2">Unfollow</span>
-              <MinusIcon className="w-5 h-5" />
-            </>
-          ) : (
-            <>
-              <span className="mr-2">Follow</span>
-              <PlusIcon className="w-5 h-5" />
-            </>
-          )}
+          {followStatus?.followed
+            ? (
+              <>
+                <span className="mr-2">Unfollow</span>
+                <MinusIcon className="w-5 h-5" />
+              </>
+            )
+            : (
+              <>
+                <span className="mr-2">Follow</span>
+                <PlusIcon className="w-5 h-5" />
+              </>
+            )}
         </Button>
       </div>
       <p className="mt-2">{post.content}</p>
@@ -143,7 +281,9 @@ export default function PostsCard({
           </span>
         </div>
         <div className="text-purple-700">
-          <Link href={{ pathname: "dashboard/posts", query: { id: postID } }}>
+          <Link
+            href={{ pathname: "dashboard/posts", query: { id: postID } }}
+          >
             Comment({commentsCounter | 0})
           </Link>
         </div>

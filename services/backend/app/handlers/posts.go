@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -17,7 +18,7 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	post := &models.Post{}
 	json.NewDecoder(r.Body).Decode(&post)
-
+	fmt.Println(post)
 	db := r.Context().Value("database").(*sql.DB)
 
 	stmt := `INSERT INTO posts (author_id, author, content,status, image, created_at) VALUES (?, ?, ?, ?, ?, ?)`

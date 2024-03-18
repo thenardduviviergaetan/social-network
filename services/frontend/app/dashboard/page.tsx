@@ -17,11 +17,11 @@ export default async function Page(
   const totalPages = await fetchPageNumber();
   return (
     <div className="w-auto">
-      <Button>
-        <Link href="/dashboard/posts/create">
+      <Link href="/dashboard/posts/create">
+        <Button>
           Create Post
-        </Link>
-      </Button>
+        </Button>
+      </Link>
       <Posts page={currentPage} />
       <Pagination totalPages={totalPages ?? 0} />
     </div>

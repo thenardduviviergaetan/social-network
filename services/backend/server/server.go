@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"server/app"
-	livechat "server/app/websockets"
+	// livechat "server/app/websockets"
 )
 
 type Server struct {
@@ -20,11 +20,12 @@ func NewServer(app *app.App) *Server {
 // Start starts the server and listens for incoming requests on port 8080.
 // It takes a database connection as a parameter.
 func (s *Server) Start(database *sql.DB) {
+	// func (s *Server) Start(database *sql.DB, hub *livechat.Hub) {
 	s.app.ServeHTTP(database)
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		livechat.WebsocketHandler(app.DB, hub, w, r)
-	})
+	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	// 	livechat.WebsocketHandler(database, hub, w, r)
+	// })
 
 	log.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)

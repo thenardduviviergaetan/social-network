@@ -2,6 +2,7 @@ package main
 
 import (
 	"server/app"
+	livechat "server/app/websockets"
 	"server/db"
 	"server/server"
 )
@@ -14,6 +15,9 @@ func main() {
 	db.ApplyMigrations(database.DB)
 	app := app.NewApp(database)
 	server := server.NewServer(app)
+
+	hub := livechat.InitHub(app)
+	go hub.Run(app)
 
 	server.Start(database.DB)
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/app/middleware/session"
 	"server/db/models"
@@ -116,4 +117,39 @@ func HandleFollowUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(followStatus)
+}
+
+func HandleGetFollowers(w http.ResponseWriter, r *http.Request) {
+	var follower models.Follower
+	var followers []models.Follower
+	var currentUser, follow string
+
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.Method == http.MethodGet {
+
+		currentUser = r.URL.Query().Get("user")
+		db := r.Context().Value("database").(*sql.DB)
+
+		rows, err := db.Query("SELECT follower_uuid FROM followers WHERE user_uuid = ?", currentUser)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			err := rows.Scan(&follow)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			session.SetFollowers(db, follow, &follower)
+			followers = append(followers, follower)
+		}
+	}
+	json.NewEncoder(w).Encode(followers)
 }

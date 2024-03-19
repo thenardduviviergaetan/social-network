@@ -278,7 +278,7 @@ function FollowButton({
           className={clsx(
             post.author_id === user ? "hidden" : "block",
             followStatus?.followed
-              ? "bg-gray-600 text-white"
+              ? "bg-gray-700 text-white"
               : "bg-purple-500 text-white",
           )}
         >

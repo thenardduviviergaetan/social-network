@@ -1,14 +1,33 @@
-'use client';
+"use client";
 import { useFormState, useFormStatus } from "react-dom";
 import { createPost } from "@/app/lib/action";
 import { Button } from "@/app/ui/button";
+import { useState } from "react";
+import axios from "axios";
+import useSWR from "swr";
 
-export default function Form() {
+export default function Form({
+  user,
+}: {
+  user: string | undefined;
+}) {
   const initialState = { message: "", error: {} };
   const [state, setState] = useFormState(createPost, initialState);
 
+  const [privacy, setPrivacy] = useState("");
+
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+
+  const { data: followers } = useSWR(
+    `http://localhost:8000/api/user/followers?user=${user}`,
+    fetcher,
+    { revalidateOnFocus: false, revalidateOnMount: true}
+  );
+
+  console.log(followers);
+
   return (
-    <main className="w-11/12 m-auto shadow-md p-5">
+    <div className="w-11/12 m-auto shadow-md p-5">
       <h1 className="text-2xl font-bold mb-4">Create a new post</h1>
       <form action={setState} className="space-y-4">
         <div>
@@ -59,7 +78,9 @@ export default function Form() {
                   name="status"
                   type="radio"
                   value="private"
+                  onChange={(e) => setPrivacy(e.target.value)}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                  aria-describedby="status-error"
                 />
                 <label
                   htmlFor="private"
@@ -70,10 +91,28 @@ export default function Form() {
               </div>
               <div className="flex items-center">
                 <input
+                  id="almost"
+                  name="status"
+                  type="radio"
+                  value="almost"
+                  onChange={(e) => setPrivacy(e.target.value)}
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                  aria-describedby="status-error"
+                />
+                <label
+                  htmlFor="almost"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-500 px-3 py-1.5 text-xs font-medium text-white"
+                >
+                  Almost private
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
                   id="public"
                   name="status"
                   type="radio"
                   value="public"
+                  onChange={(e) => setPrivacy(e.target.value)}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                   aria-describedby="status-error"
                 />
@@ -95,9 +134,37 @@ export default function Form() {
               ))}
           </div>
         </fieldset>
+        {privacy === "almost" && (
+          <div className="text-sm">
+            <h2>Select who can see this post:</h2>
+            <div className="flex flex-start w-full bg-white h-20 ">
+              {
+               followers.map((follower: any) => {
+                  return (
+                    <div key={follower.id} className="flex flex-col items-center">
+                      <input
+                        type="checkbox"
+                        id={follower.id}
+                        name={follower.id}
+                        value={follower.id}
+                        className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                      />
+                      <label
+                        htmlFor={follower.id}
+                        className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                      >
+                        {follower.username}
+                      </label>
+                    </div>
+                  );
+               })
+              }
+            </div>
+          </div>
+        )}
         <CreateButton />
       </form>
-    </main>
+    </div>
   );
 }
 

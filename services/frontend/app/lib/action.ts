@@ -181,10 +181,6 @@ export async function createComment(
 
 
 export async function followUser(user: string, authorID: string) {
-
-  // const status = await axios.get('http://caddy:8000/api/user/status?author=' + authorID);
-  // console.log(status.data);
-
   try {
     const res = await axios.post(
       `http://caddy:8000/api/user/follow`,

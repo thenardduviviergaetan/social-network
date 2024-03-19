@@ -3,6 +3,7 @@ package session
 import (
 	"database/sql"
 	"log"
+	"server/app/middleware"
 	"server/db/models"
 )
 
@@ -40,4 +41,22 @@ func GetPending(db *sql.DB, user, follower string) bool {
 		log.Fatalln(err)
 	}
 	return pending == 1
+}
+
+func SetFollowers(db *sql.DB, follow string, follower *models.Follower) (*models.Follower, error) {
+	avatar := middleware.GetAvatar(db, follow)
+
+	rows, err := db.Query("SELECT first_name, last_name from users WHERE uuid = ?", follow)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		rows.Scan(
+			&follower.FirstName,
+			&follower.LastName,
+		)
+	}
+	follower.Avatar = avatar
+	return follower, nil
 }

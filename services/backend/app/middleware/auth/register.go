@@ -36,13 +36,14 @@ func CreateUser(u *models.User, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users (uuid, email, password, first_name, last_name, date_of_birth, nickname ,about ,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	_, err = db.Exec("INSERT INTO users (uuid, email, password, first_name, last_name, date_of_birth, status, nickname ,about ,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		u.UUID,
 		u.Email,
 		string(hashPass),
 		u.FirstName,
 		u.LastName,
 		u.DateOfBirth,
+		u.Status,
 		u.Nickname,
 		u.About,
 		time.Now())

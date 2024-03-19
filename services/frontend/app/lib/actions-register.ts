@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { profile } from "console";
 
 /**
  * Schema for the registration form data.
@@ -29,6 +30,9 @@ const registerFormSchema = z.object({
   dateOfBirth: z.string().refine((value) => value.trim() !== "", {
     message: "Date of birth is required",
   }),
+  status: z.enum(['public', 'private'], {
+    invalid_type_error: "Please select a profile status"
+  }),
   nickname: z.string().optional(),
   about: z.string().optional(),
   avatar: z.custom((v) => v instanceof File && v.size < 20000, {
@@ -50,6 +54,7 @@ export type State = {
     firstName?: string[];
     lastName?: string[];
     dateOfBirth?: string[];
+    status?: string[];
     nickname?: string[];
     about?: string[];
     avatar?: string[];
@@ -75,6 +80,7 @@ export async function register(
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     dateOfBirth: formData.get("dateOfBirth"),
+    status: formData.get("status"),
     nickname: formData.get("nickname"),
     about: formData.get("about"),
     avatar: formData.get("avatar"),
@@ -120,6 +126,7 @@ export async function register(
     firstName: validatedData.data.firstName,
     lastName: validatedData.data.lastName,
     dateOfBirth: validatedData.data.dateOfBirth,
+    status: validatedData.data.status,
     nickname: validatedData.data.nickname,
     about: validatedData.data.about,
   };

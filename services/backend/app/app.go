@@ -96,7 +96,6 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleLikePost(w, r.WithContext(ctx))
 	})
-
 	http.HandleFunc("/api/user/follow", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleFollowUser(w, r.WithContext(ctx))

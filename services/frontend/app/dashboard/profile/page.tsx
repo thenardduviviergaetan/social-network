@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { fetchUser } from "@/app/lib/data";
 import { auth } from "@/auth";
+import { Button } from "@/app/ui/button";
+
 
 export default async function Page() {
       const user = await fetchUser();
@@ -9,7 +11,11 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col w-2/3 m-auto mt-10 ">
-        test
+        <form>
+          <Button>
+            toggle status
+          </Button>
+        </form>
       <h1 className="text-2xl font-bold">Profile</h1>
       <div className="flex justify-around">
        <Image

@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"log"
 	"server/db/models"
 )
 
@@ -21,4 +22,22 @@ func GetUserByEmail(db *sql.DB, email string) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func GetUserStatus(db *sql.DB, user string) bool {
+	var status string
+	err := db.QueryRow("SELECT status FROM users WHERE uuid = ?", user).Scan(&status)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return status == "private"
+}
+
+func GetPending(db *sql.DB, user, follower string) bool {
+	var pending int
+	err := db.QueryRow("SELECT pending FROM followers WHERE user_uuid = ? AND follower_uuid = ?", user, follower).Scan(&pending)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return pending == 1
 }

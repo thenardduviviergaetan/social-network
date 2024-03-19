@@ -109,8 +109,6 @@ export default function PostsCard({
       );
       case 'almost':
         const allowed = post.authorized.split(',').includes(current);
-        console.log(post);
-        console.log(post.authorized.split(','));
         if (post.author_id === user || allowed) {
           return (
             <PublicPost
@@ -289,66 +287,6 @@ export function PublicPost({
     </div>
   );
 }
-
-// export function AlmostPost({
-//   postID,
-//   post,
-//   user,
-//   followStatus,
-//   handleFollow,
-// }: {
-//   postID: string;
-//   post: any;
-//   user: string;
-//   followStatus: any;
-//   handleFollow: () => void;
-// }) {
-//   return (
-//     <div
-//       id={postID}
-//       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto"
-//     >
-//       <div className="flex justify-between">
-//         <div className="flex items-center">
-//           <Link
-//             href={{
-//               pathname: "dashboard/profile",
-//               query: { user: encodeURIComponent(post.author) },
-//             }}
-//           >
-//             <Image
-//               className="w-10 h-10 rounded-full mr-2"
-//               src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
-//               alt={post.author}
-//               width={40}
-//               height={40}
-//             />
-
-//             <div>
-//               <p className="font-semibold">{post.author}</p>
-//               <p className="text-gray-500 text-sm">
-//                 {formatDateToLocal(post.date)}
-//               </p>
-//             </div>
-//           </Link>
-//         </div>
-//         <FollowButton
-//           post={post}
-//           user={user}
-//           followStatus={followStatus}
-//           handleFollow={handleFollow}
-//         />
-        
-//       </div>
-//       <p className="text-center text-gray-500">This post is private</p>
-//       <p className="text-center text-gray-500 mb-5">
-//         Follow {post.author} to see this post
-//       </p>
-//     </div>
-//   );
-// }
-
-
 
 function FollowButton({
   post,

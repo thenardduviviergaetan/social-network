@@ -8,7 +8,7 @@ export default async function Posts({ page }: { page: number }) {
     return (
         posts.map((post: any) => {
             return (
-                <PostCard key={post.id} post={post} postID={post.id} user={session?.user?.uuid} />
+                <PostCard key={post.id} post={post} postID={post.id} user={session?.user?.uuid} current={session?.user?.name} />
             );
         })
     );

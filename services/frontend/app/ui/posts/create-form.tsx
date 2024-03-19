@@ -5,6 +5,7 @@ import { Button } from "@/app/ui/button";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
+import Image from "next/image";
 
 export default function Form({
   user,
@@ -21,10 +22,17 @@ export default function Form({
   const { data: followers } = useSWR(
     `http://localhost:8000/api/user/followers?user=${user}`,
     fetcher,
-    { revalidateOnFocus: false, revalidateOnMount: true}
+    { revalidateOnFocus: false, revalidateOnMount: true },
   );
 
-  console.log(followers);
+  const [checkedFollowers, setCheckedFollowers] = useState<string[]>([]);
+  const handleCheck = (fullName: string, isChecked: boolean) => {
+    if (isChecked) {
+      setCheckedFollowers(prev => [...prev, fullName]);
+    } else {
+      setCheckedFollowers(prev => prev.filter((name) => name !== fullName));
+    }
+  }
 
   return (
     <div className="w-11/12 m-auto shadow-md p-5">
@@ -137,28 +145,42 @@ export default function Form({
         {privacy === "almost" && (
           <div className="text-sm">
             <h2>Select who can see this post:</h2>
-            <div className="flex flex-start w-full bg-white h-20 ">
-              {
-               followers.map((follower: any) => {
-                  return (
-                    <div key={follower.id} className="flex flex-col items-center">
-                      <input
-                        type="checkbox"
-                        id={follower.id}
-                        name={follower.id}
-                        value={follower.id}
-                        className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                      />
-                      <label
-                        htmlFor={follower.id}
-                        className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
-                      >
-                        {follower.username}
-                      </label>
-                    </div>
-                  );
-               })
-              }
+            <div className="flex flex-start w-full bg-white h-50 ">
+              {followers?.map((follower: any, index: number) => {
+                const fullName = `${follower.firstName} ${follower.lastName}`;
+                const id = index.toString();
+                return (
+                  <div key={id} className="flex flex-col items-center">
+                    
+                    <label
+                      htmlFor={id}
+                      className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                    >
+                      <div className="flex flex-col justify-center align-middle text-center p-1">
+                        <Image
+                          className="w-10 h-10 rounded-full mr-2"
+                          src={`http://caddy:8000/api/avatar?id=${follower.uuid}`}
+                          alt={fullName}
+                          width={40}
+                          height={40}
+                        />
+                        <span>
+                          {fullName}
+                        </span>
+                      </div>
+                    </label>
+                    <input
+                      type="checkbox"
+                      id={id}
+                      name={fullName}
+                      value={fullName}
+                      className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                      onChange={(e) => handleCheck(fullName, e.target.checked)}
+                    />
+                  </div>
+                );
+              })}
+              <input name="authorized" type="hidden" value={checkedFollowers.join(',')} />
             </div>
           </div>
         )}

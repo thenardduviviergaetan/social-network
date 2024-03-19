@@ -57,6 +57,7 @@ func SetFollowers(db *sql.DB, follow string, follower *models.Follower) (*models
 			&follower.LastName,
 		)
 	}
+	follower.UUID = follow
 	follower.Avatar = avatar
 	return follower, nil
 }

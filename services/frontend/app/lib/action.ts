@@ -12,11 +12,13 @@ const PostFormSchema = z.object({
     message: "Content is required",
   }),
   image: z.string().optional(),
-  status: z.enum(["public", "private"], {
+  status: z.enum(["public", "almost","private"], {
     invalid_type_error: "Please select an post status.",
   }),
+  authorized: z.string().optional(),
   date: z.string(),
 });
+
 const CommentFormSchema = z.object({
   authorID: z.string(),
   author: z.string(),
@@ -46,6 +48,7 @@ export type State = {
   errors?: {
     content?: string[];
     status?: string[];
+    authorized?: string[];
   };
   message?: string | null;
 };
@@ -106,6 +109,7 @@ export async function createPost(
   const author_id = session?.user?.uuid;
   const author = session?.user?.name;
   const date = new Date().toISOString().split("T")[0];
+  const authorized = formData.get("authorized");
 
   const post = {
     author_id,
@@ -113,6 +117,7 @@ export async function createPost(
     content,
     status,
     date,
+    authorized: authorized ? String(authorized) : null,
     image: await uploadImage(imageFile, "posts"),
   };
   try {

@@ -227,6 +227,8 @@ export default function RegisterForm() {
                   value="public"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                   aria-describedby="status-error"
+                  defaultChecked
+                  
                 />
                 <label
                   htmlFor="public"

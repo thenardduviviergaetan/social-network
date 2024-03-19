@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/app/ui/button";
 import Posts from "@/app/ui/posts/posts";
 import Pagination from "@/app/ui/dashboard/pagination";
-import { fetchPageNumber } from "../lib/data";
+import { fetchPageNumber } from "@/app/lib/data"
 
 export default async function Page(
   {
@@ -17,11 +17,9 @@ export default async function Page(
   const totalPages = await fetchPageNumber();
   return (
     <div className="w-auto">
-      <Button>
-        <Link href="/dashboard/posts/create">
+        <Link href="/dashboard/posts/create" className="p-3 h-10 rounded-lg bg-purple-700 px-4 text-sm font-medium text-white transition-colors hover:bg-purple-900">
           Create Post
         </Link>
-      </Button>
       <Posts page={currentPage} />
       <Pagination totalPages={totalPages ?? 0} />
     </div>

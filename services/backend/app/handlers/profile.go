@@ -139,9 +139,9 @@ func HandleGetUserStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		// db := r.Context().Value("database").(*sql.DB)
+		db := r.Context().Value("database").(*sql.DB)
 		json.NewDecoder(r.Body).Decode(&data)
-		fmt.Println("status", data.Status)
+		db.Exec("UPDATE users SET status= ? WHERE uuid =?", data.Status, data.UUID)
 	}
 
 }

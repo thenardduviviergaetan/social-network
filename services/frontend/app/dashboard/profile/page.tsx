@@ -14,7 +14,7 @@ export default async function Page() {
         <h1 className="font-bold mt-1 p-3 break-all">Email: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.email}</p></h1>
         <h1 className="font-bold mt-1 p-3">First Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.firstName}</p></h1>
         <h1 className="font-bold mt-1 p-3">Last Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.lastName}</p></h1>
-        <Toggle className="p-3">{user?.status} {/* REMIND: ce sera ici le status et en fonctiopn du status ce sera violet ou gris */}</Toggle>
+        <Toggle user={user} className="p-3">{user?.status} </Toggle>
       </div>
       <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl w-[400px] text-center overflow-y-auto max-h-[400px] divide-y divide-dashed divide-black">
         <Image

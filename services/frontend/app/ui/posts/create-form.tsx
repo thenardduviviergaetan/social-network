@@ -22,7 +22,7 @@ export default function Form() {
             id="content"
             name="content"
             placeholder="Content of your post..."
-            className="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm mt-1 p-2"
+            className="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm mt-1 p-2 resize-none "
           />
           <div id="content-error">
             {state.errors?.content &&
@@ -56,6 +56,7 @@ export default function Form() {
               <div className="flex items-center">
                 <input
                   id="private"
+                  id="private"
                   name="status"
                   type="radio"
                   value="private"
@@ -74,6 +75,7 @@ export default function Form() {
                   name="status"
                   type="radio"
                   value="public"
+                  defaultChecked
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                   aria-describedby="status-error"
                 />

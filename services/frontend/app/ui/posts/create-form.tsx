@@ -56,7 +56,6 @@ export default function Form() {
               <div className="flex items-center">
                 <input
                   id="private"
-                  id="private"
                   name="status"
                   type="radio"
                   value="private"

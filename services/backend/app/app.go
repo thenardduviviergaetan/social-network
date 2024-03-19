@@ -45,7 +45,14 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetUser(w, r.WithContext(ctx))
 	})
-
+	http.HandleFunc("/api/user/status", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserStatus(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/followers", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetFollowers(w, r.WithContext(ctx))
+	})
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetPosts(w, r.WithContext(ctx))
@@ -101,4 +108,5 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleFollowUser(w, r.WithContext(ctx))
 	})
+
 }

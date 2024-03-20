@@ -6,15 +6,10 @@ import Link from "next/link";
 
 
 export default async function Followers({ param }: { param?: Param }) {
-    const user = await fetchUser(param?.user);
-    const session = await auth();
-
     const followers = await fetchFollowers(param?.user)
-
-
     return (
         <>
-            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg">
+            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg min-w-[450px] max-w-[700px]">
                 {
                 followers ?
                 followers?.map((follower: Follower) => {
@@ -25,7 +20,7 @@ export default async function Followers({ param }: { param?: Param }) {
                                 query: { user: encodeURIComponent(follower.uuid) },
                             }}
                         >
-                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2">
+                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2 justify-start items-center">
                                 <Image
                                     src={`http://caddy:8000/api/avatar?id=${follower.uuid}`}
                                     alt="Profile Picture"
@@ -33,8 +28,7 @@ export default async function Followers({ param }: { param?: Param }) {
                                     height={200}
                                     className="rounded-full shadow-xl"
                                 />
-                                <p>{follower.firstName}&nbsp;</p>
-                                <p>{follower.lastName}</p>
+                                <p className="text-purple-700 font-bold">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{follower.firstName}&nbsp;{follower.lastName}</p>
                             </div>
                         </Link>
                     )

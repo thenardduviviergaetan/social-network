@@ -20,8 +20,8 @@ export default async function Page(
   return (
     <div className="grid grid-cols-2 gap-2 w-full m-auto mt-10 ">
       {/* <h1 className="text-2xl font-bold">Profile</h1> */}
-      <Details param={searchParams?.user}/>
-      <UserPosts page={searchParams?.page}/>
+      <Details param={searchParams}/>
+      <UserPosts param={searchParams}/>
     </div>
   );
 }

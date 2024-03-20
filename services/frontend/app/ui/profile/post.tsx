@@ -1,12 +1,12 @@
 import { fetchPageNumber, fetchUser } from "@/app/lib/data";
 import Pagination from "../dashboard/pagination";
 import Posts from "../posts/posts";
-import { auth } from "@/auth";
+// import { auth } from "@/auth";
 
-export default async function UserPosts({page}:{page?:string}){
+export default async function UserPosts({param}:{param?:object}){
     const user = await fetchUser();
-    const session = await auth();
-    const currentPage = Number(page) || 1;
+    // const session = await auth();
+    const currentPage = Number(param?.page) || 1;
     const totalPages = await fetchPageNumber('user', `UUID=${user?.uuid}`);
     return(
         <div >

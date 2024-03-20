@@ -6,6 +6,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/app/ui/button";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Notifications({
   user,
@@ -15,7 +16,7 @@ export default function Notifications({
   const [showNotif, setShowNotif] = useState("");
 
   const { data: pending, mutate } = useSWR(
-    `http://localhost:8000/api/user/followers/pending?user=${user}`,
+    `http://${window.location.hostname}:8000/api/user/followers/pending?user=${user}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
   );
@@ -58,7 +59,7 @@ export default function Notifications({
                     className="mr-1"
                     onClick={() => {
                       axios.post(
-                        `http://localhost:8000/api/user/followers/accept`,
+                        `http://${window.location.hostname}:8000/api/user/followers/accept`,
                         {
                           user: user,
                           follower: notif.uuid,
@@ -71,7 +72,7 @@ export default function Notifications({
                   </Button>
                   <Button className="bg-red-600 hover:bg-red-800" onClick={()=>{
                     axios.post(
-                      `http://localhost:8000/api/user/followers/reject`,
+                      `http://${window.location.hostname}:8000/api/user/followers/reject`,
                       {
                         user: user,
                         follower: notif.uuid,

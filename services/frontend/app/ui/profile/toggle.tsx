@@ -23,7 +23,8 @@ export default function Toggle({ children, className, user, ...rest }: TogglePro
                 color:"white"
             }
         });
-        axios.post(`http://localhost:8000/api/user/status?user=${user?.uuid}`,{status:value, uuid:user?.uuid});
+        // axios.post(`http://localhost:8000/api/user/status?user=${user?.uuid}`,{status:value, uuid:user?.uuid});
+        axios.post(`http://${window.location.hostname}:8000/api/user/status?user=${user?.uuid}`, { status: value, uuid: user?.uuid });
     }
     return (
         <div className="flex flex-wrap justify-around mt-5 items-center p-4">

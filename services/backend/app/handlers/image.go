@@ -31,7 +31,7 @@ func HandleUploadAvatar(w http.ResponseWriter, r *http.Request) {
 
 	uploadDir := "./static/uploads/avatars"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
-		err := os.Mkdir(uploadDir, 0755)
+		err := os.MkdirAll(uploadDir, 0755)
 		if err != nil {
 			http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
 			return

@@ -29,18 +29,21 @@ export default function PostsCard({
 }) {
 
   const { data: commentsCounter } = useSWR(
-    `http://localhost:8000/api/comments/count?post_id=${postID}`,
+    // `http://localhost:8000/api/comments/count?post_id=${postID}`,
+    `http://${window.location.hostname}:8000/api/comments/count?post_id=${postID}`,
     fetcher,
   );
 
   const { data: likesData, mutate: mutateLikes } = useSWR(
-    `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
+    // `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
+    `http://${window.location.hostname}:8000/api/post/likes?id=${postID}&user=${user}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: false },
   );
 
   const { data: followStatus, mutate: mutateFollow } = useSWR(
-    `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
+    // `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
+    `http://${window.location.hostname}:8000/api/user/follow?user=${user}&author=${post.author_id}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
   );
@@ -48,7 +51,8 @@ export default function PostsCard({
   const handleLike = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/post/likes?id=${postID}`,
+        // `http://localhost:8000/api/post/likes?id=${postID}`,
+        `http://${window.location.hostname}:8000/api/post/likes?id=${postID}`,
         {
           user,
         },

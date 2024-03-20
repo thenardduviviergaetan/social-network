@@ -16,6 +16,16 @@ export const fetchUser = async (uuid?:string) => {
     }
 }
 
+export const fetchFollowers = async (uuid?:string)=> {
+    const session = await auth()
+    try {
+        const res = await axios.get(`http://caddy:8000/api/user/followers?user=${uuid ? uuid : session?.user?.uuid}`);
+        return res.data
+    } catch (error) {
+        console.error('Error fetching user data');
+        return null;
+    }
+}
 
 export const fetchPageNumber = async (urlSegment: string, param?: string) => {
     noStore()

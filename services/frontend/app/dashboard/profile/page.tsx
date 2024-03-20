@@ -1,7 +1,6 @@
-import { fetchUser } from "@/app/lib/data";
 import Details from "@/app/ui/profile/details";
+import Followers from "@/app/ui/profile/followers";
 import UserPosts from "@/app/ui/profile/post";
-import { Button } from "@/app/ui/button";
 
 
 export default async function Page(
@@ -14,13 +13,13 @@ export default async function Page(
     };
   },
 ) {
-  const user = await fetchUser();
 
 
   return (
-    <div className="grid grid-cols-2 gap-2 w-full m-auto mt-10 ">
+    <div className="grid md:grid-cols-1 xl:grid-cols-2 gap-4 w-full m-auto mt-10 ">
       {/* <h1 className="text-2xl font-bold">Profile</h1> */}
       <Details param={searchParams}/>
+      <Followers param={searchParams}/>
       <UserPosts param={searchParams}/>
     </div>
   );

@@ -27,8 +27,7 @@ export default function Form({
     { revalidateOnFocus: false, revalidateOnMount: true },
   );
 
-  console.log(user);
-  console.log(followers);
+
 
   const [checkedFollowers, setCheckedFollowers] = useState<string[]>([]);
   const handleCheck = (fullName: string, isChecked: boolean) => {

@@ -131,8 +131,8 @@ export function PrivatePost({
         <div className="flex items-center">
           <Link
             href={{
-              pathname: "dashboard/profile",
-              query: { user: encodeURIComponent(post.author) },
+              pathname: "/dashboard/profile",
+              query: { user: encodeURIComponent(post.author_id) },
             }}
           >
             <Image
@@ -211,8 +211,8 @@ export function PublicPost({
         <div className="flex items-center">
           <Link
             href={{
-              pathname: "dashboard/profile",
-              query: { user: encodeURIComponent(post.author) },
+              pathname: "/dashboard/profile",
+              query: { user: encodeURIComponent(post.author_id) },
             }}
           >
             <Image
@@ -282,7 +282,7 @@ export function PublicPost({
         </div>
         <div className="text-purple-700">
           <Link
-            href={{ pathname: "dashboard/posts", query: { id: postID } }}
+            href={{ pathname: "/dashboard/posts", query: { id: postID } }}
           >
             Comment({commentsCounter | 0})
           </Link>

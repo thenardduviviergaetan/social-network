@@ -7,9 +7,9 @@ import (
 	"server/db/models"
 )
 
-func GetUserByEmail(db *sql.DB, email string) (*models.User, error) {
+func GetUserByEmail(db *sql.DB, email, uuid string) (*models.User, error) {
 	user := &models.User{}
-	err := db.QueryRow("SELECT uuid, email, password, first_name, last_name, date_of_birth, status, nickname, about   FROM users WHERE email = ?", email).Scan(
+	err := db.QueryRow("SELECT uuid, email, password, first_name, last_name, date_of_birth, status, nickname, about FROM users WHERE email = ? OR uuid=?", email, uuid).Scan(
 		&user.UUID,
 		&user.Email,
 		&user.Password,

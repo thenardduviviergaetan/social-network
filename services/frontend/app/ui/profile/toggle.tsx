@@ -1,7 +1,7 @@
 "use client"
 import axios from "axios";
 import clsx from "clsx";
-import { User } from '../lib/definitions';
+import { User } from '../../lib/definitions';
 import { ChangeEvent, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 

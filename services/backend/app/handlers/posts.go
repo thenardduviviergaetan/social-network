@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -17,10 +18,10 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	post := &models.Post{}
 	json.NewDecoder(r.Body).Decode(&post)
-
+	fmt.Println(post)
 	db := r.Context().Value("database").(*sql.DB)
 
-	stmt := `INSERT INTO posts (author_id, author, content, status, authorized, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	stmt := `INSERT INTO posts (author_id, author, content, status, image, authorized, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 
 	var img interface{}
 	if post.Image == "" {

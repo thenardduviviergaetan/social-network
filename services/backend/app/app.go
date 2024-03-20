@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
@@ -46,6 +45,18 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetUser(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/status", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserStatus(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/posts", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserPosts(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/page-number", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserPageNumber(w, r.WithContext(ctx))
 	})
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
@@ -110,9 +121,8 @@ func (a *App) ServeHTTP(database *sql.DB) {
 
 	http.HandleFunc("/api/user/followers/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
-
 		segments := strings.Split(r.URL.Path, "/")
-		fmt.Println("following segments", segments)
+
 		switch segments[4] {
 		case "pending":
 			h.HandleGetPendingFollowers(w, r.WithContext(ctx))

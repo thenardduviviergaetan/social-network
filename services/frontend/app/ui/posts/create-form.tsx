@@ -25,6 +25,9 @@ export default function Form({
     { revalidateOnFocus: false, revalidateOnMount: true },
   );
 
+  console.log(user);
+  console.log(followers);
+
   const [checkedFollowers, setCheckedFollowers] = useState<string[]>([]);
   const handleCheck = (fullName: string, isChecked: boolean) => {
     if (isChecked) {
@@ -49,7 +52,7 @@ export default function Form({
             id="content"
             name="content"
             placeholder="Content of your post..."
-            className="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm mt-1 p-2"
+            className="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm mt-1 p-2 resize-none "
           />
           <div id="content-error">
             {state.errors?.content &&

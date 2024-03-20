@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"server/app/middleware/session"
 	"server/db/models"
+	"strconv"
 )
 
 func HandleGetUser(w http.ResponseWriter, r *http.Request) {
@@ -15,10 +16,10 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	email := r.URL.Query().Get("email")
-
+	uuid := r.URL.Query().Get("UUID")
 	db := r.Context().Value("database").(*sql.DB)
 	user := &models.User{}
-	user, err := session.GetUserByEmail(db, email)
+	user, err := session.GetUserByEmail(db, email, uuid)
 	if err != nil {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)
 		return
@@ -132,6 +133,7 @@ func HandleGetFollowers(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 
 		currentUser = r.URL.Query().Get("user")
+		fmt.Println("Current user", currentUser)
 		db := r.Context().Value("database").(*sql.DB)
 
 		rows, err := db.Query("SELECT follower_uuid FROM followers WHERE user_uuid = ?", currentUser)
@@ -151,6 +153,7 @@ func HandleGetFollowers(w http.ResponseWriter, r *http.Request) {
 			followers = append(followers, follower)
 		}
 	}
+	fmt.Println("Get followers", followers)
 	json.NewEncoder(w).Encode(followers)
 }
 
@@ -163,8 +166,6 @@ func HandleGetPendingFollowers(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
-	fmt.Println("GETTING PENDING FOLLOWERS")
 
 	if r.Method == http.MethodGet {
 
@@ -188,7 +189,6 @@ func HandleGetPendingFollowers(w http.ResponseWriter, r *http.Request) {
 			followers = append(followers, follower)
 		}
 	}
-	fmt.Println(followers)
 	json.NewEncoder(w).Encode(followers)
 }
 
@@ -242,4 +242,79 @@ func HandleRejectFollower(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to reject follower", http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleGetUserStatus(w http.ResponseWriter, r *http.Request) {
+	var data models.User
+	if r.Method != http.MethodPost && r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		db := r.Context().Value("database").(*sql.DB)
+		json.NewDecoder(r.Body).Decode(&data)
+		db.Exec("UPDATE users SET status= ? WHERE uuid =?", data.Status, data.UUID)
+	}
+
+}
+
+func HandleGetUserPageNumber(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	uuid := r.URL.Query().Get("UUID")
+	db := r.Context().Value("database").(*sql.DB)
+	rows, err := db.Query("SELECT COUNT(*) FROM posts WHERE author_id = ?", uuid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var count int
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(count)
+}
+
+func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	limit := r.URL.Query().Get("limit")
+	page := r.URL.Query().Get("page")
+	uuid := r.URL.Query().Get("UUID")
+	l, _ := strconv.Atoi(limit)
+	p, _ := strconv.Atoi(page)
+	offset := (p - 1) * l
+
+	db := r.Context().Value("database").(*sql.DB)
+	rows, err := db.Query("SELECT * FROM posts WHERE author_id = ? ORDER BY created_at DESC LIMIT (?) OFFSET (?) ", uuid, limit, offset)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	posts := []models.Post{}
+	for rows.Next() {
+		post := models.Post{}
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		posts = append(posts, post)
+	}
+	json.NewEncoder(w).Encode(posts)
+
 }

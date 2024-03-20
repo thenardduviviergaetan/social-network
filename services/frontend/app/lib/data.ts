@@ -5,10 +5,10 @@ import { unstable_noStore as noStore } from 'next/cache';
 
 const ITEMS_PER_PAGE = 5; // Number of posts per page
 
-export const fetchUser = async () => {
+export const fetchUser = async (uuid?:string) => {
     const session = await auth()
     try {
-        const res = await axios.get(`http://caddy:8000/api/user?email=${session?.user?.email}`);
+        const res = await axios.get(`http://caddy:8000/api/user?UUID=${uuid}&email=${session?.user?.email}`);
         return res.data as User;
     } catch (error) {
         console.error('Error fetching user data');
@@ -16,10 +16,11 @@ export const fetchUser = async () => {
     }
 }
 
-export const fetchPageNumber = async () => {
+
+export const fetchPageNumber = async (urlSegment: string, param?: string) => {
     noStore()
     try {
-        const res = await axios.get('http://caddy:8000/api/posts/page-number');
+        const res = await axios.get(`http://caddy:8000/api/${urlSegment}/page-number?${param}`);
         const totalPages = Math.ceil(res.data / ITEMS_PER_PAGE);
         return totalPages;
     } catch (error) {
@@ -28,9 +29,9 @@ export const fetchPageNumber = async () => {
     }
 }
 
-export const fetchPosts = async (pageNumber: number) => {
+export const fetchPosts = async (pageNumber: number, urlSegment: string, param?: string) => {
     try {
-        const res = await axios.get(`http://caddy:8000/api/posts?page=${pageNumber}&&limit=${ITEMS_PER_PAGE}`);
+        const res = await axios.get(`http://caddy:8000/api/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`);
         return res.data;
     } catch (error) {
         console.error('Error fetching posts');

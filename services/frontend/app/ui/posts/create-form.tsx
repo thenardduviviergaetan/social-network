@@ -21,7 +21,7 @@ export default function Form({
 
   const { data: followers } = useSWR(
     // `http://localhost:8000/api/user/followers?user=${user}`,
-    `http://${window.location.hostname}:8000/api/user/followers?user=${user}`,
+    `http://localhost:8000/api/user/followers?user=${user}`,
     
     fetcher,
     { revalidateOnFocus: false, revalidateOnMount: true },

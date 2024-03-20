@@ -1,10 +1,11 @@
 import { fetchFollowers, fetchUser } from "@/app/lib/data";
+import { Follower, Param } from "@/app/lib/definitions";
 import { auth } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
 
 
-export default async function Followers({ param }: { param?: object }) {
+export default async function Followers({ param }: { param?: Param }) {
     const user = await fetchUser(param?.user);
     const session = await auth();
 
@@ -16,7 +17,7 @@ export default async function Followers({ param }: { param?: object }) {
             <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg">
                 {
                 followers ?
-                followers?.map((follower: object) => {
+                followers?.map((follower: Follower) => {
                     return (
                         <Link
                             href={{

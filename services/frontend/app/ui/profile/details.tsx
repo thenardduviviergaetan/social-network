@@ -3,9 +3,10 @@ import { auth } from "@/auth";
 import Image from "next/image";
 import Toggle from "./toggle";
 import Followers from "./followers";
+import { Param } from "@/app/lib/definitions";
 // import clsx from "clsx";
 
-export default async function Details({ param }: { param?: object }) {
+export default async function Details({ param }: { param?: Param }) {
   const user = await fetchUser(param?.user);
   const session = await auth();
   const followers = await fetchFollowers(param?.user);

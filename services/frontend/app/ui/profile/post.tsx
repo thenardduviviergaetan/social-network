@@ -1,9 +1,10 @@
 import { fetchPageNumber, fetchUser } from "@/app/lib/data";
 import Pagination from "../dashboard/pagination";
 import Posts from "../posts/posts";
+import { Param } from "@/app/lib/definitions";
 // import { auth } from "@/auth";
 
-export default async function UserPosts({param}:{param?:object}){
+export default async function UserPosts({param}:{param?:Param}){
     const user = await fetchUser();
     // const session = await auth();
     const currentPage = Number(param?.page) || 1;

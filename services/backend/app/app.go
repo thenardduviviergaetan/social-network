@@ -101,4 +101,9 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleFollowUser(w, r.WithContext(ctx))
 	})
+
+	http.HandleFunc("/api/group/create", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleCreateGroup(w, r.WithContext(ctx))
+	})
 }

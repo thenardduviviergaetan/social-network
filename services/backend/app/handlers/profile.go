@@ -153,7 +153,6 @@ func HandleGetFollowers(w http.ResponseWriter, r *http.Request) {
 			followers = append(followers, follower)
 		}
 	}
-	fmt.Println("Get followers", followers)
 	json.NewEncoder(w).Encode(followers)
 }
 

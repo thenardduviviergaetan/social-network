@@ -3,9 +3,11 @@ package app
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
+	"strings"
 )
 
 type App struct {
@@ -104,5 +106,22 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/user/followers", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetFollowers(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/user/followers/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+
+		segments := strings.Split(r.URL.Path, "/")
+		fmt.Println("following segments", segments)
+		switch segments[4] {
+		case "pending":
+			h.HandleGetPendingFollowers(w, r.WithContext(ctx))
+		case "accept":
+			h.HandleAcceptFollower(w, r.WithContext(ctx))
+		case "reject":
+			h.HandleRejectFollower(w, r.WithContext(ctx))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
 	})
 }

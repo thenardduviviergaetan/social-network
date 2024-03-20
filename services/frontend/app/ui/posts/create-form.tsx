@@ -158,7 +158,7 @@ export default function Form({
                     >
                       <div className="flex flex-col justify-center align-middle text-center p-1">
                         <Image
-                          className="w-10 h-10 rounded-full mr-2"
+                          className="w-10 h-10 rounded-full m-auto"
                           src={`http://caddy:8000/api/avatar?id=${follower.uuid}`}
                           alt={fullName}
                           width={40}

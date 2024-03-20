@@ -43,7 +43,7 @@ export const fetchPost = async (postID: string) => {
         const res = await axios.get(`http://caddy:8000/api/post?id=${postID}`);
         return res.data;
     } catch (error) {
-        console.error('Error fetching post iiii');
+        console.error('Error fetching post');
         return null;
     }
 }

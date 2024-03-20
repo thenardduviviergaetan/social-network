@@ -80,7 +80,7 @@ func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 	row := db.QueryRow("SELECT * FROM posts WHERE id = ?", id)
 
 	post := models.Post{}
-	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, post.Authorized, &post.Date)
+	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { fetchUser } from "@/app/lib/data";
 import { auth } from "@/auth";
 import axios from "axios";
+import Notifications from "@/app/ui/dashboard/notifications";
 
 export default async function SideNav() {
   const session = await auth();
@@ -30,10 +31,7 @@ export default async function SideNav() {
           </Link>
         </div>
       </Suspense>
-      {/* <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block shadow-xl">
-        </div>
-      </div> */}
+      <Notifications user={session?.user?.uuid}/>
     </div>
   );
 }

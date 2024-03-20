@@ -14,6 +14,7 @@ import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
 import { Button } from "@/app/ui/button";
 import { followUser } from "@/app/lib/action";
 import clsx from "clsx";
+import {fetcher} from "@/app/lib/utils"
 
 export default function PostsCard({
   postID,
@@ -26,7 +27,6 @@ export default function PostsCard({
   user: string;
   current: string | null | undefined;
 }) {
-  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
   const { data: commentsCounter } = useSWR(
     `http://localhost:8000/api/comments/count?post_id=${postID}`,
@@ -42,7 +42,7 @@ export default function PostsCard({
   const { data: followStatus, mutate: mutateFollow } = useSWR(
     `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
     fetcher,
-    { revalidateOnMount: true, revalidateOnFocus: false },
+    { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
   );
 
   const handleLike = async () => {
@@ -224,7 +224,7 @@ export function PublicPost({
         <div className="flex items-center">
           <Link
             href={{
-              pathname: "dashboard/profile",
+              pathname: "/dashboard/profile",
               query: { user: encodeURIComponent(post.author) },
             }}
           >
@@ -278,7 +278,7 @@ export function PublicPost({
         </div>
         <div className="text-purple-700">
           <Link
-            href={{ pathname: "dashboard/posts", query: { id: postID } }}
+            href={{ pathname: "/dashboard/posts", query: { id: postID } }}
           >
             Comment({commentsCounter | 0})
           </Link>

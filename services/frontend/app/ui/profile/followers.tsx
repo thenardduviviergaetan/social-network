@@ -9,7 +9,7 @@ export default async function Followers({ param }: { param?: Param }) {
     const followers = await fetchFollowers(param?.user)
     return (
         <>
-            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg min-w-[450px] max-w-[700px]">
+            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg max-w-7/12 sm:max-w-[450px] md:max-w-[700px]">
                 {
                 followers ?
                 followers?.map((follower: Follower) => {

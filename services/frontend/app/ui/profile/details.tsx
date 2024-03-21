@@ -13,7 +13,7 @@ export default async function Details({ param }: { param?: Param }) {
 
   return (
     <>
-      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl w-[7/12] min-w-[450px] max-w-[700px] text-center overflow-y-auto max-h-[400px] divide-y divide-dashed divide-black ">
+      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl max-w-7/12  sm:max-w-[500px] md:max-w-[700px] text-center overflow-y-auto max-h-[400px] divide-y divide-dashed divide-black ">
         <Image
           src={param?.user ? `http://caddy:8000/api/avatar?id=${param?.user}` : session?.user?.picture}
           alt="Profile Picture"

@@ -2,11 +2,12 @@
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/app/ui/button";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import { CADDY_URL } from "@/app/lib/constants";
 
 interface Notification {
   uuid: string;
@@ -27,8 +28,6 @@ export default function Notifications({ user }: NotificationsProps) {
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
   );
 
-  console.log("Notifications loaded");
-
   const handleAccept = async (followerId: string) => {
     try {
       await axios.post(`/api/user/followers/accept`, {
@@ -36,6 +35,7 @@ export default function Notifications({ user }: NotificationsProps) {
         follower: followerId,
       });
       mutate();
+      showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to accept follower");
     }
@@ -48,58 +48,62 @@ export default function Notifications({ user }: NotificationsProps) {
         follower: followerId,
       });
       mutate();
+      showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to reject follower");
     }
   };
 
   return (
-    <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-      <div className="h-auto w-full grow rounded-md bg-gray-50 md:block shadow-xl">
-        <div className="flex h-10">
-          <p>
-            You have{" "}
-            <span className="text-md font-bold text-purple-600">
-              {pending?.length || 0}
-            </span>{" "}
-            pending followers
-          </p>
-          <ArrowRightCircleIcon
-            className="w-5 h-5 ml-2 text-purple-600 cursor-pointer"
+    <div className="flex-grow flex flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+      <div className="h-auto w-full rounded-md bg-gray-50 md:block shadow-xl">
+        {pending?.length > 0 && (
+          <div
+            className="flex items-center justify-between h-10 px-4 cursor-pointer"
             onClick={() =>
               setShowNotif(showNotif === "pending" ? "" : "pending")}
-          />
-        </div>
+          >
+            <p className="text-sm font-medium text-gray-600">
+              New follow request
+              <span className="ml-2 text-md font-bold text-purple-600">
+                {pending?.length || 0}
+              </span>
+            </p>
+            <ArrowRightCircleIcon className="w-5 h-5 text-purple-600" />
+          </div>
+        )}
         {showNotif === "pending" && (
-          <div className="flex h-40 justify-around overflow-x-auto">
+          <div className="flex flex-col space-y-2 p-4">
             {pending?.map((notif: Notification, index: number) => (
-              <div key={index.toString()}>
-                <div className="flex flex-col justify-center align-middle text-center p-1">
-                  <Image
-                    className="w-10 h-10 rounded-full m-auto"
-                    src={`http://caddy:8000/api/avatar?id=${notif.uuid}`}
-                    alt={`${notif.firstName} ${notif.lastName}`}
-                    width={40}
-                    height={40}
-                  />
-                  <span>
+              <div
+                key={index.toString()}
+                className="flex items-center space-x-2"
+              >
+                <Image
+                  className="w-10 h-10 rounded-full"
+                  src={`${CADDY_URL}/avatar?id=${notif.uuid}`}
+                  alt={`${notif.firstName} ${notif.lastName}`}
+                  width={40}
+                  height={40}
+                />
+                <div className="flex-grow">
+                  <p className="text-sm font-medium text-gray-800">
                     {`${notif.firstName} ${notif.lastName}`}
-                  </span>
-                </div>
-                <div className="flex justify-around">
-                  <Button
-                    className="mr-1"
-                    onClick={() =>
-                      handleAccept(notif.uuid)}
-                  >
-                    Accept
-                  </Button>
-                  <Button
-                    className="bg-red-600 hover:bg-red-800"
-                    onClick={() => handleReject(notif.uuid)}
-                  >
-                    Reject
-                  </Button>
+                  </p>
+                  <div className="flex space-x-2">
+                    <Button
+                      className="text-xs  h-8"
+                      onClick={() => handleAccept(notif.uuid)}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      className="text-xs bg-red-600 hover:bg-red-800 h-8"
+                      onClick={() => handleReject(notif.uuid)}
+                    >
+                      Reject
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

@@ -9,7 +9,7 @@ export default async function SideNav() {
 
   return (
     <div className="flex flex-col px-3 py-4 md:px-2">
-      <Suspense fallback={<div>Loading...</div>}>
+      {/* <Suspense fallback={<div>Loading...</div>}> */}
         <div className="mb-2 flex h-50 items-end justify-center rounded-md bg-purple-700 p-4 md:h-50">
           <Link href="/dashboard/profile">
             <div className="flex flex-col items-center mb-2">
@@ -28,7 +28,7 @@ export default async function SideNav() {
             </div>
           </Link>
         </div>
-      </Suspense>
+      {/* </Suspense> */}
       <Notifications user={session?.user?.uuid}/>
     </div>
   );

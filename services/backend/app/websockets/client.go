@@ -9,10 +9,11 @@ import (
 )
 
 type Client struct {
-	hub      *Hub
-	conn     *websocket.Conn
-	send     chan []byte
-	Username string   `json:"username"`
+	hub  *Hub
+	conn *websocket.Conn
+	send chan []byte
+	// Username string   `json:"username"`
+	UUID     string   `json:"uuid"`
 	Online   bool     `json:"online"`
 	Message  string   `json:"message"`
 	LastMsg  []string `json:"last_msg"`
@@ -43,6 +44,7 @@ func (c *Client) Read() {
 		c.hub.broadcast <- msg
 	}
 }
+
 func (c *Client) Write() {
 	defer func() {
 		c.conn.Close()
@@ -61,19 +63,25 @@ func (c *Client) Write() {
 		}
 	}
 }
+
 func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
-
-	fmt.Println(r)
-
-	client := &Client{Username: "test", //TODO: handle user first name / lastname /username ?
+	_, msg, err := conn.ReadMessage()
+	if err != nil {
+		fmt.Println(err)
+		conn.Close()
+		return
+	}
+	client := &Client{
+		UUID:   string(msg), // TODO: handle user first name / lastname /username ?
 		hub:    hub,
 		conn:   conn,
 		send:   make(chan []byte, 256),
-		Online: true}
+		Online: true,
+	}
 	client.hub.register <- client
 	go client.Write()
 	go client.Read()

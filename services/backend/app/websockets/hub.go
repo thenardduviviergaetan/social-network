@@ -4,10 +4,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"server/app"
-	"server/app/middleware"
+	"log"
 	"strings"
 	"time"
+
+	"server/app"
+	"server/app/middleware"
 )
 
 type Hub struct {
@@ -18,12 +20,13 @@ type Hub struct {
 	status     []*Client
 }
 type Message struct {
-	Msg_type string `json:"msg_type"`
-	Content  string `json:"content"`
-	Target   string `json:"target"`
-	Sender   string `json:"sender"`
-	Date     string `json:"date"`
-	Image    string `json:"image"`
+	Msg_type   string `json:"msg_type"`
+	Content    string `json:"content"`
+	TypeTarget string `json:"type_target"`
+	Target     string `json:"target"`
+	Sender     string `json:"sender"`
+	Date       string `json:"date"`
+	Image      string `json:"image"`
 }
 type StatusMessage struct {
 	Msg_type string    `json:"msg_type"`
@@ -32,10 +35,11 @@ type StatusMessage struct {
 }
 
 func InitHub(app *app.App) *Hub {
-	users := middleware.GetAllUsers(app.DB.DB) //TODO Get all users from db ?
+	users := middleware.GetAllUsers(app.DB.DB) // TODO Get all users from db ?
 	offlineInit := make([]*Client, 0)
-	for _, user := range users {
-		client := &Client{Username: user, send: make(chan []byte)}
+	for _, userUUID := range users {
+		// client := &Client{Username: user, send: make(chan []byte)}
+		client := &Client{UUID: userUUID, send: make(chan []byte)}
 		offlineInit = append(offlineInit, client)
 	}
 	return &Hub{
@@ -46,27 +50,30 @@ func InitHub(app *app.App) *Hub {
 		status:     offlineInit,
 	}
 }
+
 func (h *Hub) Run(app *app.App) {
 	for {
 		select {
 		case client := <-h.register:
 			client.Online = true
-			h.clients[client.Username] = client
+			h.clients[client.UUID] = client
 			h.status = Remove(h.status, client)
 			h.status = append(h.status, client)
 			h.SendStatusMessage(app, client)
 		case client := <-h.unregister:
-			if _, ok := h.clients[client.Username]; ok {
+			if _, ok := h.clients[client.UUID]; ok {
 				client.Online = false
 				h.status = Remove(h.status, client)
 				h.status = append(h.status, client)
 				h.SendStatusMessage(app, client)
-				close(h.clients[client.Username].send)
-				delete(h.clients, client.Username)
+				close(h.clients[client.UUID].send)
+				delete(h.clients, client.UUID)
 			}
 		case message := <-h.broadcast:
 			msg := &Message{}
 			json.Unmarshal(message, msg)
+			log.Println("msg :", string(message))
+			log.Println("msg :", msg)
 			switch msg.Msg_type {
 			case "notification":
 				notif := &Message{Msg_type: "notification", Target: msg.Target, Sender: msg.Sender}
@@ -83,49 +90,54 @@ func (h *Hub) Run(app *app.App) {
 				}
 				jsonTyping, _ := json.Marshal(typing)
 				h.SendMessageToTarget(app, msg.Target, jsonTyping)
+			default:
+				h.SendMessageToTarget(app, msg.Target, message)
 			}
 		}
 	}
 }
+
 func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
-	h.clients[current.Username].LastMsg = []string{}
-	h.clients[current.Username].LastMsg = GetLastestMessages(app, current.Username)
-	msg := &StatusMessage{Msg_type: "status", Target: current.Username, Status: h.status}
+	h.clients[current.UUID].LastMsg = []string{}
+	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
+	msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status}
 	jsonClients, _ := json.Marshal(msg)
 	for c := range h.clients {
 		h.clients[c].send <- jsonClients
 	}
 }
-func (h *Hub) SendMessageToTarget(app *app.App, username string, message []byte) {
+
+func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	msg := &Message{}
 	json.Unmarshal(message, msg)
 	if msg.Msg_type == "chat" {
-		if client, ok := h.clients[username]; ok {
-			if client.Username == msg.Target || client.Username == msg.Sender {
+		if client, ok := h.clients[UUID]; ok {
+			if client.UUID == msg.Target || client.UUID == msg.Sender {
 				SavePrivateMessage(app, msg)
 				client.send <- message
 			}
 		}
 	}
 	if msg.Msg_type == "notification" {
-		if client, ok := h.clients[username]; ok {
-			if client.Username == msg.Target {
+		if client, ok := h.clients[UUID]; ok {
+			if client.UUID == msg.Target {
 				client.send <- message
 			}
 		}
 	}
 	if msg.Msg_type == "typing" {
-		if client, ok := h.clients[username]; ok {
-			if client.Username == msg.Target {
+		if client, ok := h.clients[UUID]; ok {
+			if client.UUID == msg.Target {
 				client.send <- message
 			}
 		}
 	}
 }
+
 func Remove(clients []*Client, c *Client) []*Client {
 	index := -1
 	for i, v := range clients {
-		if v.Username == c.Username {
+		if v.UUID == c.UUID {
 			index = i
 			break
 		}
@@ -135,6 +147,7 @@ func Remove(clients []*Client, c *Client) []*Client {
 	}
 	return append(clients[:index], clients[index+1:]...)
 }
+
 func SavePrivateMessage(app *app.App, message *Message) error {
 	var image []byte
 	if message.Image != "" {
@@ -155,6 +168,7 @@ func SavePrivateMessage(app *app.App, message *Message) error {
 	)
 	return err
 }
+
 func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*Message, error) {
 	rows, err := app.DB.Query("SELECT sender, target, content, date,image FROM private_messages WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation DESC LIMIT ? OFFSET ?",
 		target,
@@ -179,6 +193,7 @@ func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*
 	}
 	return messages, nil
 }
+
 func GetLastestMessages(app *app.App, target string) []string {
 	clients := []string{}
 	rows, err := app.DB.Query("SELECT sender FROM private_messages WHERE target = ? ORDER BY creation DESC", target)
@@ -197,6 +212,7 @@ func GetLastestMessages(app *app.App, target string) []string {
 	}
 	return clients
 }
+
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {

@@ -1,9 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { fetchUser } from "@/app/lib/data";
 import { auth } from "@/auth";
-import axios from "axios";
 import Notifications from "@/app/ui/dashboard/notifications";
 
 export default async function SideNav() {

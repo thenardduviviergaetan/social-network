@@ -133,7 +133,6 @@ func HandleGetFollowers(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 
 		currentUser = r.URL.Query().Get("user")
-		fmt.Println("Current user", currentUser)
 		db := r.Context().Value("database").(*sql.DB)
 
 		rows, err := db.Query("SELECT follower_uuid FROM followers WHERE user_uuid = ?", currentUser)

@@ -10,11 +10,11 @@ import (
 )
 
 type App struct {
-	db *db.DB
+	DB *db.DB
 }
 
 func NewApp(db *db.DB) *App {
-	return &App{db: db}
+	return &App{DB: db}
 }
 
 // ServeHTTP handles the incoming HTTP requests and routes them to the appropriate handlers.

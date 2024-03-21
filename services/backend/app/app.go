@@ -106,4 +106,9 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleCreateGroup(w, r.WithContext(ctx))
 	})
+
+	http.HandleFunc("/api/groups", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroupList(w, r.WithContext(ctx))
+	})
 }

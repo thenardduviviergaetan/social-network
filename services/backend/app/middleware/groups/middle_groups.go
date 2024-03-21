@@ -2,22 +2,14 @@ package groups
 
 import (
 	"database/sql"
+	"server/db/models"
 	"time"
 )
 
-type Groups struct {
-	ID           int       `json:"id"`
-	CreationDate time.Time `json:"creationDate"`
-	CreatorID    id        `json:"creatorID"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
-}
-
-func CreateGroup(db *sql.DB, g *Groups) error {
-	_, err := db.Exec(`INSERT INTO groups 
-		(id, creationDate, creator, name, description)
-		VALUES (?,?,?,?,?)`,
-		g.ID,
+func CreateGroup(db *sql.DB, g *models.Groups) error {
+	_, err := db.Exec(`INSERT INTO social_groups 
+		(creation_date, creator_id, name, description)
+		VALUES (?,?,?,?)`,
 		time.Now(),
 		g.CreatorID,
 		g.Name,
@@ -29,7 +21,7 @@ func CreateGroup(db *sql.DB, g *Groups) error {
 }
 
 // TODO Find what I will use as input to get UserID
-func GetGroupsCreatedByUser(db *sql.DB, id string) ([]Groups, error) {
+func GetGroupsCreatedByUser(db *sql.DB, id string) ([]models.Groups, error) {
 	rows, err := db.Query("SELECT * FROM groups WHERE creatorID=?", id)
 	if err != nil {
 		return nil, err
@@ -38,9 +30,13 @@ func GetGroupsCreatedByUser(db *sql.DB, id string) ([]Groups, error) {
 	return extractGroups(rows)
 }
 
-func GetGroupsWhereUserIsMember(db *sql.DB, id string) ([]Groups, error) {
-	rows, err := db.Query(`SELECT * FROM groups WHERE creatorID IN 
-		(SELECT groupid FROM groups_members WHERE memberID=?)`, id)
+func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]models.Groups, error) {
+	// rows, err := db.Query(`SELECT * FROM groups WHERE creatorID IN
+	// 	(SELECT groupid FROM groups_members WHERE memberID=? LIMIT(?) OFFEST(?))`,
+	// 	id, limit, offset)
+	rows, err := db.Query(`SELECT * FROM social_groups WHERE id IN 
+		(SELECT groupid FROM groups_members WHERE memberID=?)`,
+		id)
 	if err != nil {
 		return nil, err
 	}
@@ -48,12 +44,12 @@ func GetGroupsWhereUserIsMember(db *sql.DB, id string) ([]Groups, error) {
 	return extractGroups(rows)
 }
 
-func extractGroups(rows *sql.Rows) ([]Groups, error) {
-	groupList := make([]Groups, 0)
+func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
+	groupList := make([]models.Groups, 0)
 
 	defer rows.Close()
 	for rows.Next() {
-		group := Groups{}
+		group := models.Groups{}
 
 		errScan := rows.Scan(
 			&group.ID,

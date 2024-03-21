@@ -33,5 +33,4 @@ export type Comment = {
     content: string
     image: File | null
     date: string
-
 }

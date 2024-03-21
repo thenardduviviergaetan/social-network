@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { formatDateToLocal } from "@/app/lib/utils";
 import Link from "next/link";
-import axios from "axios";
 import useSWR from "swr";
 import {
   HeartIcon as Empty_heart,
@@ -13,51 +12,82 @@ import {
 import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
 import { Button } from "@/app/ui/button";
 import { followUser } from "@/app/lib/action";
-import clsx from "clsx";
-import {fetcher} from "@/app/lib/utils"
+import { fetcher } from "@/app/lib/utils";
+import { useEffect, useState } from "react";
+import {
+  FollowButtonProps,
+  PostCardProps,
+  PrivatePostProps,
+  PublicPostProps,
+} from "@/app/lib/posts-types";
+import { API_BASE_URL, CADDY_URL } from "@/app/lib/constants";
+import {
+  fetchCommentsCount,
+  fetchFollowStatus,
+  fetchLikePost,
+  fetchLikes,
+} from "@/app/lib/data";
 
 export default function PostsCard({
-  postID,
   post,
   user,
-  current
-}: {
-  postID: string;
-  post: any;
-  user: string;
-  current: string | null | undefined;
-}) {
+  current,
+}: PostCardProps) {
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: commentsCounter } = useSWR(
-    // `http://localhost:8000/api/comments/count?post_id=${postID}`,
-    `http://localhost:8000/api/comments/count?post_id=${postID}`,
+  const { data: commentsCounter, mutate: mutateCommentsCounter } = useSWR(
+    `${API_BASE_URL}/comments/count?post_id=${post.id}`,
     fetcher,
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: false,
+      refreshInterval: 1000,
+    },
   );
 
   const { data: likesData, mutate: mutateLikes } = useSWR(
-    // `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
-    `http://localhost:8000/api/post/likes?id=${postID}&user=${user}`,
+    `${API_BASE_URL}/post/likes?id=${post.id}&user=${user}`,
     fetcher,
-    { revalidateOnMount: true, revalidateOnFocus: false },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: false,
+      refreshInterval: 1000,
+    },
   );
 
   const { data: followStatus, mutate: mutateFollow } = useSWR(
-    // `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
-    `http://localhost:8000/api/user/follow?user=${user}&author=${post.author_id}`,
+    `${API_BASE_URL}/user/follow?user=${user}&author=${post.author_id}`,
     fetcher,
-    { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
+    { revalidateOnMount: true, revalidateOnFocus: false, refreshInterval: 1000 },
   );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [commentsRes] = await Promise.all([
+          fetchCommentsCount(post.id),
+          fetchLikes(post.id, user),
+          fetchFollowStatus(user, post.author_id),
+        ]);
+        mutateCommentsCounter(commentsRes.data);
+        // setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [
+    post.id,
+    user,
+    post.author_id,
+    mutateCommentsCounter,
+  ]);
 
   const handleLike = async () => {
     try {
-      const res = await axios.post(
-        // `http://localhost:8000/api/post/likes?id=${postID}`,
-        `http://localhost:8000/api/post/likes?id=${postID}`,
-        {
-          user,
-        },
-      );
-      mutateLikes({ liked: res.data.liked, likecount: res.data.likecount });
+      const res = await fetchLikePost(post.id, user);
+      mutateLikes(res);
     } catch (error) {
       console.error(error);
     }
@@ -66,98 +96,87 @@ export default function PostsCard({
   const handleFollow = async () => {
     try {
       const res = await followUser(user, post.author_id);
-        mutateFollow({ followed: res.followed, pending: res.pending});
+      mutateFollow(res);
     } catch (error) {
       console.error(error);
     }
   };
 
+  let PostComponent = null;
+  let postProps = {};
 
   switch (post.status) {
     case "public":
-      return (
-        <PublicPost
-          postID={postID}
-          post={post}
-          user={user}
-          followStatus={followStatus}
-          handleFollow={handleFollow}
-          likesData={likesData}
-          commentsCounter={commentsCounter}
-          handleLike={handleLike}
-        />
-      );
     case "private":
-      if (post.author_id === user || (followStatus?.followed && !followStatus?.pending)) {
-        return (
-          <PublicPost
-            postID={postID}
-            post={post}
-            user={user}
-            followStatus={followStatus}
-            handleFollow={handleFollow}
-            likesData={likesData}
-            commentsCounter={commentsCounter}
-            handleLike={handleLike}
-          />
-        );
+      if (
+        post.author_id === user ||
+        (followStatus?.followed && !followStatus?.pending)
+      ) {
+        PostComponent = PublicPost;
+        postProps = {
+          post,
+          user,
+          followStatus,
+          handleFollow,
+          likesData,
+          commentsCounter,
+          handleLike,
+        };
+      } else {
+        PostComponent = PrivatePost;
+        postProps = {
+          post,
+          user,
+          followStatus,
+          handleFollow,
+        };
       }
-      return (
-        <PrivatePost
-          postID={postID}
-          post={post}
-          user={user}
-          followStatus={followStatus}
-          handleFollow={handleFollow}
-        />
+      break;
+    case "almost":
+      const allowed = (post.authorized ?? "").split(",").includes(
+        current as string,
       );
-      case 'almost':
-        const allowed = post.authorized.split(',').includes(current);
-        if (post.author_id === user || allowed) {
-          return (
-            <PublicPost
-            postID={postID}
-            post={post}
-            user={user}
-            followStatus={followStatus}
-            handleFollow={handleFollow}
-            likesData={likesData}
-            commentsCounter={commentsCounter}
-            handleLike={handleLike}
-            />
-          );
-        } else {
-          return (
-            <PrivatePost 
-            postID={postID}
-            post={post}
-            user={user}
-            followStatus={followStatus}
-            handleFollow={handleFollow}
-            />
-            );
-          }
+      if (post.author_id === user || allowed) {
+        PostComponent = PublicPost;
+        postProps = {
+          post,
+          user,
+          followStatus,
+          handleFollow,
+          likesData,
+          commentsCounter,
+          handleLike,
+        };
+      } else {
+        PostComponent = PrivatePost;
+        postProps = {
+          post,
+          user,
+          followStatus,
+          handleFollow,
+        };
+      }
+      break;
     default:
       return null;
   }
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
+
+  return <PostComponent {...postProps} />;
 }
 
 export function PrivatePost({
-  postID,
   post,
   user,
   followStatus,
   handleFollow,
-}: {
-  postID: string;
-  post: any;
-  user: string;
-  followStatus: any;
-  handleFollow: () => void;
-}) {
+}: PrivatePostProps) {
   return (
     <div
-      id={postID}
+      id={post.id}
       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto"
     >
       <div className="flex justify-between">
@@ -170,7 +189,7 @@ export function PrivatePost({
           >
             <Image
               className="w-10 h-10 rounded-full mr-2"
-              src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+              src={`${CADDY_URL}/avatar?id=${post.author_id}`}
               alt={post.author}
               width={40}
               height={40}
@@ -190,7 +209,6 @@ export function PrivatePost({
           followStatus={followStatus}
           handleFollow={handleFollow}
         />
-        
       </div>
       <p className="text-center text-gray-500">This post is private</p>
       <p className="text-center text-gray-500 mb-5">
@@ -201,7 +219,6 @@ export function PrivatePost({
 }
 
 export function PublicPost({
-  postID,
   post,
   user,
   followStatus,
@@ -209,19 +226,10 @@ export function PublicPost({
   likesData,
   commentsCounter,
   handleLike,
-}: {
-  postID: string;
-  post: any;
-  user: string;
-  followStatus: any;
-  handleFollow: () => void;
-  likesData: any;
-  commentsCounter: number;
-  handleLike: () => void;
-}) {
+}: PublicPostProps) {
   return (
     <div
-      id={postID}
+      id={post.id}
       className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto "
     >
       <div className="flex justify-between">
@@ -234,7 +242,7 @@ export function PublicPost({
           >
             <Image
               className="w-10 h-10 rounded-full mr-2"
-              src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+              src={`${CADDY_URL}/avatar?id=${post.author_id}`}
               alt={post.author}
               width={40}
               height={40}
@@ -260,7 +268,7 @@ export function PublicPost({
       {post.image && (
         <div className="mt-4 flex justify-center">
           <Image
-            src={`http://caddy:8000/api/post/image?path=${post.image}`}
+            src={`${CADDY_URL}/post/image?path=${post.image}`}
             alt="Post image"
             width={500}
             height={500}
@@ -282,7 +290,7 @@ export function PublicPost({
         </div>
         <div className="text-purple-700">
           <Link
-            href={{ pathname: "/dashboard/posts", query: { id: postID } }}
+            href={{ pathname: "/dashboard/posts", query: { id: post.id } }}
           >
             Comment({commentsCounter | 0})
           </Link>
@@ -297,43 +305,38 @@ function FollowButton({
   user,
   followStatus,
   handleFollow,
-}: {
-  post: any;
-  user: string;
-  followStatus: any;
-  handleFollow: () => void;
-}){
-  return(
+}: FollowButtonProps) {
+  return (
     <Button
-          onClick={handleFollow}
-          className={clsx(
-            post.author_id === user ? "hidden" : "block",
-            followStatus?.followed
-              ? "bg-gray-700 text-white"
-              : "bg-purple-500 text-white",
-          )}
-        >
-          {followStatus?.followed
+      onClick={handleFollow}
+      className={`${post.author_id === user ? "hidden" : "block"}
+        ${
+        followStatus?.followed
+          ? "bg-gray-700"
+          : "bg-purple-500"
+      }`}
+    >
+      {followStatus?.followed
+        ? (
+          followStatus?.pending
             ? (
-              followStatus?.pending
-                ? (
-                  <>
-                    <span className="mr-2">Pending...</span>
-                  </>
-                )
-                : (
-                  <>
-                    <span className="mr-2">Unfollow</span>
-                    <MinusIcon className="w-5 h-5" />
-                  </>
-                )
+              <>
+                <span className="mr-2">Pending...</span>
+              </>
             )
             : (
               <>
-                <span className="mr-2">Follow</span>
-                <PlusIcon className="w-5 h-5" />
+                <span className="mr-2">Unfollow</span>
+                <MinusIcon className="w-5 h-5" />
               </>
-            )}
-        </Button>
-  )
+            )
+        )
+        : (
+          <>
+            <span className="mr-2">Follow</span>
+            <PlusIcon className="w-5 h-5" />
+          </>
+        )}
+    </Button>
+  );
 }

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense } from "react";
 import { auth } from "@/auth";
 import Notifications from "@/app/ui/dashboard/notifications";
 

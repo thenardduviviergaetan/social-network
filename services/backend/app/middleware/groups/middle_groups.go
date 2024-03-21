@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-func CreateGroup(db *sql.DB, g *models.Groups) error {
+func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 	_, err := db.Exec(`INSERT INTO social_groups 
 		(creation_date, creator_id, name, description)
 		VALUES (?,?,?,?)`,
 		time.Now(),
-		g.CreatorID,
+		uuid,
 		g.Name,
 		g.Description)
 
@@ -20,9 +20,9 @@ func CreateGroup(db *sql.DB, g *models.Groups) error {
 	return err
 }
 
-// TODO Find what I will use as input to get UserID
+// TODO: Find what I will use as input to get UserID
 func GetGroupsCreatedByUser(db *sql.DB, id string) ([]models.Groups, error) {
-	rows, err := db.Query("SELECT * FROM groups WHERE creatorID=?", id)
+	rows, err := db.Query("SELECT * FROM social_groups WHERE creator_id=?", id)
 	if err != nil {
 		return nil, err
 	}

@@ -8,15 +8,18 @@ export default async function Groups({ page }: { page: number}) {
     const totalPages = await fetchTotalGroupPages()
 
     console.log("Pages = ",page);
+    console.log(groups)
 
     return (
-        <div className="flex-grow flex justify-center items-end">
-            { groups && groups.map((post: any) => {
+        <div className="flex-grow flex justify-center items-center">
+            {groups?.map((group: any) => {
                 return (
                     // TODO Create a GroupCard for better readability.
                     // TODO Maybe pass the USERID in the GroupCard so it can 
                     // filter there. For now it's in the fetch.
-                    <div>${post}</div>
+                    <div>
+                        group name : {group.name}
+                    </div>
                 )
             })}
             <div className="align-end">

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"server/app/middleware/groups"
 	"server/db/models"
-	"strconv"
 )
 
 func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
@@ -24,8 +23,10 @@ func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
-	if errCreate := groups.CreateGroup(db, &group); errCreate != nil {
+	fmt.Println("group, ", group)
+	uuid := r.URL.Query().Get("UUID")
+	fmt.Println(uuid)
+	if errCreate := groups.CreateGroup(db, &group, uuid); errCreate != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
@@ -45,11 +46,13 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
 	userUUID := q.Get("user")
-	limit, _ := strconv.Atoi(q.Get("limit"))
-	page, _ := strconv.Atoi(q.Get("page"))
-	offset := (page - 1) * limit
+	fmt.Println(userUUID)
+	// limit, _ := strconv.Atoi(q.Get("limit"))
+	// page, _ := strconv.Atoi(q.Get("page"))
+	// offset := (page - 1) * limit
 
-	groupList, errGetGroups := groups.GetGroupsWhereUserIsMember(db, userUUID, limit, offset)
+	groupList, errGetGroups := groups.GetGroupsCreatedByUser(db, userUUID)
+	fmt.Println(groupList)
 	if errGetGroups != nil {
 		fmt.Println("ERROR =", errGetGroups)
 		http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)

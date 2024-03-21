@@ -91,10 +91,10 @@ export const fetchTotalGroupPages = async () => {
 }
 
 export const fetchGroups = async (pageNumber: number) => {
-    const session = await auth()
+    const user = await fetchUser()
 
     return fetchGlobal(
-        `/groups?page=${pageNumber}&&limit=${GROUPS_PER_PAGE}&&user=${session?.user?.id}`,
+        `/groups?page=${pageNumber}&limit=${GROUPS_PER_PAGE}&user=${user?.uuid}`,
         'Error fetching groups')
 }
 

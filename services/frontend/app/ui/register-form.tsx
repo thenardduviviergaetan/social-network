@@ -198,6 +198,59 @@ export default function RegisterForm() {
           </div>
 
           <div className="mt-4">
+                  <fieldset>
+          <legend className="mb-2 block text-sm font-medium">
+            Choose profile status
+          </legend>
+          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+            <div className="flex gap-4">
+              <div className="flex items-center">
+                <input
+                  id="private"
+                  name="status"
+                  type="radio"
+                  value="private"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="private"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                >
+                  Private
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="public"
+                  name="status"
+                  type="radio"
+                  value="public"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                  aria-describedby="status-error"
+                  defaultChecked
+                  
+                />
+                <label
+                  htmlFor="public"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                >
+                  Public
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="status-error">
+            {state.errors?.status &&
+              state.errors.status.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </fieldset>
+          </div>
+
+          <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
               htmlFor="nickname"
@@ -233,7 +286,9 @@ export default function RegisterForm() {
               <IdentificationIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
+
         </div>
+
 
         
           <div className="mt-4">

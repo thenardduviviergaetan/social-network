@@ -4,8 +4,18 @@ export type User = {
     firstName: string
     lastName: string
     dateOfBirth: string
+    status: boolean
     nickname?: string
     about?: string
+}
+export type Follower = {
+    uuid: string
+    firstName: string
+    lastName: string
+}
+export type Param = {
+    page?: string
+    user?: string
 }
 
 export type TokenUser = {
@@ -23,5 +33,5 @@ export type Comment = {
     content: string
     image: File | null
     date: string
-    
+
 }

@@ -6,14 +6,15 @@ import (
 	"net/http"
 	h "server/app/handlers"
 	"server/db"
+	"strings"
 )
 
 type App struct {
-	db *db.DB
+	DB *db.DB
 }
 
 func NewApp(db *db.DB) *App {
-	return &App{db: db}
+	return &App{DB: db}
 }
 
 // ServeHTTP handles the incoming HTTP requests and routes them to the appropriate handlers.
@@ -44,6 +45,18 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetUser(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/status", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserStatus(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/posts", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserPosts(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/user/page-number", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetUserPageNumber(w, r.WithContext(ctx))
 	})
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +109,6 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleLikePost(w, r.WithContext(ctx))
 	})
-
 	http.HandleFunc("/api/user/follow", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleFollowUser(w, r.WithContext(ctx))
@@ -110,5 +122,26 @@ func (a *App) ServeHTTP(database *sql.DB) {
 	http.HandleFunc("/api/groups", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetGroupList(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/user/followers", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetFollowers(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/user/followers/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		segments := strings.Split(r.URL.Path, "/")
+
+		switch segments[4] {
+		case "pending":
+			h.HandleGetPendingFollowers(w, r.WithContext(ctx))
+		case "accept":
+			h.HandleAcceptFollower(w, r.WithContext(ctx))
+		case "reject":
+			h.HandleRejectFollower(w, r.WithContext(ctx))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
 	})
 }

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS posts (
     content TEXT NOT NULL,
     status Text NOT NULL,
     image TEXT,
+    authorized TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
 );

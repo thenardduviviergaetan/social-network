@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"server/db/models"
 	"strconv"
@@ -17,10 +18,10 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	post := &models.Post{}
 	json.NewDecoder(r.Body).Decode(&post)
-
+	fmt.Println(post)
 	db := r.Context().Value("database").(*sql.DB)
 
-	stmt := `INSERT INTO posts (author_id, author, content,status, image, created_at) VALUES (?, ?, ?, ?, ?, ?)`
+	stmt := `INSERT INTO posts (author_id, author, content, status, image, authorized, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 
 	var img interface{}
 	if post.Image == "" {
@@ -29,7 +30,14 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		img = post.Image
 	}
 
-	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.Content, post.Status, img, time.Now())
+	var authorized interface{}
+	if post.Authorized == "" {
+		authorized = nil
+	} else {
+		authorized = post.Authorized
+	}
+
+	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.Content, post.Status, img, authorized, time.Now())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -55,7 +63,7 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 	posts := []models.Post{}
 	for rows.Next() {
 		post := models.Post{}
-		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Date)
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -73,7 +81,7 @@ func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 	row := db.QueryRow("SELECT * FROM posts WHERE id = ?", id)
 
 	post := models.Post{}
-	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Date)
+	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

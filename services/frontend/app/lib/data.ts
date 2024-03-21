@@ -6,10 +6,10 @@ import { unstable_noStore as noStore } from 'next/cache';
 const ITEMS_PER_PAGE = 5; // Number of posts per page
 const GROUPS_PER_PAGE = 10 // Number of groups per page
 
-export const fetchUser = async () => {
+export const fetchUser = async (uuid?:string) => {
     const session = await auth()
     try {
-        const res = await axios.get(`http://caddy:8000/api/user?email=${session?.user?.email}`);
+        const res = await axios.get(`http://caddy:8000/api/user?UUID=${uuid}&email=${session?.user?.email}`);
         return res.data as User;
     } catch (error) {
         console.error('Error fetching user data');
@@ -17,11 +17,21 @@ export const fetchUser = async () => {
     }
 }
 
-// TODO  Rename this func to better reflect that usage is limited to POSTS.
-export const fetchPageNumber = async () => {
+export const fetchFollowers = async (uuid?:string)=> {
+    const session = await auth()
+    try {
+        const res = await axios.get(`http://caddy:8000/api/user/followers?user=${uuid ? uuid : session?.user?.uuid}`);
+        return res.data
+    } catch (error) {
+        console.error('Error fetching user data');
+        return null;
+    }
+}
+
+export const fetchPageNumber = async (urlSegment: string, param?: string) => {
     noStore()
     try {
-        const res = await axios.get('http://caddy:8000/api/posts/page-number');
+        const res = await axios.get(`http://caddy:8000/api/${urlSegment}/page-number?${param}`);
         const totalPages = Math.ceil(res.data / ITEMS_PER_PAGE);
         return totalPages;
     } catch (error) {
@@ -30,9 +40,9 @@ export const fetchPageNumber = async () => {
     }
 }
 
-export const fetchPosts = async (pageNumber: number) => {
+export const fetchPosts = async (pageNumber: number, urlSegment: string, param?: string) => {
     try {
-        const res = await axios.get(`http://caddy:8000/api/posts?page=${pageNumber}&&limit=${ITEMS_PER_PAGE}`);
+        const res = await axios.get(`http://caddy:8000/api/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`);
         return res.data;
     } catch (error) {
         console.error('Error fetching posts');
@@ -45,7 +55,7 @@ export const fetchPost = async (postID: string) => {
         const res = await axios.get(`http://caddy:8000/api/post?id=${postID}`);
         return res.data;
     } catch (error) {
-        console.error('Error fetching post iiii');
+        console.error('Error fetching post');
         return null;
     }
 }
@@ -59,7 +69,6 @@ export const fetchComments = async (postID: string) => {
         return null;
     }
 }
-
 /////////////////>- GROUPS -</////////////////
 
 // TODO this function could be used to shorten every function in this page.

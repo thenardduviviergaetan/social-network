@@ -118,6 +118,10 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetFollowers(w, r.WithContext(ctx))
 	})
+	http.HandleFunc("/api/user/followed", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetFollowed(w, r.WithContext(ctx))
+	})
 
 	http.HandleFunc("/api/user/followers/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)

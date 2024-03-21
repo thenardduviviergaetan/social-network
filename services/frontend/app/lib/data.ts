@@ -32,6 +32,20 @@ export const fetchFollowers = async (uuid?: string) => {
     return null;
   }
 };
+export const fetchFollowed = async (uuid?: string) => {
+  const session = await auth();
+  try {
+    const res = await axios.get(
+      `${CADDY_URL}/user/followed?user=${
+        uuid ? uuid : session?.user?.uuid
+      }`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching user data");
+    return null;
+  }
+};
 
 export const fetchPageNumber = async (urlSegment: string, param?: string) => {
   noStore();

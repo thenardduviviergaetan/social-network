@@ -24,26 +24,26 @@ export default async function Details({ param }: { param?: Param }) {
         <div className="flex flex-row flex-wrap mt-5">
           {
             user?.nickname &&
-            <h1 className="p-5 w-4/12">
+            <p className="p-5 w-4/12">
               Nickname:
               <p className=" text-center text-purple-700 hover:text-purple-400">{user?.nickname}</p>
-            </h1>
+            </p>
           }
-          <h1 className="p-5 w-4/12">
+          <p className="p-5 w-4/12">
             Date of birth:
             <p className=" text-center text-purple-700 hover:text-purple-400">{user?.dateOfBirth}</p>
-          </h1>
-          <h1 className="p-5 w-4/12">
+          </p>
+          <p className="p-5 w-4/12">
             Followers :
             <p className=" text-center text-purple-700 hover:text-purple-400 ">{followers ? followers.length : 0}</p>
-          </h1>
+          </p>
         </div>
-        {user?.about && <h1 className="font-bold p-5 break-all">About: <p className="text-purple-700">{user?.about}</p></h1>}
+        {user?.about && <p className="font-bold p-5 break-all">About: <p className="text-purple-700">{user?.about}</p></p>}
       </div>
       <div className="flex flex-col justify-evenly items-center rounded-lg bg-white shadow-xl p-3 w-9/12 text-center min-w-[300px] max-w-[600px]">
-        <h1 className="font-bold mt-1 p-3 break-all">Email: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.email}</p></h1>
-        <h1 className="font-bold mt-1 p-3">First Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.firstName}</p></h1>
-        <h1 className="font-bold mt-1 p-3">Last Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.lastName}</p></h1>
+        <p className="font-bold mt-1 p-3 break-all">Email: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.email}</p></p>
+        <p className="font-bold mt-1 p-3">First Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.firstName}</p></p>
+        <p className="font-bold mt-1 p-3">Last Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.lastName}</p></p>
         {
           param?.user ? (param?.user === session?.user?.uuid ? <Toggle user={user} className="p-3">{user?.status} </Toggle> : ""):<Toggle user={user} className="p-3">{user?.status} </Toggle>
         }

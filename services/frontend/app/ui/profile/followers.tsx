@@ -3,13 +3,16 @@ import { Follower, Param } from "@/app/lib/definitions";
 import { auth } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
+import { use } from "react";
 
 
 export default async function Followers({ param }: { param?: Param }) {
     const followers = await fetchFollowers(param?.user)
+    const user = await fetchUser(param?.user)
     return (
         <>
             <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg max-w-7/12 sm:max-w-[450px] md:max-w-[700px]">
+                <p className="text-white p-1 mb-3">{user?.firstName}'s Followers :</p>
                 {
                 followers ?
                 followers?.map((follower: Follower) => {

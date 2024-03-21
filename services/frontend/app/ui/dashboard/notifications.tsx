@@ -58,10 +58,10 @@ export default function Notifications({ user }: NotificationsProps) {
       <div className="h-auto w-full grow rounded-md bg-gray-50 md:block shadow-xl">
         <div className="flex h-10">
           <p>
-            You have{" "}
+            You have&nbsp;
             <span className="text-md font-bold text-purple-600">
               {pending?.length || 0}
-            </span>{" "}
+            </span>&nbsp;
             pending followers
           </p>
           <ArrowRightCircleIcon

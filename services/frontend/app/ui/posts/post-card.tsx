@@ -33,7 +33,6 @@ export default function PostsCard({
   user,
   current,
 }: PostCardProps) {
-  const [isLoading, setIsLoading] = useState(true);
 
   const { data: commentsCounter, mutate: mutateCommentsCounter } = useSWR(
     `${API_BASE_URL}/comments/count?post_id=${post.id}`,
@@ -58,7 +57,11 @@ export default function PostsCard({
   const { data: followStatus, mutate: mutateFollow } = useSWR(
     `${API_BASE_URL}/user/follow?user=${user}&author=${post.author_id}`,
     fetcher,
-    { revalidateOnMount: true, revalidateOnFocus: false, refreshInterval: 1000 },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: false,
+      refreshInterval: 1000,
+    },
   );
 
   useEffect(() => {
@@ -70,7 +73,6 @@ export default function PostsCard({
           fetchFollowStatus(user, post.author_id),
         ]);
         mutateCommentsCounter(commentsRes.data);
-        // setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -160,10 +162,6 @@ export default function PostsCard({
     default:
       return null;
   }
-
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
 
   return <PostComponent {...postProps} />;
 }
@@ -310,11 +308,7 @@ function FollowButton({
     <Button
       onClick={handleFollow}
       className={`${post.author_id === user ? "hidden" : "block"}
-        ${
-        followStatus?.followed
-          ? "bg-gray-700"
-          : "bg-purple-500"
-      }`}
+        ${followStatus?.followed ? "bg-gray-700" : "bg-purple-500"}`}
     >
       {followStatus?.followed
         ? (

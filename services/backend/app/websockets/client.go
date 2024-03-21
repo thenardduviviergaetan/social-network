@@ -67,9 +67,9 @@ func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	fmt.Println(r)
+	test := r.URL.Query().Get("token")
 
-	client := &Client{Username: "test", //TODO: handle user first name / lastname /username ?
+	client := &Client{Username: test, //TODO: handle user first name / lastname /username ?
 		hub:    hub,
 		conn:   conn,
 		send:   make(chan []byte, 256),

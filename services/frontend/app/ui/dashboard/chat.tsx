@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function Chat() {
   useEffect(() => {
-        const socket = new WebSocket('ws://localhost:8000/api/ws');
+        const socket = new WebSocket('ws://localhost:8000/api/ws?token=123456');
 
         socket.onopen = (event) => {
           console.log('WebSocket connection opened');
@@ -35,6 +35,8 @@ export default function Chat() {
             socket.close();
         };
     }, []);
+
+    console.log('Chat loaded');
 
   return (
     <div>

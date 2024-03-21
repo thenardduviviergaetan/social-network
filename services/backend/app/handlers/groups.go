@@ -12,7 +12,7 @@ import (
 
 func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
 	//TODO move this to the parent
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}

@@ -1,6 +1,8 @@
 import { fetchGroups, fetchTotalGroupPages } from "@/app/lib/data";
 import { auth } from "@/auth";
 import Pagination from "@/app/ui/dashboard/pagination";
+import GroupCard from "./group-card";
+import { Group } from "@/app/lib/definitions";
 
 export default async function Groups({ page }: { page: number}) {
     const groups = await fetchGroups(page);
@@ -12,13 +14,10 @@ export default async function Groups({ page }: { page: number}) {
 
     return (
         <div className="flex-grow flex justify-center items-center">
-            {groups?.map((group: any) => {
+            {groups?.map((group: Group) => {
                 return (
-                    // TODO Create a GroupCard for better readability.
-                    // TODO Maybe pass the USERID in the GroupCard so it can 
-                    // filter there. For now it's in the fetch.
-                    <div>
-                        group name : {group.name}
+                    <div key={group.id} className="flex flex-wrap p-4">
+                        <GroupCard key={group.id} group={group}/>
                     </div>
                 )
             })}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"server/app/middleware/groups"
 	"server/db/models"
+	"strconv"
 )
 
 func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
@@ -47,11 +48,15 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	userUUID := q.Get("user")
 	fmt.Println(userUUID)
-	// limit, _ := strconv.Atoi(q.Get("limit"))
-	// page, _ := strconv.Atoi(q.Get("page"))
-	// offset := (page - 1) * limit
+	limit, _ := strconv.Atoi(q.Get("limit"))
+	page, _ := strconv.Atoi(q.Get("page"))
+	offset := (page - 1) * limit
 
 	groupList, errGetGroups := groups.GetGroupsCreatedByUser(db, userUUID)
+	//FIXME: faire en sorte que create group mette le creator en membre, puis utiliser getgrupecreatedbyuser pour append dans get grups where user is member
+	groupListMember, errGetGroups := groups.GetGroupsWhereUserIsMember(db, userUUID, limit, offset)
+
+	groupList = append(groupList, groupListMember...)
 	fmt.Println(groupList)
 	if errGetGroups != nil {
 		fmt.Println("ERROR =", errGetGroups)

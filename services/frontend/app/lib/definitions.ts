@@ -35,3 +35,11 @@ export type Comment = {
     date: string
 
 }
+
+export type Group = {
+    id: number
+    creation_date: string
+    creator_id : number
+    name:string
+    description:string
+}

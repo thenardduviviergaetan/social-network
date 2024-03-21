@@ -20,9 +20,8 @@ func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 	return err
 }
 
-// TODO: Find what I will use as input to get UserID
-func GetGroupsCreatedByUser(db *sql.DB, id string) ([]models.Groups, error) {
-	rows, err := db.Query("SELECT * FROM social_groups WHERE creator_id=?", id)
+func GetGroupsCreatedByUser(db *sql.DB, uuid string) ([]models.Groups, error) {
+	rows, err := db.Query("SELECT * FROM social_groups WHERE creator_id=?", uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +34,7 @@ func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]mod
 	// 	(SELECT groupid FROM groups_members WHERE memberID=? LIMIT(?) OFFEST(?))`,
 	// 	id, limit, offset)
 	rows, err := db.Query(`SELECT * FROM social_groups WHERE id IN 
-		(SELECT groupid FROM groups_members WHERE memberID=?)`,
+		(SELECT group_id FROM group_members WHERE member_id=?)`,
 		id)
 	if err != nil {
 		return nil, err

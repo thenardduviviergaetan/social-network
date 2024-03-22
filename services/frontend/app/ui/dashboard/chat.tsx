@@ -1,10 +1,6 @@
 'use client'
 
-import { User } from "@/app/lib/definitions";
-// import { fetchUser } from "@/app/lib/data";
-import { auth } from "@/auth";
-import { Socket } from "dgram";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 
 class Message {

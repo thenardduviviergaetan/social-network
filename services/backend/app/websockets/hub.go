@@ -32,6 +32,11 @@ type StatusMessage struct {
 	Target   string    `json:"target"`
 	Status   []*Client `json:"status"`
 }
+type HistoryMessage struct {
+	Msg_type   string     `json:"msg_type"`
+	Target     string     `json:"target"`
+	TabMessage []*Message `json:"tab_message"`
+}
 
 func InitHub(app *app.App) *Hub {
 	users := middleware.GetAllUsers(app.DB.DB) // TODO Get all users from db ?
@@ -90,6 +95,17 @@ func (h *Hub) Run(app *app.App) {
 			case "history":
 				log.Println("msg :", string(message))
 				log.Println("msg :", msg)
+				// log.Println("msg.TypeTarget :", msg.TypeTarget)
+				if msg.TypeTarget == "user" {
+					tabmsg, err := GetOldMessages(app, "chat_users", msg.Sender, msg.Target, 100, 0)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+					sendmsg := &HistoryMessage{Msg_type: "history", Target: msg.Target, TabMessage: tabmsg}
+					jsonMessage, _ := json.Marshal(sendmsg)
+					h.clients[msg.Sender].send <- jsonMessage
+				}
 				// default:
 				// 	h.SendMessageToTarget(app, msg.Target, message)
 			}
@@ -112,14 +128,15 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	json.Unmarshal(message, msg)
 	if msg.Msg_type == "chat" {
 		// log.Println("Preview")
-		if client, ok := h.clients[UUID]; ok {
+		// if client, ok := h.clients[UUID]; ok {
+		for _, client := range h.clients {
 			// log.Println("Next")
 			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				SavePrivateMessage(app, msg)
+				// SavePrivateMessage(app, msg)
 				client.send <- message
 			}
 		}
-		// SavePrivateMessage(app, msg)
+		SavePrivateMessage(app, msg)
 	}
 	if msg.Msg_type == "notification" {
 		if client, ok := h.clients[UUID]; ok {
@@ -171,8 +188,8 @@ func SavePrivateMessage(app *app.App, message *Message) error {
 	return err
 }
 
-func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*Message, error) {
-	rows, err := app.DB.Query("SELECT sender, target, message_content, creation_date,image FROM chat_users WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation DESC LIMIT ? OFFSET ?",
+func GetOldMessages(app *app.App, table, sender, target string, limit, offset int) ([]*Message, error) {
+	rows, err := app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM "+table+" WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation_date ASC LIMIT ? OFFSET ?",
 		target,
 		sender,
 		sender,
@@ -185,7 +202,7 @@ func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*
 	defer rows.Close()
 	messages := []*Message{}
 	for rows.Next() {
-		message := &Message{Msg_type: "historic"}
+		message := &Message{Msg_type: "history"}
 		blob := make([]byte, 0)
 		if err := rows.Scan(&message.Sender, &message.Target, &message.Content, &message.Date, &blob); err != nil {
 			return nil, err
@@ -198,7 +215,7 @@ func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*
 
 func GetLastestMessages(app *app.App, target string) []string {
 	clients := []string{}
-	rows, err := app.DB.Query("SELECT sender FROM private_messages WHERE target = ? ORDER BY creation DESC", target)
+	rows, err := app.DB.Query("SELECT sender FROM private_messages WHERE target = ? ORDER BY creation_date DESC", target)
 	if err != nil {
 		return nil
 	}

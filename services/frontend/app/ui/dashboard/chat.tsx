@@ -9,7 +9,7 @@ class Message {
   target: string;
   type_target: string;
   sender: string;
-  // date: string;
+  date: string;
   image: string;
 
   constructor(
@@ -25,8 +25,8 @@ class Message {
     this.type_target = type_target;
     this.target = target;
     this.sender = sender;
-    // let date = new Date()
-    // this.date = `${date.toLocaleDateString("fr")}-${date.toLocaleTimeString("fr")}`;
+    let date = new Date()
+    this.date = `${date.toLocaleDateString("fr")}-${date.toLocaleTimeString("fr")}`;
     this.image = image;
   }
 }
@@ -65,6 +65,9 @@ class ListMessage {
   constructor() {
     this.tab = new Array();
   }
+  add(message:Message){
+    this.tab.push(message);
+  }
   new(
     msg_type: string,
     content: string,
@@ -87,13 +90,12 @@ class ListMessage {
 }
 export default function Chat({ user }: { user: string | null }) {
   let listUser = new ListUser();
-  let listMessage = new ListMessage();
   const userUuid = user;
   const [content, setContent] = useState("");
   const [socket, setsocket] = useState(Object);
   const [userList, setUserList] = useState(listUser.tab);
   const [groupList, setGroupList] = useState([]);
-  const [messageList, setmessageList] = useState(listMessage.tab);
+  const [messageList, setmessageList] = useState(new ListMessage().tab);
   const [target, settarget] = useState(new Target("undefined", "undefined"));
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
@@ -126,7 +128,13 @@ export default function Chat({ user }: { user: string | null }) {
           // console.log(userList);
           break;
         case "history":
-          listMessage = new ListMessage();
+          let listMessage = new ListMessage();
+          message.tab_message.forEach((el:Message) => {
+            // console.log(el)
+            listMessage.add(el);
+          })
+          // console.log(message)
+          setmessageList(listMessage.tab);
           break;
         case "chat":
           setmessageList(prevMessage => [...prevMessage, 
@@ -173,8 +181,8 @@ export default function Chat({ user }: { user: string | null }) {
                       new Message(
                         "history",
                         "",
-                        "user",
                         users.uuid,
+                        "user",
                         userUuid ?? "",
                         "",
                       ),

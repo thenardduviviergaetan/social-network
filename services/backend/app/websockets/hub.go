@@ -71,8 +71,6 @@ func (h *Hub) Run(app *app.App) {
 		case message := <-h.broadcast:
 			msg := &Message{}
 			json.Unmarshal(message, msg)
-			// log.Println("msg :", string(message))
-			// log.Println("msg :", msg)
 			switch msg.Msg_type {
 			case "notification":
 				notif := &Message{Msg_type: "notification", Target: msg.Target, Sender: msg.Sender}
@@ -89,8 +87,11 @@ func (h *Hub) Run(app *app.App) {
 				}
 				jsonTyping, _ := json.Marshal(typing)
 				h.SendMessageToTarget(app, msg.Target, jsonTyping)
-			default:
-				h.SendMessageToTarget(app, msg.Target, message)
+			case "history":
+				log.Println("msg :", string(message))
+				log.Println("msg :", msg)
+				// default:
+				// 	h.SendMessageToTarget(app, msg.Target, message)
 			}
 		}
 	}
@@ -110,13 +111,15 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	msg := &Message{}
 	json.Unmarshal(message, msg)
 	if msg.Msg_type == "chat" {
+		// log.Println("Preview")
 		if client, ok := h.clients[UUID]; ok {
+			// log.Println("Next")
 			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				// SavePrivateMessage(app, msg)
+				SavePrivateMessage(app, msg)
 				client.send <- message
 			}
 		}
-		SavePrivateMessage(app, msg)
+		// SavePrivateMessage(app, msg)
 	}
 	if msg.Msg_type == "notification" {
 		if client, ok := h.clients[UUID]; ok {

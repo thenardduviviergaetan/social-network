@@ -11,6 +11,9 @@ type Groups struct {
 }
 
 type Group struct {
+	Id        int    `json:"id"`
+	CreatorId string `json:"creator_id"`
+	// REMIND: ON VEUT AUSSI CHECK SI LE MEC EST MEMBRE POUR POUVOIR AFFICHER LE BOUTON (rajouter un boolean ?:)
 	CreationDate     time.Time `json:"creation_date"`
 	CreatorFirstName string    `json:"creator_first_name"`
 	CreatorLastName  string    `json:"creator_last_name"`

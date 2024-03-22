@@ -69,14 +69,6 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
 		}
 		json.NewEncoder(w).Encode(groupList)
-		// default:
-		// groupList, errGetGroups := groups.GetAllGroups(db, limit, offset)
-		// fmt.Println(groupList)
-		// if errGetGroups != nil {
-		// 	fmt.Println("ERROR =", errGetGroups)
-		// 	http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
-		// }
-		// json.NewEncoder(w).Encode(groupList)
 	}
 }
 
@@ -89,17 +81,33 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 	db := r.Context().Value("database").(*sql.DB)
 	groupId := r.URL.Query().Get("id")
 	fmt.Println(groupId)
-	row := db.QueryRow(`SELECT creation_date,first_name,last_name,name,description FROM social_groups
+	row := db.QueryRow(`SELECT social_groups.id,creator_id,creation_date,first_name,last_name,name,description FROM social_groups
 		INNER JOIN users ON users.uuid = social_groups.creator_id WHERE social_groups.id = ?`, groupId)
 	row.Scan(
+		&group.Id,
+		&group.CreatorId,
 		&group.CreationDate,
 		&group.CreatorFirstName,
 		&group.CreatorLastName,
 		&group.Name,
 		&group.Description,
 	)
-
+	fmt.Println(group)
 	group.Members = groups.GetMembers(groupId, db)
 	json.NewEncoder(w).Encode(group)
+
+}
+
+func HandleJoinGroup(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	q := r.URL.Query()
+	group := q.Get("group")
+	user := q.Get("user")
+	owner := q.Get("owner")
+	fmt.Printf("group : %s\n user %s\n owner %s\n", group, user, owner)
 
 }

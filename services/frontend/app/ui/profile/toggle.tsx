@@ -35,7 +35,6 @@ export default function Toggle({ children, className, user}: ToggleProps) {
                     {child}
                 </span>
             </label>
-            <Toaster />
         </div>
     )
 }

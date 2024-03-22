@@ -165,3 +165,4 @@ export const fetchGroup = async (groupeID?: string) => {
         `Error fetching group with ID ${groupeID}`
     )
 }
+

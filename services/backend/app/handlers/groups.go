@@ -24,7 +24,6 @@ func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("group, ", group)
 	uuid := r.URL.Query().Get("UUID")
 	fmt.Println(uuid)
 	if errCreate := groups.CreateGroup(db, &group, uuid); errCreate != nil {
@@ -41,12 +40,11 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-	// groupList := []models.Groups{}
 	db := r.Context().Value("database").(*sql.DB)
 
 	q := r.URL.Query()
 	listType := q.Get("type")
-	fmt.Println(listType)
+
 	userUUID := q.Get("user")
 	limit, _ := strconv.Atoi(q.Get("limit"))
 	page, _ := strconv.Atoi(q.Get("page"))
@@ -55,7 +53,6 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 	switch listType {
 	case "member":
 		groupList, errGetGroups := groups.GetGroupsWhereUserIsMember(db, userUUID, limit, offset)
-		fmt.Println(groupList)
 		if errGetGroups != nil {
 			fmt.Println("ERROR =", errGetGroups)
 			http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
@@ -69,14 +66,6 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
 		}
 		json.NewEncoder(w).Encode(groupList)
-		// default:
-		// groupList, errGetGroups := groups.GetAllGroups(db, limit, offset)
-		// fmt.Println(groupList)
-		// if errGetGroups != nil {
-		// 	fmt.Println("ERROR =", errGetGroups)
-		// 	http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
-		// }
-		// json.NewEncoder(w).Encode(groupList)
 	}
 }
 

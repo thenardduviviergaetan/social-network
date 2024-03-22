@@ -137,16 +137,21 @@ export default function Chat({ user }: { user: string | null }) {
           setmessageList(listMessage.tab);
           break;
         case "chat":
-          setmessageList(prevMessage => [...prevMessage, 
-            new Message(
-              message.msg_type,
-              message.content,
-              message.target,
-              message.type_target,
-              message.sender,
-              message.image,
-              )
-            ]);
+          console.log("message target : ",message.target,"\ntarget : ", target.target)
+          if (message.target == target.target || message.sender == target.target){
+            setmessageList(prevMessage => [...prevMessage, 
+              new Message(
+                message.msg_type,
+                message.content,
+                message.target,
+                message.type_target,
+                message.sender,
+                message.image,
+                )
+              ]);
+          }else{
+            /// TODO : ADD notif ici
+          }
           break;
       }
     };
@@ -220,7 +225,7 @@ export default function Chat({ user }: { user: string | null }) {
           {messageList.map((message, idx) => {
             return (
               <div key={idx}>
-                <div className="message">{message.content}</div>
+                <div className={message.sender===userUuid? "message right" : "message left"}>{message.content}</div>
               </div>
             );
           })}

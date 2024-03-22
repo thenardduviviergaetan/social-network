@@ -77,11 +77,12 @@ export default async function Details({ param }: { param?: Param }) {
             {user?.lastName}
           </p>
         </h3>
+        <h3 className="font-bold mt-1 p-3">Profile Status:</h3>
         {param?.user
           ? (param?.user === session?.user?.uuid
-            ? <Toggle user={user} className="p-3">{user?.status}</Toggle>
+            ? <Toggle user={user}>{user?.status}</Toggle>
             : "")
-          : <Toggle user={user} className="p-3">{user?.status}</Toggle>}
+          : <Toggle user={user} >{user?.status}</Toggle>}
       </div>
     </>
   );

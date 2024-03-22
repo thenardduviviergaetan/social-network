@@ -11,7 +11,6 @@ export const fetchUser = async (uuid?: string) => {
     const res = await axios.get(
       `${CADDY_URL}/user?UUID=${uuid}&email=${session?.user?.email}`,
     );
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data as User;
   } catch (error) {
     console.error("Error fetching user data");

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS social_groups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    creator_id INTEGER NOT NULL,
+    creator_id VARCHAR(255) NOT NULL,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     FOREIGN KEY (creator_id) REFERENCES users(id)

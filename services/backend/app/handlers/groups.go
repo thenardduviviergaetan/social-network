@@ -47,16 +47,13 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
 	userUUID := q.Get("user")
-	fmt.Println(userUUID)
 	limit, _ := strconv.Atoi(q.Get("limit"))
 	page, _ := strconv.Atoi(q.Get("page"))
 	offset := (page - 1) * limit
 
-	groupList, errGetGroups := groups.GetGroupsCreatedByUser(db, userUUID)
+	// groupListOwn, errGetGroups := groups.GetGroupsCreatedByUser(db, userUUID)
 	//FIXME: faire en sorte que create group mette le creator en membre, puis utiliser getgrupecreatedbyuser pour append dans get grups where user is member
-	groupListMember, errGetGroups := groups.GetGroupsWhereUserIsMember(db, userUUID, limit, offset)
-
-	groupList = append(groupList, groupListMember...)
+	groupList, errGetGroups := groups.GetGroupsWhereUserIsMember(db, userUUID, limit, offset)
 	fmt.Println(groupList)
 	if errGetGroups != nil {
 		fmt.Println("ERROR =", errGetGroups)

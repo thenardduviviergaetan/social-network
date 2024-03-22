@@ -2,11 +2,13 @@ package groups
 
 import (
 	"database/sql"
+	"fmt"
 	"server/db/models"
 	"time"
 )
 
 func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
+	var ID int
 	_, err := db.Exec(`INSERT INTO social_groups 
 		(creation_date, creator_id, name, description)
 		VALUES (?,?,?,?)`,
@@ -14,6 +16,12 @@ func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 		uuid,
 		g.Name,
 		g.Description)
+
+	//TODO: FAIRE UNE ERREUR AU MOMENT DU CREATE GROUP SI LE NOM EXISTE DEJA
+	err = db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
+	fmt.Println("ID:", ID)
+	_, err = db.Exec(`INSERT INTO group_members
+		(group_id,member_id) VALUES (?,?)`, ID, uuid)
 
 	// In the same time create add the CREATOR to the Groupe_Members
 
@@ -33,10 +41,12 @@ func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]mod
 	// rows, err := db.Query(`SELECT * FROM groups WHERE creatorID IN
 	// 	(SELECT groupid FROM groups_members WHERE memberID=? LIMIT(?) OFFEST(?))`,
 	// 	id, limit, offset)
-	rows, err := db.Query(`SELECT * FROM social_groups WHERE id IN 
-		(SELECT group_id FROM group_members WHERE member_id=?)`,
+	fmt.Println("member_id :", id)
+	rows, err := db.Query(`SELECT social_groups.id, creation_date, creator_id, name, description FROM social_groups 
+		INNER JOIN group_members ON group_members.group_id = social_groups.id WHERE member_id = ?`,
 		id)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 

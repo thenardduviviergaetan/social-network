@@ -19,6 +19,7 @@ export type Follower = {
 export type Param = {
     page?: string
     user?: string
+    id?:string
 }
 
 export type TokenUser = {
@@ -81,4 +82,14 @@ export interface FollowButtonProps {
   user: string;
   followStatus: FollowStatus;
   handleFollow: () => void;
+}
+export type Group = {
+    id: number
+    creation_date: string
+    creator_id : string
+    creator_first_name:string
+    creator_last_name:string
+    name:string
+    description:string
+    members:Array<User>
 }

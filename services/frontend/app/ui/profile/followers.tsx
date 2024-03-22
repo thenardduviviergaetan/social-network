@@ -6,6 +6,7 @@ import { CADDY_URL } from "@/app/lib/constants";
 
 export async function Followers({ param }: { param?: Param }) {
     const followers = await fetchFollowers(param?.user)
+    const user = await fetchUser(param?.user)
     return (
         <>
             <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg max-w-7/12 sm:max-w-[450px] md:max-w-[700px]">

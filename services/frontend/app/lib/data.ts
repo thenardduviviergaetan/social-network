@@ -3,6 +3,7 @@ import { User } from "@/app/lib/definitions";
 import { auth } from "@/auth";
 import { unstable_noStore as noStore } from "next/cache";
 import { API_BASE_URL, CADDY_URL, ITEMS_PER_PAGE } from "./constants";
+const GROUPS_PER_PAGE = 10 // Number of groups per page
 
 export const fetchUser = async (uuid?: string) => {
   const session = await auth();
@@ -128,3 +129,39 @@ export const fetchFollowUser = async (user: string, author: string) => {
   const res = await axios.post(`${API_BASE_URL}/user/follow`, { user, author });
   return { followed: res.data.followed, pending: res.data.pending };
 };
+/////////////////>- GROUPS -</////////////////
+
+// TODO this function could be used to shorten every function in this page.
+async function fetchGlobal(url: string, err: string) {
+    try {
+        const res = await axios.get(`http://caddy:8000/api${url}`)
+        return res.data
+    } catch (error) {
+        console.log(err);
+        console.log(error);
+        return null
+    }
+}
+
+export const fetchTotalGroupPages = async () => {
+    return fetchGlobal(
+        `/groups?totalPages=true`,
+        'Error fetching total group pages'
+    )
+}
+
+export const fetchGroups = async (pageNumber: number,type?:string) => {
+    const user = await fetchUser()
+
+    return fetchGlobal(
+        `/groups?page=${pageNumber}&limit=${GROUPS_PER_PAGE}&user=${user?.uuid}&type=${type}`,
+        'Error fetching groups')
+}
+
+//TODO: remove this fetch global
+export const fetchGroup = async (groupeID?: string) => {
+    return fetchGlobal(
+        `/group?id=${groupeID}`,
+        `Error fetching group with ID ${groupeID}`
+    )
+}

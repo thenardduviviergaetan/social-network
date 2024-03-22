@@ -2,7 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { createGroup } from "@/app/lib/action-group";
-import { Button } from "../button";
+import { Button } from "@/app/ui/button";
 
 export default function GroupForm() {
   const initialState = { message: null, errors: {} };

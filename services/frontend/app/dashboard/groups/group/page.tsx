@@ -25,8 +25,9 @@ export default async function Page(
                 <div className="bg-purple-700 rounded-lg p-3 w-auto font-bold">{group.description}</div>
             </div>
             <div className="bg-white shadow-lg w-6/12 rounded-lg mt-8 p-5"><span className="text-purple-700 font-bold underline">Members of this group :</span>
-                {group.members.map((member: User) => {
+                {group.members.map((member: User, index) => {
                     return (
+                        <div key={index}>
                         <Link
                             href={{
                                 pathname: "/dashboard/profile",
@@ -44,6 +45,7 @@ export default async function Page(
                                 <p className="text-purple-700 font-bold">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{member.firstName}&nbsp;{member.lastName}</p>
                             </div>
                         </Link>
+                            </div>
                     )
                 })}
             </div>

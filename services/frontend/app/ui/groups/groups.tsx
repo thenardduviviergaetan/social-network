@@ -13,6 +13,7 @@ export default async function Groups({ page, type }: { page: number, type?: stri
 
     console.log("Pages = ", page);
     console.log(groups)
+    
     return (
         <div className="flex flex-wrap justify-center items-baseline bg-purple-700 mt-5 rounded-lg">
             {groups?.map((group: Group) => {

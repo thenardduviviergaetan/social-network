@@ -10,11 +10,11 @@ export default async function GroupCard({ group, user }: { group: Group, user: U
             <p className="p-3 bg-white shadow-xl">Description : <span className="text-purple-700 font-bold">{group.description}</span></p>
             <Link
                 href={{
-                    pathname: `/dashboard/group`,
+                    pathname: `/dashboard/groups/group`,
                     query: { id: encodeURIComponent(group.id) }
                 }}
                 className={LINK_STYLE + " text-[12px] text-left w-auto"}
-            >Go to {group.name}'s Page</Link>
+            >Go to {group.name}&apos;s Page</Link>
         </div>
     )
 }

@@ -54,8 +54,7 @@ func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]mod
 }
 
 func GetAllGroups(db *sql.DB, limit, offset int) ([]models.Groups, error) {
-	rows, err := db.Query(`SELECT id, creation_date, creator_id, name, description 
-	FROM social_groups`)
+	rows, err := db.Query("SELECT id, creation_date, creator_id, name, description FROM social_groups")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

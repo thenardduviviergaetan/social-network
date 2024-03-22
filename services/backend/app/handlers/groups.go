@@ -104,10 +104,17 @@ func HandleJoinGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	db := r.Context().Value("database").(*sql.DB)
 	q := r.URL.Query()
 	group := q.Get("group")
 	user := q.Get("user")
 	owner := q.Get("owner")
 	fmt.Printf("group : %s\n user %s\n owner %s\n", group, user, owner)
+
+	_, err := db.Exec("INSERT INTO group_members(group_id,member_id,pending) VALUES (?,?,1)", group, user)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 }

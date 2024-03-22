@@ -20,7 +20,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-slate-50`}>
         <Header />
         {children}
-        </body>
+      </body>
     </html>
   );
 }

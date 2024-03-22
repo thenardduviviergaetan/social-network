@@ -1,7 +1,9 @@
+"use server"
 import axios, { AxiosError } from "axios";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
+import { fetchUser } from "./data";
+import { redirect } from "next/navigation";
 
 const groupFormSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -19,6 +21,7 @@ export type State = {
 }
 
 export async function createGroup(prevState: State | undefined, formData: FormData){
+    const user = await fetchUser()
     const validatedData = groupFormSchema.safeParse({
         name: formData.get("name"),
         description: formData.get("description"),
@@ -39,12 +42,12 @@ export async function createGroup(prevState: State | undefined, formData: FormDa
 
     try {
         const res = await axios.post(
-            "http://localhost:8000/api/group/create",
+            `http://caddy:8000/api/group/create?UUID=${user?.uuid}`,
             groupData,
         );
 
-        // revalidatePath("/group/create");
-        // redirect("dashboard/group");
+        revalidatePath("/dashboard");
+        redirect("/dashboard")
     } catch (error) {
         console.log("Error during POST", error );
         const state: State = {

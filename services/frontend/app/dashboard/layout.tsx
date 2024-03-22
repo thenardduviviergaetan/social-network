@@ -4,7 +4,7 @@ import Chat from "@/app/ui/dashboard/chat";
 export default function Layout({ children }: { children: React.ReactNode }) {
   console.log("LAYOUT LOADED");
   return (
-    <main className="flex flex-col md:flex-row md:overflow-hidden">
+    <main className="flex flex-col h-full md:flex-row md:overflow-hidden">
       <div className="w-full flex-none md:w-64">
         <SideNav />
       </div>

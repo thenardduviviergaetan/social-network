@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"strings"
-	"time"
 
 	"server/app"
 	"server/app/middleware"
@@ -37,9 +36,9 @@ type StatusMessage struct {
 func InitHub(app *app.App) *Hub {
 	users := middleware.GetAllUsers(app.DB.DB) // TODO Get all users from db ?
 	offlineInit := make([]*Client, 0)
-	for _, userUUID := range users {
+	for _, user := range users {
 		// client := &Client{Username: user, send: make(chan []byte)}
-		client := &Client{UUID: userUUID, send: make(chan []byte)}
+		client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}
 		offlineInit = append(offlineInit, client)
 	}
 	return &Hub{
@@ -72,8 +71,8 @@ func (h *Hub) Run(app *app.App) {
 		case message := <-h.broadcast:
 			msg := &Message{}
 			json.Unmarshal(message, msg)
-			log.Println("msg :", string(message))
-			log.Println("msg :", msg)
+			// log.Println("msg :", string(message))
+			// log.Println("msg :", msg)
 			switch msg.Msg_type {
 			case "notification":
 				notif := &Message{Msg_type: "notification", Target: msg.Target, Sender: msg.Sender}
@@ -113,10 +112,11 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	if msg.Msg_type == "chat" {
 		if client, ok := h.clients[UUID]; ok {
 			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				SavePrivateMessage(app, msg)
+				// SavePrivateMessage(app, msg)
 				client.send <- message
 			}
 		}
+		SavePrivateMessage(app, msg)
 	}
 	if msg.Msg_type == "notification" {
 		if client, ok := h.clients[UUID]; ok {
@@ -158,19 +158,18 @@ func SavePrivateMessage(app *app.App, message *Message) error {
 		image, _ = base64.StdEncoding.DecodeString(dataURLParts[1])
 	}
 	_, err := app.DB.Exec(
-		"INSERT INTO private_messages(sender, target, content, date, creation, image) VALUES (?,?,?,?,?, ?)",
+		"INSERT INTO chat_users(sender, target, message_content, creation_date, link_image) VALUES (?,?,?,datetime(),?)",
 		message.Sender,
 		message.Target,
 		message.Content,
-		message.Date,
-		time.Now(),
 		image,
 	)
+	log.Println(err)
 	return err
 }
 
 func GetOldMessages(app *app.App, sender, target string, limit, offset int) ([]*Message, error) {
-	rows, err := app.DB.Query("SELECT sender, target, content, date,image FROM private_messages WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation DESC LIMIT ? OFFSET ?",
+	rows, err := app.DB.Query("SELECT sender, target, message_content, creation_date,image FROM chat_users WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation DESC LIMIT ? OFFSET ?",
 		target,
 		sender,
 		sender,

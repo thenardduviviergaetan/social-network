@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"net/http"
 
+	"server/app/middleware"
+
 	"github.com/gorilla/websocket"
 )
 
 type Client struct {
-	hub  *Hub
-	conn *websocket.Conn
-	send chan []byte
-	// Username string   `json:"username"`
+	hub      *Hub
+	conn     *websocket.Conn
+	send     chan []byte
+	Username string   `json:"username"`
 	UUID     string   `json:"uuid"`
 	Online   bool     `json:"online"`
 	Message  string   `json:"message"`
@@ -76,11 +78,12 @@ func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Reque
 		return
 	}
 	client := &Client{
-		UUID:   string(msg), // TODO: handle user first name / lastname /username ?
-		hub:    hub,
-		conn:   conn,
-		send:   make(chan []byte, 256),
-		Online: true,
+		UUID:     string(msg), // TODO: handle user first name / lastname /username ?
+		Username: middleware.GetUsersname(db, string(msg)),
+		hub:      hub,
+		conn:     conn,
+		send:     make(chan []byte, 256),
+		Online:   true,
 	}
 	client.hub.register <- client
 	go client.Write()

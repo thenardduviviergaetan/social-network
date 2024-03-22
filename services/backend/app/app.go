@@ -114,16 +114,6 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		h.HandleFollowUser(w, r.WithContext(ctx))
 	})
 
-	http.HandleFunc("/api/group/create", func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "database", database)
-		h.HandleCreateGroup(w, r.WithContext(ctx))
-	})
-
-	http.HandleFunc("/api/groups", func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "database", database)
-		h.HandleGetGroupList(w, r.WithContext(ctx))
-	})
-
 	http.HandleFunc("/api/user/followers", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetFollowers(w, r.WithContext(ctx))
@@ -143,5 +133,18 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
+	})
+	http.HandleFunc("/api/groups/create", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleCreateGroup(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/groups", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroupList(w, r.WithContext(ctx))
+	})
+	http.HandleFunc("/api/group", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroup(w, r.WithContext(ctx))
 	})
 }

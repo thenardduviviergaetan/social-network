@@ -53,6 +53,17 @@ func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]mod
 	return extractGroups(rows)
 }
 
+func GetAllGroups(db *sql.DB, limit, offset int) ([]models.Groups, error) {
+	rows, err := db.Query(`SELECT id, creation_date, creator_id, name, description 
+	FROM social_groups`)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return extractGroups(rows)
+}
+
 func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
 	groupList := make([]models.Groups, 0)
 
@@ -75,4 +86,23 @@ func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
 	}
 
 	return groupList, nil
+}
+
+func GetMembers(id string, db *sql.DB) (members []models.User) {
+	member := models.User{}
+	rows, err := db.Query(`SELECT uuid,first_name,last_name FROM users
+		INNER JOIN group_members ON group_members.member_id = users.uuid WHERE group_members.group_id = ?`, id)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	for rows.Next() {
+		rows.Scan(
+			&member.UUID,
+			&member.FirstName,
+			&member.LastName,
+		)
+		members = append(members, member)
+	}
+	return
 }

@@ -90,16 +90,16 @@ export const fetchTotalGroupPages = async () => {
     )
 }
 
-export const fetchGroups = async (pageNumber: number) => {
+export const fetchGroups = async (pageNumber: number,type?:string) => {
     const user = await fetchUser()
 
     return fetchGlobal(
-        `/groups?page=${pageNumber}&limit=${GROUPS_PER_PAGE}&user=${user?.uuid}`,
+        `/groups?page=${pageNumber}&limit=${GROUPS_PER_PAGE}&user=${user?.uuid}&type=${type}`,
         'Error fetching groups')
 }
 
-
-export const fetchGroup = async (groupeID: string) => {
+//TODO: remove this fetch global
+export const fetchGroup = async (groupeID?: string) => {
     return fetchGlobal(
         `/group?id=${groupeID}`,
         `Error fetching group with ID ${groupeID}`

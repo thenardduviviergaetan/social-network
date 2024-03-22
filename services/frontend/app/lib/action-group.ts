@@ -44,11 +44,11 @@ export async function createGroup(prevState: State | undefined, formData: FormDa
     console.log('UUID',user?.uuid)
     try {
         const res = await axios.post(
-            `http://caddy:8000/api/group/create?UUID=${user?.uuid}`,
+            `http://caddy:8000/api/groups/create?UUID=${user?.uuid}`,
             groupData,
         );
 
-        revalidatePath("/group/create");
+        revalidatePath("/groups/create");
         // redirect("/dashboard/group");
     } catch (error) {
         console.log("Error during POST", error );

@@ -16,6 +16,7 @@ export type Follower = {
 export type Param = {
     page?: string
     user?: string
+    id?:string
 }
 
 export type TokenUser = {
@@ -39,7 +40,10 @@ export type Comment = {
 export type Group = {
     id: number
     creation_date: string
-    creator_id : number
+    creator_id : string
+    creator_first_name:string
+    creator_last_name:string
     name:string
     description:string
+    members:Array<User>
 }

@@ -9,3 +9,12 @@ type Groups struct {
 	Name         string    `json:"name"`
 	Description  string    `json:"description"`
 }
+
+type Group struct {
+	CreationDate     time.Time `json:"creation_date"`
+	CreatorFirstName string    `json:"creator_first_name"`
+	CreatorLastName  string    `json:"creator_last_name"`
+	Name             string    `json:"name"`
+	Description      string    `json:"description"`
+	Members          []User    `json:"members"`
+}

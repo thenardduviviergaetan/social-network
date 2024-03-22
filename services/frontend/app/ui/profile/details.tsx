@@ -26,24 +26,24 @@ export default async function Details({ param }: { param?: Param }) {
             user?.nickname &&
             <p className="p-5 w-4/12">
               Nickname:
-              <p className=" text-center text-purple-700 hover:text-purple-400">{user?.nickname}</p>
+              <span className=" text-center text-purple-700 hover:text-purple-400">{user?.nickname}</span>
             </p>
           }
           <p className="p-5 w-4/12">
             Date of birth:
-            <p className=" text-center text-purple-700 hover:text-purple-400">{user?.dateOfBirth}</p>
+            <span className=" text-center text-purple-700 hover:text-purple-400">{user?.dateOfBirth}</span>
           </p>
           <p className="p-5 w-4/12">
             Followers :
-            <p className=" text-center text-purple-700 hover:text-purple-400 ">{followers ? followers.length : 0}</p>
+            <span className=" text-center text-purple-700 hover:text-purple-400 ">{followers ? followers.length : 0}</span>
           </p>
         </div>
-        {user?.about && <p className="font-bold p-5 break-all">About: <p className="text-purple-700">{user?.about}</p></p>}
+        {user?.about && <p className="font-bold p-5 break-all">About: <span className="text-purple-700">{user?.about}</span></p>}
       </div>
       <div className="flex flex-col justify-evenly items-center rounded-lg bg-white shadow-xl p-3 w-9/12 text-center min-w-[300px] max-w-[600px]">
-        <p className="font-bold mt-1 p-3 break-all">Email: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.email}</p></p>
-        <p className="font-bold mt-1 p-3">First Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.firstName}</p></p>
-        <p className="font-bold mt-1 p-3">Last Name: <p className="text-purple-700 hover:text-purple-400 mt-1">{user?.lastName}</p></p>
+        <p className="font-bold mt-1 p-3 break-all">Email: <span className="text-purple-700 hover:text-purple-400 mt-1">{user?.email}</span></p>
+        <p className="font-bold mt-1 p-3">First Name: <span className="text-purple-700 hover:text-purple-400 mt-1">{user?.firstName}</span></p>
+        <p className="font-bold mt-1 p-3">Last Name: <span className="text-purple-700 hover:text-purple-400 mt-1">{user?.lastName}</span></p>
         {
           param?.user ? (param?.user === session?.user?.uuid ? <Toggle user={user} className="p-3">{user?.status} </Toggle> : ""):<Toggle user={user} className="p-3">{user?.status} </Toggle>
         }

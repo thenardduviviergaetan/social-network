@@ -34,6 +34,17 @@ class Message {
     this.image = image;
   }
 }
+class Target{
+  type_target:string;
+  target:string;
+  constructor(
+    type_target:string,
+    target:string
+  ){
+    this.type_target = type_target;
+    this.target = target;
+  }
+}
 class ConnBtn {
   username: string;
   uuid: string;
@@ -59,7 +70,7 @@ export default function Chat({ user }: { user: string | null }) {
   const [socket, setsocket] = useState(Object)
   const [userList, setUserList] = useState(listUser.tab)
   const [groupList, setGroupList] = useState([])
-  const [target, settarget] = useState({})
+  const [target, settarget] = useState(new Target("undefined","undefined"))
   useEffect(() => {
     let sc = new WebSocket('ws://localhost:8000/api/ws')
     sc.onopen = (event) => {
@@ -80,8 +91,8 @@ export default function Chat({ user }: { user: string | null }) {
       if (message.msg_type === 'status') {
         console.log('WebSocket status:', message.status);
         message.status
-          .filter((el: Object) => { return el.uuid != user })
-          .forEach((el: Object) => {
+          .filter((el: ConnBtn) => { return el.uuid != user })
+          .forEach((el: ConnBtn) => {
             listUser.new(el.username, el.uuid, el.online);
           })
         setUserList(listUser.tab);
@@ -113,10 +124,8 @@ export default function Chat({ user }: { user: string | null }) {
                 <div key={idx}>
                   <button id={user.username} onClick={
                     (e) => {
-                      settarget({
-                        type_target: "user",
-                        target: user.uuid
-                      })
+                      let t = new Target("user",user.uuid)
+                      settarget(t)
                     }
                   }>{user.username}
                     <svg className="notification" width="10" height="10">
@@ -151,14 +160,14 @@ export default function Chat({ user }: { user: string | null }) {
             ></input>
             <input id="submit" type="submit" onClick={(e) => {
               e.preventDefault();
-              if (target?.target !== undefined) {
+              if (target.target !== "undefined") {
                 console.log(content, user)
                 let message = new Message(
                   "chat",
                   content,
                   target?.target,
                   target?.type_target,
-                  user?.uuid,
+                  user??'',
                   ""
                 )
                 let msg = JSON.stringify(message)

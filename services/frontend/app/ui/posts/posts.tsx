@@ -11,8 +11,8 @@ export default async function Posts(
     param?: string;
   },
 ) {
-  const posts = await fetchPosts(page, urlSegment, param);
   const session = await auth();
+  const posts = await fetchPosts(page, urlSegment, param);
 
   return (
     posts.map((post: Post) => {

@@ -53,7 +53,7 @@ class ListUser {
     this.tab.push(new ConnBtn(username, uuid, online));
   }
 }
-export default function Chat({ user }: { user: User | null }) {
+export default function Chat({ user }: { user: string | null }) {
   let listUser = new ListUser()
   const [content, setContent] = useState("")
   const [socket, setsocket] = useState(Object)
@@ -64,7 +64,7 @@ export default function Chat({ user }: { user: User | null }) {
     let sc = new WebSocket('ws://localhost:8000/api/ws')
     sc.onopen = (event) => {
       console.log('WebSocket connection opened');
-      sc.send(user?.uuid);
+      sc.send(user??'');
     };
 
     sc.onmessage = (event) => {
@@ -76,11 +76,11 @@ export default function Chat({ user }: { user: User | null }) {
         console.error('WebSocket message error:', event.data);
       }
 
+      listUser = new ListUser()
       if (message.msg_type === 'status') {
-        listUser = new ListUser()
         console.log('WebSocket status:', message.status);
         message.status
-          .filter((el: Object) => { return el.uuid != user?.uuid })
+          .filter((el: Object) => { return el.uuid != user })
           .forEach((el: Object) => {
             listUser.new(el.username, el.uuid, el.online);
           })
@@ -110,7 +110,7 @@ export default function Chat({ user }: { user: User | null }) {
           {
             userList.map((user, idx) => {
               return (
-                <div>
+                <div key={idx}>
                   <button id={user.username} onClick={
                     (e) => {
                       settarget({
@@ -132,7 +132,7 @@ export default function Chat({ user }: { user: User | null }) {
           {
             groupList?.map((group, idx) => {
               return (
-                <div>
+                <div key={idx}>
                   <button>
                   </button>
                 </div>
@@ -152,7 +152,7 @@ export default function Chat({ user }: { user: User | null }) {
             <input id="submit" type="submit" onClick={(e) => {
               e.preventDefault();
               if (target?.target !== undefined) {
-                console.log(content, user?.uuid)
+                console.log(content, user)
                 let message = new Message(
                   "chat",
                   content,

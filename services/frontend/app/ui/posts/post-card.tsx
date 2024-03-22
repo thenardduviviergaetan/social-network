@@ -109,6 +109,17 @@ export default function PostsCard({
 
   switch (post.status) {
     case "public":
+      PostComponent = PublicPost;
+      postProps = {
+        post,
+        user,
+        followStatus,
+        handleFollow,
+        likesData,
+        commentsCounter,
+        handleLike,
+      };
+      break;
     case "private":
       if (
         post.author_id === user ||

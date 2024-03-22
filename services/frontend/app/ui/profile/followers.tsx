@@ -10,7 +10,7 @@ export async function Followers({ param }: { param?: Param }) {
     const user = await fetchUser(param?.user)
     return (
         <>
-            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg max-w-7/12 sm:max-w-[450px] md:max-w-[700px]">
+            <div className="flex flex-col bg-purple-700 p-3 rounded-lg m-auto mb-5 overflow-y-auto max-h-1/2">
                 <h1 className="text-white font-bold text-center">Followers</h1>
                 {
                 followers ?
@@ -47,7 +47,7 @@ export async function Followed({param}: {param?: Param}){
     const followed = await fetchFollowed(param?.user)
     return (
         <>
-            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg max-w-7/12 sm:max-w-[450px] md:max-w-[700px]">
+            <div className="flex flex-col w-auto h-auto bg-purple-700 p-3 rounded-lg overflow-y-auto max-h-1/2">
                 <h1 className="text-white font-bold text-center">Followed</h1>
                 {
                 followed ?

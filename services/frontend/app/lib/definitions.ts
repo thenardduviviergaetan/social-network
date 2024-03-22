@@ -83,6 +83,11 @@ export interface FollowButtonProps {
   followStatus: FollowStatus;
   handleFollow: () => void;
 }
+export interface JoinButtonProps{
+    group:Group;
+    user?:string;
+    // joinGroupRequest:()=>void
+}
 export type Group = {
     id: number
     creation_date: string

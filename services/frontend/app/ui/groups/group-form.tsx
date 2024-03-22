@@ -10,7 +10,7 @@ export default function GroupForm() {
 
   return (
     <form action={setFormState}
-      className="space-y-3 grid place-items-center h-auto mt-4"
+      className="space-y-3 grid items-center h-auto mt-4 w-[623px]"
     >
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 shadow-xl">
         <label htmlFor="groupName">Groupe Name*</label>

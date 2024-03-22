@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { fetchUser } from "./data";
+import { CADDY_URL } from "./constants";
 
 const groupFormSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -56,5 +57,17 @@ export async function createGroup(prevState: State | undefined, formData: FormDa
             message: "Failed to create the groupe",
         };
         return state;
+    }
+}
+
+
+export const joinGroupRequestFetch = async (id: number, owner: string) => {
+    const user = await fetchUser();
+    try {
+        console.log("salut")
+        const res = await axios.get(`${CADDY_URL}/group/join?group=${id}&user=${user?.uuid}&owner=${owner}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
     }
 }

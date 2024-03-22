@@ -21,7 +21,7 @@ func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 	err = db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
 	fmt.Println("ID:", ID)
 	_, err = db.Exec(`INSERT INTO group_members
-		(group_id,member_id) VALUES (?,?)`, ID, uuid)
+		(group_id,member_id,pending) VALUES (?,?,0)`, ID, uuid)
 
 	// In the same time create add the CREATOR to the Groupe_Members
 
@@ -105,3 +105,5 @@ func GetMembers(id string, db *sql.DB) (members []models.User) {
 	}
 	return
 }
+
+// JoinGroup()

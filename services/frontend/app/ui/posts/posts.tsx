@@ -2,7 +2,7 @@ import { fetchPosts } from "@/app/lib/data";
 import PostCard from "@/app/ui/posts/post-card";
 import { auth } from "@/auth";
 import { Suspense } from "react";
-import { Post } from "@/app/lib/posts-types";
+import { Post } from "@/app/lib/definitions";
 
 export default async function Posts(
   { page, urlSegment, param }: {

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { User } from '../../lib/definitions';
 import { ChangeEvent, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { API_BASE_URL } from "@/app/lib/constants";
 
 
 interface ToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,8 +24,7 @@ export default function Toggle({ children, className, user}: ToggleProps) {
                 color:"white"
             }
         });
-        // axios.post(`http://localhost:8000/api/user/status?user=${user?.uuid}`,{status:value, uuid:user?.uuid});
-        axios.post(`http://localhost:8000/api/user/status?user=${user?.uuid}`, { status: value, uuid: user?.uuid });
+        axios.post(`${API_BASE_URL}/user/status?user=${user?.uuid}`, { status: value, uuid: user?.uuid });
     }
     return (
         <div className="flex flex-wrap justify-around mt-5 items-center p-4">
@@ -39,5 +39,3 @@ export default function Toggle({ children, className, user}: ToggleProps) {
         </div>
     )
 }
-
-/* REMIND: THIS IS FOR THE PRIVATE/PUBLIC*/

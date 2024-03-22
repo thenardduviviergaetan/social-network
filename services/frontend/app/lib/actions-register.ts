@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { profile } from "console";
+import { CADDY_URL } from "@/app/lib/constants";
 
 /**
  * Schema for the registration form data.
@@ -102,7 +102,7 @@ export async function register(
     f.append("avatar", validatedData.data.avatar as Blob);
     try {
       const upload = await axios.post(
-        "http://caddy:8000/api/avatar",
+        `${CADDY_URL}/avatar`,
         f,
         {
           headers: {
@@ -133,7 +133,7 @@ export async function register(
 
   try {
     const res = await axios.post(
-      "http://caddy:8000/api/register",
+      `${CADDY_URL}/register`,
       userData,
     );
     revalidatePath("/login");

@@ -1,9 +1,8 @@
 import axios, { AxiosResponse } from "axios";
-import { User } from "./definitions";
+import { User } from "@/app/lib/definitions";
 import { auth } from "@/auth";
 import { unstable_noStore as noStore } from "next/cache";
 import { API_BASE_URL, CADDY_URL, ITEMS_PER_PAGE } from "./constants";
-
 
 export const fetchUser = async (uuid?: string) => {
   const session = await auth();
@@ -11,6 +10,7 @@ export const fetchUser = async (uuid?: string) => {
     const res = await axios.get(
       `${CADDY_URL}/user?UUID=${uuid}&email=${session?.user?.email}`,
     );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data as User;
   } catch (error) {
     console.error("Error fetching user data");
@@ -22,9 +22,7 @@ export const fetchFollowers = async (uuid?: string) => {
   const session = await auth();
   try {
     const res = await axios.get(
-      `${CADDY_URL}/user/followers?user=${
-        uuid ? uuid : session?.user?.uuid
-      }`,
+      `${CADDY_URL}/user/followers?user=${uuid ?? session?.user?.uuid}`,
     );
     return res.data;
   } catch (error) {
@@ -36,9 +34,7 @@ export const fetchFollowed = async (uuid?: string) => {
   const session = await auth();
   try {
     const res = await axios.get(
-      `${CADDY_URL}/user/followed?user=${
-        uuid ? uuid : session?.user?.uuid
-      }`,
+      `${CADDY_URL}/user/followed?user=${uuid ?? session?.user?.uuid}`,
     );
     return res.data;
   } catch (error) {
@@ -70,6 +66,7 @@ export const fetchPosts = async (
     const res = await axios.get(
       `${CADDY_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`,
     );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data;
   } catch (error) {
     console.error("Error fetching posts");

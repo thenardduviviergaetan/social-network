@@ -5,6 +5,7 @@ import CommentForm from "@/app/ui/posts/comment-form";
 import Comments from "@/app/ui/posts/comments";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { CADDY_URL } from "@/app/lib/constants";
 
 export function Post({ post }: { post: any }) {
   return (
@@ -21,7 +22,7 @@ export function Post({ post }: { post: any }) {
         <div className="flex items-center">
           <Image
             className="w-10 h-10 rounded-full mr-2"
-            src={`http://caddy:8000/api/avatar?id=${post.author_id}`}
+            src={`${CADDY_URL}/avatar?id=${post.author_id}`}
             alt={post.author}
             width={40}
             height={40}
@@ -39,7 +40,7 @@ export function Post({ post }: { post: any }) {
         {post.image && (
           <div className="mt-4 flex justify-center">
             <Image
-              src={`http://caddy:8000/api/post/image?path=${post.image}`}
+              src={`${CADDY_URL}/post/image?path=${post.image}`}
               alt="Post image"
               width={500}
               height={500}

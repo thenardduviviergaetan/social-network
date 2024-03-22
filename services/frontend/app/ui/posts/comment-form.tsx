@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 import { createComment } from "@/app/lib/action";
 import { Button } from "@/app/ui/button";
 

@@ -13,13 +13,13 @@ import { HeartIcon as Fill_heart } from "@heroicons/react/24/solid";
 import { Button } from "@/app/ui/button";
 import { followUser } from "@/app/lib/action";
 import { fetcher } from "@/app/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   FollowButtonProps,
   PostCardProps,
   PrivatePostProps,
   PublicPostProps,
-} from "@/app/lib/posts-types";
+} from "@/app/lib/definitions";
 import { API_BASE_URL, CADDY_URL } from "@/app/lib/constants";
 import {
   fetchCommentsCount,

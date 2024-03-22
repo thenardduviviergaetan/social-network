@@ -1,3 +1,4 @@
+
 export type User = {
     uuid: string
     email: string
@@ -7,7 +8,9 @@ export type User = {
     status: boolean
     nickname?: string
     about?: string
+    picture?: string
 }
+
 export type Follower = {
     uuid: string
     firstName: string
@@ -33,4 +36,49 @@ export type Comment = {
     content: string
     image: File | null
     date: string
+}
+
+export interface Post {
+  id: string;
+  author_id: string;
+  author: string;
+  date: string;
+  content: string;
+  image?: string;
+  status: string;
+  authorized?: string;
+}
+
+export interface FollowStatus {
+  followed: boolean;
+  pending: boolean;
+}
+
+export interface LikesData {
+  liked: boolean;
+  likecount: number;
+}
+
+export interface PostCardProps {
+  post: Post;
+  user: string;
+  current: string | null | undefined;
+}
+
+export interface PrivatePostProps extends PostCardProps {
+  followStatus: FollowStatus;
+  handleFollow: () => void;
+}
+
+export interface PublicPostProps extends PrivatePostProps {
+  likesData: LikesData;
+  commentsCounter: number;
+  handleLike: () => void;
+}
+
+export interface FollowButtonProps {
+  post: Post;
+  user: string;
+  followStatus: FollowStatus;
+  handleFollow: () => void;
 }

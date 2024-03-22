@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { Toaster } from 'react-hot-toast';
 
 export default async function Page() {
 

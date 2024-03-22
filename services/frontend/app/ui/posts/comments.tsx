@@ -1,6 +1,7 @@
 import { fetchComments } from "@/app/lib/data";
 import type { Comment } from "@/app/lib/definitions";
 import Image from "next/image";
+import { CADDY_URL } from "@/app/lib/constants";
 
 export default async function Comments({ postID }: { postID: string }) {
   const comments = await fetchComments(postID);
@@ -22,7 +23,7 @@ export async function CommentComponent({ comment }: { comment: Comment }) {
         <div className="flex-shrink-0">
               <Image
           className="w-10 h-10 rounded-full mr-2"
-          src={`http://caddy:8000/api/avatar?id=${comment.author_id}`}
+          src={`${CADDY_URL}/avatar?id=${comment.author_id}`}
           alt={comment.author}
           width={40}
           height={40}
@@ -43,7 +44,7 @@ export async function CommentComponent({ comment }: { comment: Comment }) {
         {comment.image && (
           <div className="mt-4">
             <Image
-              src={`http://caddy:8000/api/comment/image?path=${comment.image}`}
+              src={`${CADDY_URL}/comment/image?path=${comment.image}`}
               alt="Comment image"
               width={100}
               height={100}

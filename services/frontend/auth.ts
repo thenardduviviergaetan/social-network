@@ -1,9 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
 import type { TokenUser } from "@/app/lib/definitions";
 import axios from "axios";
 import { z } from "zod";
+import { AdapterUser } from "next-auth/adapters";
+import { CADDY_URL } from "@/app/lib/constants";
 
 /**
  * Authentication function that handles signing in and signing out.
@@ -38,26 +40,25 @@ export const { auth, signIn, signOut } = NextAuth({
       return null;
     },
   })],
-  callbacks:{
+  callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.name = (user as TokenUser).name
+        token.name = (user as TokenUser).name;
         token.uuid = (user as TokenUser).uuid;
       }
       return token;
     },
     async session({ session, token }) {
-      session.id = token.id;
       session.user = {
         id: token.id as string,
         email: token.email as string,
         name: token.name,
-        picture: "http://caddy:8000/api/avatar?id=" + token.uuid ,
+        picture: `${CADDY_URL}/avatar?id=${token.uuid}`,
         uuid: token.uuid,
-      };
+      } as unknown as AdapterUser & User;
       return session;
     },
-  }
+  },
 });

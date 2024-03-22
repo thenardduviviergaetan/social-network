@@ -4,6 +4,7 @@ import axios from "axios";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { CADDY_URL } from "@/app/lib/constants";
 
 const PostFormSchema = z.object({
   authorID: z.string(),
@@ -68,7 +69,7 @@ async function uploadImage(image: File | null, path: string) {
   formData.append("path", path);
   try {
     const res = await axios.post(
-      "http://caddy:8000/api/posts/upload-image",
+      `${CADDY_URL}/posts/upload-image`,
       formData,
     );
     return res.data;
@@ -121,7 +122,7 @@ export async function createPost(
     image: await uploadImage(imageFile, "posts"),
   };
   try {
-    const res = await axios.post("http://caddy:8000/api/posts/create", post);
+    const res = await axios.post(`${CADDY_URL}/posts/create`, post);
   } catch (error) {
     console.error(error);
     return { message: "Failed to create post" };
@@ -173,7 +174,7 @@ export async function createComment(
   
   try {
     const res = await axios.post(
-      "http://caddy:8000/api/comments/create",
+      `${CADDY_URL}/comments/create`,
       comment,
     );
   } catch (error) {
@@ -188,7 +189,7 @@ export async function createComment(
 export async function followUser(user: string, authorID: string) {
   try {
     const res = await axios.post(
-      `http://caddy:8000/api/user/follow`,
+      `${CADDY_URL}/user/follow`,
       {
         user : authorID,
         follower: user,

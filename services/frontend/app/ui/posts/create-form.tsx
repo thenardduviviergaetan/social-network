@@ -6,6 +6,7 @@ import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 import Image from "next/image";
+import { CADDY_URL, API_BASE_URL } from "@/app/lib/constants";
 
 export default function Form({
   user,
@@ -20,8 +21,7 @@ export default function Form({
   const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
   const { data: followers } = useSWR(
-    // `http://localhost:8000/api/user/followers?user=${user}`,
-    `http://localhost:8000/api/user/followers?user=${user}`,
+    `${API_BASE_URL}/user/followers?user=${user}`,
     
     fetcher,
     { revalidateOnFocus: false, revalidateOnMount: true },
@@ -163,7 +163,7 @@ export default function Form({
                       <div className="flex flex-col justify-center align-middle text-center p-1">
                         <Image
                           className="w-10 h-10 rounded-full m-auto"
-                          src={`http://caddy:8000/api/avatar?id=${follower.uuid}`}
+                          src={`${CADDY_URL}/avatar?id=${follower.uuid}`}
                           alt={fullName}
                           width={40}
                           height={40}

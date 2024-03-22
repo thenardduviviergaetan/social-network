@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/app/ui/button";
 import Posts from "@/app/ui/posts/posts";
 import Pagination from "@/app/ui/dashboard/pagination";
 import { fetchPageNumber } from "@/app/lib/data"

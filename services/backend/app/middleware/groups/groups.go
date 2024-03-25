@@ -9,29 +9,44 @@ import (
 )
 
 func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
-	var ID int
+	var ID int64
 
-	err := db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
+	var exists bool
+	err := db.QueryRow(`SELECT EXISTS(SELECT 1 FROM social_groups WHERE name = ?)`, g.Name).Scan(&exists)
 	if err != nil {
-		if err != sql.ErrNoRows {
+		return err
+	}
+
+	if exists {
+		return errors.New("group name already exists")
+	} else {
+		err = db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
+		if err != nil {
+			if err != sql.ErrNoRows {
+				return err
+			}
+		}
+
+		result, err := db.Exec(`INSERT INTO social_groups (creation_date, creator_id, name, description) VALUES (?,?,?,?)`,
+			time.Now(),
+			uuid,
+			g.Name,
+			g.Description)
+		if err != nil {
 			return err
 		}
-	} else {
-		return errors.New("group name already exists")
-	}
 
-	_, err = db.Exec(`INSERT INTO social_groups (creation_date, creator_id, name, description) VALUES (?,?,?,?)`,
-		time.Now(),
-		uuid,
-		g.Name,
-		g.Description)
-	if err != nil {
-		return err
-	}
+		ID, err = result.LastInsertId()
+		if err != nil {
+			return err
+		}
 
-	_, err = db.Exec(`INSERT INTO group_members (group_id,member_id,pending) VALUES (?,?,0)`, ID, uuid)
-	if err != nil {
-		return err
+		fmt.Println("ID", ID)
+
+		_, err = db.Exec(`INSERT INTO group_members (group_id,member_id,pending) VALUES (?,?,0)`, ID, uuid)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

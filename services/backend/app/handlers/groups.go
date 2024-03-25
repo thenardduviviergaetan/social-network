@@ -89,8 +89,20 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 		&group.Name,
 		&group.Description,
 	)
-	group.Members = groups.GetMembers(groupId, db)
+	// group.Members = groups.GetMembers(groupId, db)
 	json.NewEncoder(w).Encode(group)
+}
+
+func HandleGetGroupMembers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	db := r.Context().Value("database").(*sql.DB)
+	groupId := r.URL.Query().Get("id")
+	members := groups.GetMembers(groupId, db)
+
+	json.NewEncoder(w).Encode(members)
 }
 
 func GetPending(db *sql.DB, group int, user string) bool {

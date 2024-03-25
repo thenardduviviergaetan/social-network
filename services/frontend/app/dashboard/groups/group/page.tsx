@@ -1,9 +1,7 @@
 import { fetchGroup, fetchUser } from "@/app/lib/data";
 import { Group, User } from "@/app/lib/definitions";
 import JoinGroupButton from "@/app/ui/groups/join";
-import Image from "next/image";
-import Link from "next/link";
-import { CADDY_URL } from "@/app/lib/constants";
+import { GroupMembers } from "@/app/ui/groups/group";
 
 export default async function Page(
   {
@@ -16,12 +14,16 @@ export default async function Page(
     };
   },
 ) {
-
   const user = await fetchUser();
   const group = await fetchGroup(searchParams?.id) as Group;
 
   return (
-    <div className="text-white">
+    <div>
+      <JoinGroupButton
+        group={group}
+        user={user?.uuid}
+      />
+
       <div className="bg-white shadow-xl h-[80px] w-auto rounded-lg p-4 flex flex-row mb-3 justify-between">
         <p className=" text-purple-700 rounded-lg p-3 w-4/12 font-bold">
           {group.name}
@@ -36,44 +38,8 @@ export default async function Page(
           {group.description}
         </div>
       </div>
-      <div className="bg-white shadow-lg w-6/12 rounded-lg mt-8 p-5">
-        <p className="text-purple-700 font-bold underline">
-          Members of this group :
-        </p>
-
-        <p className="text-black">Want to</p>
-        <JoinGroupButton
-          group={group}
-          user={user?.uuid}
-        />
-
-        {group?.members?.map((member: User, index) => {
-          return (
-            <div key={index}>
-              <Link
-                href={{
-                  pathname: "/dashboard/profile",
-                  query: { user: encodeURIComponent(member.uuid) },
-                }}
-              >
-                <div className=" flex flex-row w-auto h-auto shadow-lg bg-zinc-200 p-3 rounded-lg mb-2 mt-5 justify-start items-center">
-                  <Image
-                    src={`${CADDY_URL}/avatar?id=${member.uuid}`}
-                    alt="Profile Picture"
-                    width={50}
-                    height={200}
-                    className="rounded-full shadow-xl"
-                  />
-                  <p className="text-purple-700 font-bold">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{member
-                      .firstName}&nbsp;{member.lastName}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
-      </div>
+      
+     <GroupMembers group={group} />
     </div>
   );
 }

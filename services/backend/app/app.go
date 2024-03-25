@@ -153,6 +153,11 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		h.HandleGetGroup(w, r.WithContext(ctx))
 	})
 
+	http.HandleFunc("/api/group/members", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroupMembers(w, r.WithContext(ctx))
+	})
+
 	http.HandleFunc("/api/group/join", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleJoinGroup(w, r.WithContext(ctx))

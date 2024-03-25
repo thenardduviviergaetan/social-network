@@ -48,7 +48,6 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// groupList := []models.Groups{}
 	db := r.Context().Value("database").(*sql.DB)
 
 	q := r.URL.Query()
@@ -86,4 +85,28 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(finalList)
+}
+
+func HandleGetGroupeID(w http.ResponseWriter, r *http.Request) {
+	//TODO move this to the parent
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+	groupID := r.URL.Query().Get("ID")
+	userID := r.URL.Query().Get("userID")
+
+	fmt.Println("userID =", userID)
+
+	group := models.Groups{}
+	var err error
+
+	if group, err = groups.GetGroupByID(db, userID, groupID); err != nil {
+		fmt.Println("Error = ", err)
+		http.Error(w, "You do not have access to this group", http.StatusUnauthorized)
+	}
+
+	json.NewEncoder(w).Encode(group)
 }

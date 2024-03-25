@@ -9,9 +9,11 @@ import (
 
 func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
 	groupList := make([]models.Groups, 0)
+	fmt.Println("ROWS IN LOOP = ", rows)
+	fmt.Println("NEXT ROW = ", rows.Next())
 
-	defer rows.Close()
 	for rows.Next() {
+		fmt.Println("BONJOOOOOUUUUUUUUR")
 		group := models.Groups{}
 
 		errScan := rows.Scan(
@@ -25,8 +27,14 @@ func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
 			return nil, errScan
 		}
 
+		fmt.Println("Group In Loop", group)
+
 		groupList = append(groupList, group)
 	}
+	fmt.Println("IM OUT OF HERE")
+
+	fmt.Println("POSSIBLE ERROS = ", rows.Err())
+	rows.Close()
 
 	return groupList, nil
 }
@@ -59,6 +67,26 @@ func CreateGroup(db *sql.DB, g *models.Groups) error {
 		g.CreatorID, groupID)
 
 	return errAddMember
+}
+
+func GetGroupByID(db *sql.DB, userID, groupID string) (models.Groups, error) {
+	row, err := db.Query(`SELECT * FROM social_groups WHERE id IN 
+	(SELECT group_id FROM group_members WHERE group_id=? AND member_id=?)`, groupID, userID)
+	fmt.Println("ROWS = ", row)
+
+	if err != nil {
+		return models.Groups{}, err
+	} else {
+		fmt.Println("ERROR WHEN QUERYING = ", err)
+		groups, errExtract := extractGroups(row)
+		return groups[0], errExtract
+	}
+}
+
+func IsMemberOfGroup(db *sql.DB, userID, groupID string) bool {
+	row := db.QueryRow(`SELECT 1 FROM group_members WHERE group_id=? AND member_id=?`, groupID, userID)
+
+	return row != nil
 }
 
 // TODO Find what I will use as input to get UserID

@@ -31,11 +31,11 @@ class Message {
   }
 }
 class Target {
-  type_target: string;
-  target: string;
+  type_target?: string;
+  target?: string;
   constructor(
-    type_target: string,
-    target: string,
+    type_target?: string,
+    target?: string,
   ) {
     this.type_target = type_target;
     this.target = target;
@@ -107,7 +107,7 @@ export default function Chat({ user }: { user: string | null }) {
   const [userList, setUserList] = useState(listUser.tab);
   const [groupList, setGroupList] = useState(Array<Groupe>);
   const [messageList, setmessageList] = useState(new ListMessage().tab);
-  const [target, settarget] = useState(new Target("undefined", "undefined"));
+  const [ target, setTarget] = useState(new Target());
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
@@ -127,8 +127,6 @@ export default function Chat({ user }: { user: string | null }) {
       switch (message.msg_type) {
         case "status":
           listUser = new ListUser();
-          // console.log('WebSocket status:', message.stauts);
-          // console.log('WebSocket Groupe:', message.Groupe);
           message.status
             .filter((el: ConnBtn) => {
               return el.uuid != userUuid;
@@ -143,21 +141,64 @@ export default function Chat({ user }: { user: string | null }) {
             tabGroupe.push(elgroupe);
           })
           setGroupList(tabGroupe)
-          console.log(groupList)
-          // console.log(userList);
+          // console.log(groupList)
+          break;
+      }
+    };
+
+    sc.onerror = (event) => {
+      console.error("WebSocket error:", event);
+    };
+
+    sc.onclose = (event) => {
+      console.log("WebSocket connection closed:", event);
+    };
+    setsocket(sc);
+    return () => {
+      sc.close();
+    };
+  }, []);
+
+
+  useEffect(()=>{
+    socket.onmessage = (event:{data:string}) => {
+      let message: any;
+      try {
+        message = JSON.parse(event.data);
+        console.log("Message send", message);
+      } catch {
+        console.error("WebSocket message error:", event.data);
+      }
+
+      switch (message.msg_type) {
+        case "status":
+          listUser = new ListUser();
+          message.status
+            .filter((el: ConnBtn) => {
+              return el.uuid != userUuid;
+            })
+            .forEach((el: ConnBtn) => {
+              listUser.new(el.username, el.uuid, el.online);
+            });
+          setUserList(listUser.tab);
+          let tabGroupe = new Array<Groupe>
+          message.Groupe
+          .forEach((elgroupe:Groupe) => {
+            tabGroupe.push(elgroupe);
+          })
+          setGroupList(tabGroupe)
+          // console.log(groupList)
           break;
         case "history":
           let listMessage = new ListMessage();
           message.tab_message.forEach((el:Message) => {
-            // console.log(el)
             listMessage.add(el);
           })
-          // console.log(message)
           setmessageList(listMessage.tab);
           break;
         case "chat":
-          console.log(target)
-          console.log("message target : ",message.target,"\ntarget : ", target.target)
+          // console.log("message target : ",message.target,"\ntarget : ", target)
+          // console.log(message.target, target.target, message.sender)
           if (message.target == target.target || message.sender == target.target){
             setmessageList(prevMessage => [...prevMessage, 
               new Message(
@@ -175,19 +216,9 @@ export default function Chat({ user }: { user: string | null }) {
           break;
       }
     };
+  },[target]);
 
-    sc.onerror = (event) => {
-      console.error("WebSocket error:", event);
-    };
 
-    sc.onclose = (event) => {
-      console.log("WebSocket connection closed:", event);
-    };
-    setsocket(sc);
-    return () => {
-      sc.close();
-    };
-  }, []);
   return (
     <div className="chat">
       <h1>Chat</h1>
@@ -200,8 +231,9 @@ export default function Chat({ user }: { user: string | null }) {
                 <button
                   id={users.username}
                   onClick={(e) => {
-                    let t = new Target("user", users.uuid);
-                    settarget(t);
+                    // console.log("users.uuid",users.uuid)
+                    // let t = new Target("user", users.uuid);
+                    setTarget(new Target("user", users.uuid));
                     socket.send(JSON.stringify(
                       new Message(
                         "history",
@@ -238,7 +270,7 @@ export default function Chat({ user }: { user: string | null }) {
                  id={group.name}
                  onClick={(e) => {
                    let t = new Target("group", group.id);
-                   settarget(t);
+                   setTarget(t);
                    socket.send(JSON.stringify(
                      new Message(
                        "history",
@@ -282,17 +314,18 @@ export default function Chat({ user }: { user: string | null }) {
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
+                // console.log("target submit",target)
                 if (target.target !== "undefined") {
                   let message = new Message(
                     "chat",
                     content,
-                    target?.target,
-                    target?.type_target,
+                    target?.target??"",
+                    target?.type_target??"",
                     userUuid ?? "",
                     "",
                   );
                   let msg = JSON.stringify(message);
-                  console.log(msg)
+                  // console.log(msg)
                   setContent("");
                   socket.send(msg);
                 }

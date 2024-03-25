@@ -1,6 +1,7 @@
 package livechat
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -126,10 +127,11 @@ func (h *Hub) Run(app *app.App) {
 func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 	h.clients[current.UUID].LastMsg = []string{}
 	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
-	current.reloadGroup(app.DB.DB)
-	msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: current.tabgroup}
-	jsonClients, _ := json.Marshal(msg)
+	// current.reloadGroup(app.DB.DB)
 	for c := range h.clients {
+		h.clients[c].reloadGroup(app.DB.DB)
+		msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: h.clients[c].tabgroup}
+		jsonClients, _ := json.Marshal(msg)
 		h.clients[c].send <- jsonClients
 	}
 }
@@ -209,15 +211,28 @@ func SavePrivateMessage(app *app.App, message *Message, table string) error {
 }
 
 func GetOldMessages(app *app.App, table, sender, target string, limit, offset int) ([]*Message, error) {
-	rows, err := app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM "+table+" WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation_date ASC LIMIT ? OFFSET ?",
-		target,
-		sender,
-		sender,
-		target,
-		limit,
-		offset)
-	if err != nil {
-		return nil, err
+	var rows *sql.Rows
+	var err error
+	if table == "chat_users" {
+		rows, err = app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM chat_users WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation_date ASC LIMIT ? OFFSET ?",
+			target,
+			sender,
+			sender,
+			target,
+			limit,
+			offset)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		rows, err = app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM chat_groups WHERE target = ? ORDER BY creation_date ASC LIMIT ? OFFSET ?",
+			target,
+			limit,
+			offset)
+		if err != nil {
+			log.Println("Error get old message groupe", err)
+			return nil, err
+		}
 	}
 	defer rows.Close()
 	messages := []*Message{}

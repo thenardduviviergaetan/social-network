@@ -126,8 +126,6 @@ export  function GroupNotifications({ user }: NotificationsProps) {
 
 
   const handleAccept = async (user: string, groupId: number) => {
-
-    console.log('user', user, 'group', groupId);
     try {
       await axios.post(`/api/group/manage/accept`, {
         user,
@@ -162,7 +160,6 @@ export  function GroupNotifications({ user }: NotificationsProps) {
           onClick={() =>
             setShowNotif(showNotif === "pending" ? "" : "pending")}
             >
-              <h1>{pending?.group_requested}</h1>
             <p className="text-sm font-medium text-gray-600">
               New Join Group request
               <span className="ml-2 text-md font-bold text-purple-600">

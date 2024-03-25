@@ -62,11 +62,10 @@ export const fetchPageNumber = async (urlSegment: string, param?: string) => {
 export const fetchPosts = async (
   pageNumber: number,
   urlSegment: string,
-  param?: string,
 ) => {
   try {
     const res = await axios.get(
-      `${CADDY_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`,
+      `${API_BASE_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}`,
     );
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data;

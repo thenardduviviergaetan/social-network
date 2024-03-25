@@ -3,11 +3,9 @@ import { Follower, Param } from "@/app/lib/definitions";
 import Image from "next/image";
 import Link from "next/link";
 import { CADDY_URL } from "@/app/lib/constants";
-import { fetchUser } from "@/app/lib/data";
 
 export async function Followers({ param }: { param?: Param }) {
     const followers = await fetchFollowers(param?.user)
-    const user = await fetchUser(param?.user)
     return (
         <>
             <div className="flex flex-col bg-purple-700 p-3 rounded-lg m-auto mb-5 overflow-y-auto max-h-1/2">

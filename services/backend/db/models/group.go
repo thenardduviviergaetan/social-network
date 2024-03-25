@@ -11,13 +11,20 @@ type Groups struct {
 }
 
 type Group struct {
-	Id        int    `json:"id"`
-	CreatorId string `json:"creator_id"`
-	// REMIND: ON VEUT AUSSI CHECK SI LE MEC EST MEMBRE POUR POUVOIR AFFICHER LE BOUTON (rajouter un boolean ?:)
+	Id               int       `json:"id"`
+	CreatorId        string    `json:"creator_id"`
 	CreationDate     time.Time `json:"creation_date"`
 	CreatorFirstName string    `json:"creator_first_name"`
 	CreatorLastName  string    `json:"creator_last_name"`
 	Name             string    `json:"name"`
 	Description      string    `json:"description"`
 	Members          []User    `json:"members"`
+}
+
+type Member struct {
+	UUID           string `json:"uuid"`
+	FirstName      string `json:"firstName"`
+	LastName       string `json:"lastName"`
+	Avatar         string `json:"avatar"`
+	GroupRequested int    `json:"group_requested"`
 }

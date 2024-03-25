@@ -15,11 +15,12 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	email := r.URL.Query().Get("email")
+	// email := r.URL.Query().Get("email")
 	uuid := r.URL.Query().Get("UUID")
 	db := r.Context().Value("database").(*sql.DB)
 	user := &models.User{}
-	user, err := session.GetUserByEmail(db, email, uuid)
+	// user, err := session.GetUserByEmail(db, email, uuid)
+	user, err := session.GetUserByUUID(db, uuid)
 	if err != nil {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)
 		return

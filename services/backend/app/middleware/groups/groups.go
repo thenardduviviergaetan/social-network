@@ -2,6 +2,7 @@ package groups
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"server/db/models"
 	"time"
@@ -9,23 +10,30 @@ import (
 
 func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 	var ID int
-	_, err := db.Exec(`INSERT INTO social_groups 
-		(creation_date, creator_id, name, description)
-		VALUES (?,?,?,?)`,
+
+	err := db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	} else {
+		return errors.New("group name already exists")
+	}
+
+	_, err = db.Exec(`INSERT INTO social_groups (creation_date, creator_id, name, description) VALUES (?,?,?,?)`,
 		time.Now(),
 		uuid,
 		g.Name,
 		g.Description)
+	if err != nil {
+		return err
+	}
 
-	//TODO: FAIRE UNE ERREUR AU MOMENT DU CREATE GROUP SI LE NOM EXISTE DEJA
-	err = db.QueryRow(`SELECT id FROM social_groups WHERE name =?`, g.Name).Scan(&ID)
-	fmt.Println("ID:", ID)
-	_, err = db.Exec(`INSERT INTO group_members
-		(group_id,member_id,pending) VALUES (?,?,0)`, ID, uuid)
-
-	// In the same time create add the CREATOR to the Groupe_Members
-
-	return err
+	_, err = db.Exec(`INSERT INTO group_members (group_id,member_id,pending) VALUES (?,?,0)`, ID, uuid)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetGroupsCreatedByUser(db *sql.DB, uuid string) ([]models.Groups, error) {
@@ -38,10 +46,7 @@ func GetGroupsCreatedByUser(db *sql.DB, uuid string) ([]models.Groups, error) {
 }
 
 func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]models.Groups, error) {
-	// rows, err := db.Query(`SELECT * FROM groups WHERE creatorID IN
-	// 	(SELECT groupid FROM groups_members WHERE memberID=? LIMIT(?) OFFEST(?))`,
-	// 	id, limit, offset)
-	fmt.Println("member_id :", id)
+
 	rows, err := db.Query(`SELECT social_groups.id, creation_date, creator_id, name, description FROM social_groups 
 		INNER JOIN group_members ON group_members.group_id = social_groups.id WHERE member_id = ?`,
 		id)
@@ -90,7 +95,7 @@ func extractGroups(rows *sql.Rows) ([]models.Groups, error) {
 func GetMembers(id string, db *sql.DB) (members []models.User) {
 	member := models.User{}
 	rows, err := db.Query(`SELECT uuid,first_name,last_name FROM users
-		INNER JOIN group_members ON group_members.member_id = users.uuid WHERE group_members.group_id = ?`, id)
+		INNER JOIN group_members ON group_members.member_id = users.uuid WHERE group_members.group_id = ? AND pending IS NOT 1`, id)
 	if err != nil {
 		fmt.Println(err)
 		return nil

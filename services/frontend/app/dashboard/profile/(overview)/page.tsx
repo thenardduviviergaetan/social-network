@@ -18,10 +18,10 @@ export default async function Page(
 
 
   return (
-    <div className="flex flex-col justify-around items-start w-7/12">
-      <div className="flex flex-row justify-around w-full mb-8">
-      {/* <div className="grid md:grid-cols-1 xl:grid-cols-2 gap-4 w-full m-auto mt-10 ">
-      <div className="flex flex-row justify-between min-w-fit max-w-[250px]"> */}
+    // <div className="flex flex-col justify-around items-start w-7/12">
+      <div className="grid md:grid-cols-1 xl:grid-cols-2 gap-4 w-full m-auto mt-10 ">
+        <div className="flex flex-row justify-around w-full mb-8">
+      {/* <div className="flex flex-row justify-between min-w-fit max-w-[250px]"> */}
         <Link
           href={{
             pathname: '/dashboard/groups',

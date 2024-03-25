@@ -147,12 +147,30 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetGroupList(w, r.WithContext(ctx))
 	})
+
 	http.HandleFunc("/api/group", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleGetGroup(w, r.WithContext(ctx))
 	})
+
 	http.HandleFunc("/api/group/join", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleJoinGroup(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/group/manage/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		segments := strings.Split(r.URL.Path, "/")
+
+		switch segments[4] {
+		case "pending":
+			h.HandleGetPendingJoin(w, r.WithContext(ctx))
+		case "accept":
+			h.HandleAcceptMember(w, r.WithContext(ctx))
+		case "reject":
+			h.HandleRejectMember(w, r.WithContext(ctx))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
 	})
 }

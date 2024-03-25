@@ -6,10 +6,12 @@ import { API_BASE_URL, CADDY_URL, ITEMS_PER_PAGE } from "./constants";
 const GROUPS_PER_PAGE = 10 // Number of groups per page
 
 export const fetchUser = async (uuid?: string) => {
-  const session = await auth();
+  uuid = uuid ?? (await auth())?.user?.uuid;
+  // const session = await auth();
   try {
     const res = await axios.get(
-      `${CADDY_URL}/user?UUID=${uuid}&email=${session?.user?.email}`,
+      // `${CADDY_URL}/user?UUID=${uuid}&email=${session?.user?.email}`,
+      `${CADDY_URL}/user?UUID=${uuid}`,
     );
     return res.data as User;
   } catch (error) {
@@ -128,12 +130,19 @@ export const fetchFollowUser = async (user: string, author: string) => {
   const res = await axios.post(`${API_BASE_URL}/user/follow`, { user, author });
   return { followed: res.data.followed, pending: res.data.pending };
 };
+
+export const fetchJoinStatus = async (user: string, groupID: number) => {
+  const res = await axios.get(
+    `${API_BASE_URL}/group/join?user=${user}&group=${groupID}`,
+  );
+  return res.data;
+};
 /////////////////>- GROUPS -</////////////////
 
 // TODO this function could be used to shorten every function in this page.
 async function fetchGlobal(url: string, err: string) {
     try {
-        const res = await axios.get(`http://caddy:8000/api${url}`)
+        const res = await axios.get(`${CADDY_URL}${url}`)
         return res.data
     } catch (error) {
         console.log(err);
@@ -151,7 +160,6 @@ export const fetchTotalGroupPages = async () => {
 
 export const fetchGroups = async (pageNumber: number,type?:string) => {
     const user = await fetchUser()
-
     return fetchGlobal(
         `/groups?page=${pageNumber}&limit=${GROUPS_PER_PAGE}&user=${user?.uuid}&type=${type}`,
         'Error fetching groups')

@@ -98,3 +98,8 @@ export type Group = {
     description:string
     members:Array<User>
 }
+
+export interface JoinStatus{
+    joined:boolean;
+    pending:boolean;
+}

@@ -49,8 +49,6 @@ export async function createGroup(
       `${CADDY_URL}/groups/create?UUID=${user?.uuid}`,
       groupData,
     );
-    revalidatePath("/dashboard/groups");
-    redirect("/dashboard/groups");
   } catch (error) {
     if (
       (error as AxiosError).response &&
@@ -61,9 +59,10 @@ export async function createGroup(
         message: "Name already exists",
       };
       return state;
-      return state;
     }
   }
+  revalidatePath("/dashboard/groups?type=all");
+  redirect("/dashboard/groups?type=all");
 }
 
 export async function joinGroup(user: string | undefined, group: string) {

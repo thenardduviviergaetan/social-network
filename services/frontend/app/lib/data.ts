@@ -90,18 +90,25 @@ export const fetchTotalGroupPages = async () => {
     )
 }
 
-export const fetchGroups = async (pageNumber: number) => {
-    const session = await auth()
+export const fetchGroups = async (
+    created: boolean, member: boolean,pageNumber: number) => {
+
+    const user = await fetchUser()
+    const options = `created=${created}&&member=${member}`
 
     return fetchGlobal(
-        `/groups?page=${pageNumber}&&limit=${GROUPS_PER_PAGE}&&user=${session?.user?.id}`,
+        `/groups?${options}&&page=${pageNumber}
+        &&limit=${GROUPS_PER_PAGE}&&user=${user?.uuid}`,
         'Error fetching groups')
 }
 
 
 export const fetchGroup = async (groupeID: string) => {
+    const user = await fetchUser()
+    
+    //TODO change so the user ID doesn't appear as an argument in the URL.
     return fetchGlobal(
-        `/group?id=${groupeID}`,
+        `/group?id=${groupeID}&&userID=${user?.uuid}`,
         `Error fetching group with ID ${groupeID}`
     )
 }

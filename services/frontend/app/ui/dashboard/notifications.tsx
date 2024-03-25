@@ -36,6 +36,7 @@ export default function Notifications({ user }: NotificationsProps) {
         follower: followerId,
       });
       mutate();
+      toast.success("Follower accepted");
       showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to accept follower");
@@ -49,6 +50,7 @@ export default function Notifications({ user }: NotificationsProps) {
         follower: followerId,
       });
       mutate();
+      toast.error("Follower rejected");
       showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to reject follower");
@@ -132,6 +134,7 @@ export  function GroupNotifications({ user }: NotificationsProps) {
         groupId,
       });
       mutate();
+      toast.success("Group request accepted");
       showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to accept group request");
@@ -145,6 +148,7 @@ export  function GroupNotifications({ user }: NotificationsProps) {
         groupId,
       });
       mutate();
+      toast.error("Group request rejected");
       showNotif === "pending" && setShowNotif("");
     } catch (error) {
       toast.error("Failed to reject group request");

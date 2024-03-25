@@ -17,7 +17,7 @@ export default async function Page(
   const session = await auth();
   const currentPage = Number(searchParams?.page) || 1;
   const totalPages = await fetchPageNumber("posts");
-  
+
   return (
     <div className="w-auto">
       <Link
@@ -26,19 +26,7 @@ export default async function Page(
       >
         Create Post
       </Link>
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center h-screen">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900">
-              </div>
-              <p className="mt-2">Loading...</p>
-            </div>
-          </div>
-        }
-      >
-        <Posts page={currentPage} urlSegment={"posts"} user={session?.user} />
-      </Suspense>
+      <Posts page={currentPage} urlSegment={"posts"} user={session?.user} />
       <Pagination totalPages={totalPages ?? 0} />
     </div>
   );

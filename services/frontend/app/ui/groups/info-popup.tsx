@@ -25,7 +25,7 @@ export function CreateGroupButton() {
                 Create New Group
             </button>
             {popup && <Popup func={setPop}>
-                    <GroupForm func={setPop} />
+                    <GroupForm redir={setPop} />
                 </Popup>
             }
         </>

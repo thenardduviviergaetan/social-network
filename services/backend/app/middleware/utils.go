@@ -1,6 +1,8 @@
 package middleware
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 func GetAllUsers(db *sql.DB) (users [][2]string) {
 	rows, err := db.Query("SELECT uuid, first_name, last_name FROM users")
@@ -43,4 +45,25 @@ func GetUsersname(db *sql.DB, uuid string) (users string) {
 		users = firstName + " " + lastName
 	}
 	return users
+}
+
+func GetAllGroupUsers(db *sql.DB, userUuid string) (Groupe [][2]string) {
+	rows, err := db.Query("SELECT social_groups.name, social_groups.id FROM social_groups JOIN group_members ON social_groups.id = group_members.group_id where group_members.member_id = ?", userUuid)
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		var name string
+		var group_id string
+		err = rows.Scan(
+			&name,
+			&group_id,
+		)
+		if err != nil {
+			return
+		}
+		groupe := [2]string{group_id, name}
+		Groupe = append(Groupe, groupe)
+	}
+	return
 }

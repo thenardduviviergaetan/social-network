@@ -31,6 +31,7 @@ type StatusMessage struct {
 	Msg_type string    `json:"msg_type"`
 	Target   string    `json:"target"`
 	Status   []*Client `json:"status"`
+	Groupe   []*Groupe
 }
 type HistoryMessage struct {
 	Msg_type   string     `json:"msg_type"`
@@ -105,6 +106,15 @@ func (h *Hub) Run(app *app.App) {
 					sendmsg := &HistoryMessage{Msg_type: "history", Target: msg.Target, TabMessage: tabmsg}
 					jsonMessage, _ := json.Marshal(sendmsg)
 					h.clients[msg.Sender].send <- jsonMessage
+				} else if msg.TypeTarget == "group" {
+					tabmsg, err := GetOldMessages(app, "chat_groups", msg.Sender, msg.Target, 100, 0)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+					sendmsg := &HistoryMessage{Msg_type: "history", Target: msg.Target, TabMessage: tabmsg}
+					jsonMessage, _ := json.Marshal(sendmsg)
+					h.clients[msg.Sender].send <- jsonMessage
 				}
 				// default:
 				// 	h.SendMessageToTarget(app, msg.Target, message)
@@ -116,7 +126,8 @@ func (h *Hub) Run(app *app.App) {
 func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 	h.clients[current.UUID].LastMsg = []string{}
 	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
-	msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status}
+	current.reloadGroup(app.DB.DB)
+	msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: current.tabgroup}
 	jsonClients, _ := json.Marshal(msg)
 	for c := range h.clients {
 		h.clients[c].send <- jsonClients
@@ -129,14 +140,23 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	if msg.Msg_type == "chat" {
 		// log.Println("Preview")
 		// if client, ok := h.clients[UUID]; ok {
-		for _, client := range h.clients {
-			// log.Println("Next")
-			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				// SavePrivateMessage(app, msg)
-				client.send <- message
+		if msg.TypeTarget == "user" {
+			for _, client := range h.clients {
+				if client.UUID == msg.Target || client.UUID == msg.Sender {
+					// SavePrivateMessage(app, msg)
+					client.send <- message
+				}
 			}
+			SavePrivateMessage(app, msg, "chat_users")
+		} else if msg.TypeTarget == "group" {
+			for _, client := range h.clients {
+				if client.group[msg.Target] != nil {
+					// SavePrivateMessage(app, msg)
+					client.send <- message
+				}
+			}
+			SavePrivateMessage(app, msg, "chat_groups")
 		}
-		SavePrivateMessage(app, msg)
 	}
 	if msg.Msg_type == "notification" {
 		if client, ok := h.clients[UUID]; ok {
@@ -168,7 +188,7 @@ func Remove(clients []*Client, c *Client) []*Client {
 	return append(clients[:index], clients[index+1:]...)
 }
 
-func SavePrivateMessage(app *app.App, message *Message) error {
+func SavePrivateMessage(app *app.App, message *Message, table string) error {
 	var image []byte
 	if message.Image != "" {
 		dataURLParts := strings.Split(message.Image, ",")
@@ -178,7 +198,7 @@ func SavePrivateMessage(app *app.App, message *Message) error {
 		image, _ = base64.StdEncoding.DecodeString(dataURLParts[1])
 	}
 	_, err := app.DB.Exec(
-		"INSERT INTO chat_users(sender, target, message_content, creation_date, link_image) VALUES (?,?,?,datetime(),?)",
+		"INSERT INTO "+table+"(sender, target, message_content, creation_date, link_image) VALUES (?,?,?,datetime(),?)",
 		message.Sender,
 		message.Target,
 		message.Content,

@@ -88,13 +88,24 @@ class ListMessage {
     );
   }
 }
+class Groupe{
+  name: string;
+  id: string;
+    constructor
+    (
+      name: string,
+      id: string,){
+        this.name = name;
+        this.id = id;
+      }
+}
 export default function Chat({ user }: { user: string | null }) {
   let listUser = new ListUser();
   const userUuid = user;
   const [content, setContent] = useState("");
   const [socket, setsocket] = useState(Object);
   const [userList, setUserList] = useState(listUser.tab);
-  const [groupList, setGroupList] = useState([]);
+  const [groupList, setGroupList] = useState(Array<Groupe>);
   const [messageList, setmessageList] = useState(new ListMessage().tab);
   const [target, settarget] = useState(new Target("undefined", "undefined"));
   useEffect(() => {
@@ -116,7 +127,8 @@ export default function Chat({ user }: { user: string | null }) {
       switch (message.msg_type) {
         case "status":
           listUser = new ListUser();
-          // console.log('WebSocket status:', message.status);
+          // console.log('WebSocket status:', message.stauts);
+          // console.log('WebSocket Groupe:', message.Groupe);
           message.status
             .filter((el: ConnBtn) => {
               return el.uuid != userUuid;
@@ -125,6 +137,13 @@ export default function Chat({ user }: { user: string | null }) {
               listUser.new(el.username, el.uuid, el.online);
             });
           setUserList(listUser.tab);
+          let tabGroupe = new Array<Groupe>
+          message.Groupe
+          .forEach((elgroupe:Groupe) => {
+            tabGroupe.push(elgroupe);
+          })
+          setGroupList(tabGroupe)
+          console.log(groupList)
           // console.log(userList);
           break;
         case "history":
@@ -137,6 +156,7 @@ export default function Chat({ user }: { user: string | null }) {
           setmessageList(listMessage.tab);
           break;
         case "chat":
+          console.log(target)
           console.log("message target : ",message.target,"\ntarget : ", target.target)
           if (message.target == target.target || message.sender == target.target){
             setmessageList(prevMessage => [...prevMessage, 
@@ -176,7 +196,7 @@ export default function Chat({ user }: { user: string | null }) {
         <div className="user">
           {userList.map((users, idx) => {
             return (
-              <div key={idx}>
+              <div key={"user"+idx}>
                 <button
                   id={users.username}
                   onClick={(e) => {
@@ -210,10 +230,26 @@ export default function Chat({ user }: { user: string | null }) {
           })}
         </div>
         <div className="group">
+        <h2>Groupe</h2>
           {groupList?.map((group, idx) => {
             return (
-              <div key={idx}>
-                <button>
+              <div key={"groupe"+idx}>
+                <button
+                 id={group.name}
+                 onClick={(e) => {
+                   let t = new Target("group", group.id);
+                   settarget(t);
+                   socket.send(JSON.stringify(
+                     new Message(
+                       "history",
+                       "",
+                       group.id,
+                       "group",
+                       userUuid ?? "",
+                       "",
+                     ),
+                   ));
+                 }}>{group.name}
                 </button>
               </div>
             );
@@ -256,6 +292,7 @@ export default function Chat({ user }: { user: string | null }) {
                     "",
                   );
                   let msg = JSON.stringify(message);
+                  console.log(msg)
                   setContent("");
                   socket.send(msg);
                 }

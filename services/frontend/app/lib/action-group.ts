@@ -10,7 +10,7 @@ import { CADDY_URL } from "./constants";
 const groupFormSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters long"),
     description: z.string().refine(value => value.trim() !== "", {
-        message: "The groupe rquires a description"
+        message: "The group requires a description"
     })
 })
 
@@ -64,10 +64,11 @@ export async function createGroup(prevState: State | undefined, formData: FormDa
 export const joinGroupRequestFetch = async (id: number, owner: string) => {
     const user = await fetchUser();
     try {
-        console.log("salut")
-        const res = await axios.get(`${CADDY_URL}/group/join?group=${id}&user=${user?.uuid}&owner=${owner}`)
+        const res = await axios.get(`${CADDY_URL}/group/join?group=${id}&user=${user?.uuid}`)
         return res.data
     } catch (error) {
         console.error(error)
     }
 }
+
+

@@ -1,15 +1,10 @@
 "use client"
-import toast from "react-hot-toast"
 import { Button } from "../button"
-import { FollowButtonProps, Group, JoinButtonProps } from "@/app/lib/definitions"
-import { fetchUser } from "@/app/lib/data"
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
-import axios from "axios"
-import { CADDY_URL } from "@/app/lib/constants"
+import {GroupButtonProps } from "@/app/lib/definitions"
+
 import { joinGroupRequestFetch } from "@/app/lib/action-group"
 
-export default function JoinGroup({ group, user }: JoinButtonProps) {
-    console.log(group.id)
+export default function JoinGroup({ group, user }: GroupButtonProps) {
     const joinGroupRequest = async () => {
         try {
             const res = await joinGroupRequestFetch(group.id, group.creator_id)
@@ -20,9 +15,9 @@ export default function JoinGroup({ group, user }: JoinButtonProps) {
     return (
         <Button
             onClick={joinGroupRequest}
-            className={`${group.creator_id === user ? "hidden" : "block"}`}
+            className={`${group.creator_id === user ? "hidden" : "block"} mt-3`} //TODO: gerer pour que ce soit tous les members et pas juste le createur
         >
-            Join ?
+            Want to join ?
         </Button>
     );
 }

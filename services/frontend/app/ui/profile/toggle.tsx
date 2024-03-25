@@ -2,7 +2,7 @@
 import axios from "axios";
 import clsx from "clsx";
 import { User } from '../../lib/definitions';
-import { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { API_BASE_URL } from "@/app/lib/constants";
 
@@ -13,7 +13,7 @@ interface ToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 export default function Toggle({ children, className, user}: ToggleProps) {
     const [child,setChildren] = useState(children);
-    const  apply = async (value:string, e:ChangeEvent<HTMLInputElement>)=> {
+    const  apply = async (value:string | React.ReactNode, e:ChangeEvent<HTMLInputElement>)=> {
         
         value = e.target.checked ? "public" : "private";
         setChildren(value);
@@ -29,7 +29,7 @@ export default function Toggle({ children, className, user}: ToggleProps) {
     return (
         <div className="flex flex-wrap justify-around mt-5 items-center p-4">
             <label className={clsx("inline-flex items-center cursor-pointer", className)}>
-                {children?.[0] === 'private' ? <input type="checkbox" className="sr-only peer" onChange={(event) => { apply(children?.[0], event) }} /> : <input type="checkbox" className="sr-only peer" defaultChecked onChange={(event) => { apply(children?.[0], event) }} />}
+                {children === 'private' ? <input type="checkbox" className="sr-only peer" onChange={(event) => { apply(children, event) }} /> : <input type="checkbox" className="sr-only peer" defaultChecked onChange={(event) => { apply(children, event) }} />}
                 <div className={`relative w-11 h-6 bg-gray-400 peer-focus:outline-none rounded-full peer dark:bg-black-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600`}></div>
                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-400">
                     {child}

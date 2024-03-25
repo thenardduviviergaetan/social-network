@@ -21,3 +21,11 @@ type Group struct {
 	Description      string    `json:"description"`
 	Members          []User    `json:"members"`
 }
+
+type Event struct {
+	Date        string `json:"date"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Creator     string `json:"creator"`
+	Group       int    `json:"group_id"`
+}

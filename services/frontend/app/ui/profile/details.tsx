@@ -14,7 +14,7 @@ export default async function Details({ param }: { param?: Param }) {
 
   return (
     <>
-      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl text-center divide-y divide-dashed divide-black w-full mb-8 ">
+      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl text-center divide-y divide-dashed divide-black w-full mb-8 md:min-w-[450px] min-w-[300px]">
         {/* <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl max-w-7/12  sm:max-w-[500px] md:max-w-[700px] text-center overflow-y-auto max-h-[400px] divide-y divide-dashed divide-black "> */}
         <Image
           src={param?.user
@@ -30,7 +30,7 @@ export default async function Details({ param }: { param?: Param }) {
             {user?.nickname &&
               (
                 <h3 className="p-5 w-4/12">
-                  Nickname:
+                  Nickname: 
                   <p className=" text-center text-purple-700 hover:text-purple-400">
                     {user?.nickname}
                   </p>

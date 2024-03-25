@@ -28,14 +28,14 @@ func CreateGroup(db *sql.DB, g *models.Groups, uuid string) error {
 	return err
 }
 
-func GetGroupsCreatedByUser(db *sql.DB, uuid string) ([]models.Groups, error) {
-	rows, err := db.Query("SELECT * FROM social_groups WHERE creator_id=?", uuid)
-	if err != nil {
-		return nil, err
-	}
+// func GetGroupsCreatedByUser(db *sql.DB, uuid string) ([]models.Groups, error) {
+// 	rows, err := db.Query("SELECT * FROM social_groups WHERE creator_id=?", uuid)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return extractGroups(rows)
-}
+// 	return extractGroups(rows)
+// }
 
 func GetGroupsWhereUserIsMember(db *sql.DB, id string, limit, offset int) ([]models.Groups, error) {
 	// rows, err := db.Query(`SELECT * FROM groups WHERE creatorID IN

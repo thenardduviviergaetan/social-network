@@ -8,10 +8,12 @@ import (
 	"server/app/middleware/groups"
 	"server/db/models"
 	"strconv"
+	"time"
 )
 
 func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
-	//TODO move this to the parent
+	//TODO: move this to the parent
+	//TODO: CHECK SI LE NAME EST DEJA PRIS
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -25,9 +27,9 @@ func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uuid := r.URL.Query().Get("UUID")
-	fmt.Println(uuid)
+
 	if errCreate := groups.CreateGroup(db, &group, uuid); errCreate != nil {
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		http.Error(w, "Failed to create group", http.StatusInternalServerError)
 		return
 	}
 
@@ -105,8 +107,6 @@ func HandleJoinGroup(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	group := q.Get("group")
 	user := q.Get("user")
-	owner := q.Get("owner")
-	fmt.Printf("group : %s\n user %s\n owner %s\n", group, user, owner)
 
 	_, err := db.Exec("INSERT INTO group_members(group_id,member_id,pending) VALUES (?,?,1)", group, user)
 	if err != nil {
@@ -114,4 +114,32 @@ func HandleJoinGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+func HandleCreateEvent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var event models.Event
+	db := r.Context().Value("database").(*sql.DB)
+	json.NewDecoder(r.Body).Decode(&event)
+
+	if groups.CheckEventName(db, event.Name) {
+		fmt.Println("oups")
+		http.Error(w, "This Event Name already exist", http.StatusConflict)
+		return
+	}
+	_, err := db.Exec(
+		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id) VALUES (?,?,?,?,?)",
+		time.Now(),
+		event.Date,
+		event.Name,
+		event.Group,
+		event.Creator,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

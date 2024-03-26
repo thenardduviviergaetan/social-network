@@ -25,6 +25,7 @@ type Message struct {
 	TypeTarget string `json:"type_target"`
 	Target     string `json:"target"`
 	Sender     string `json:"sender"`
+	SenderName string `json:"sender_name"`
 	Date       string `json:"date"`
 	Image      string `json:"image"`
 }
@@ -32,7 +33,7 @@ type StatusMessage struct {
 	Msg_type string    `json:"msg_type"`
 	Target   string    `json:"target"`
 	Status   []*Client `json:"status"`
-	Groupe   []*Groupe
+	Groupe   []*Groupe `json:"groupe"`
 }
 type HistoryMessage struct {
 	Msg_type   string     `json:"msg_type"`
@@ -139,6 +140,8 @@ func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	msg := &Message{}
 	json.Unmarshal(message, msg)
+	msg.SenderName = middleware.GetUsersname(app.DB.DB, msg.Sender)
+	message, _ = json.Marshal(msg)
 	if msg.Msg_type == "chat" {
 		// log.Println("Preview")
 		// if client, ok := h.clients[UUID]; ok {
@@ -242,6 +245,7 @@ func GetOldMessages(app *app.App, table, sender, target string, limit, offset in
 		if err := rows.Scan(&message.Sender, &message.Target, &message.Content, &message.Date, &blob); err != nil {
 			return nil, err
 		}
+		message.SenderName = middleware.GetUsersname(app.DB.DB, message.Sender)
 		message.Image = base64.StdEncoding.EncodeToString(blob)
 		messages = append(messages, message)
 	}

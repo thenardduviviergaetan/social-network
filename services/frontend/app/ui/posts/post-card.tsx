@@ -33,7 +33,6 @@ export default function PostsCard({
   post,
   user,
   current,
-  group,
 }: PostCardProps) {
 
   console.log("PostCardProps", post, "USER ",user, current);
@@ -69,7 +68,7 @@ export default function PostsCard({
   );
 
   const { data: groupMembers, mutate: mutateMembers } = useSWR(
-    `${API_BASE_URL}/group/members?id=${group}`,
+    `${API_BASE_URL}/group/members?id=${post.group_id}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 5000 },
   );
@@ -185,7 +184,7 @@ export default function PostsCard({
       }
       break;
     case "group":
-      if (groupMembers?.some((m: any) => m.uuid === user) || post.author_id === user) {
+      if (groupMembers?.some((m: any) => m.uuid === user)) {
         PostComponent = PublicPost;
         postProps = {
           post,

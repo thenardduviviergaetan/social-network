@@ -43,6 +43,7 @@ export interface Post {
   id: string;
   author_id: string;
   author: string;
+  group_id?: string | null | undefined;
   date: string;
   content: string;
   image?: string;
@@ -64,7 +65,6 @@ export interface PostCardProps {
   post: Post;
   user: string;
   current: string | null | undefined;
-  group?: string | null | undefined;
 }
 
 export interface PrivatePostProps extends PostCardProps {

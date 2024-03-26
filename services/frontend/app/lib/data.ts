@@ -180,6 +180,13 @@ export const fetchGroupPosts = async (groupeID?: string) => {
     )
 }
 
+export const fetchGroupMembers = async (groupeID?: string) => {
+    return fetchGlobal(
+        `/group/members?id=${groupeID}`,
+        `Error fetching group members with ID ${groupeID}`
+    )
+}
+
 export const participateEvent = async (event_id:number,type:string, user?:string) => {
     try {
       console.log("event",event_id)

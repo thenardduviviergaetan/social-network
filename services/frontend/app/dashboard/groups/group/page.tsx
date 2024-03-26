@@ -5,15 +5,13 @@ import {
   fetchPosts,
   fetchUser,
 } from "@/app/lib/data";
-import { Group, User } from "@/app/lib/definitions";
+import { Group } from "@/app/lib/definitions";
 import JoinGroupButton from "@/app/ui/groups/join";
 import { GroupMembers } from "@/app/ui/groups/group-members";
 import InviteComponent from "@/app/ui/groups/invite";
 import EventCard from "@/app/ui/groups/event-card";
 import CreateEvent from "@/app/ui/groups/event-form";
-import Form from "@/app/ui/posts/create-form";
-import Posts from "@/app/ui/posts/posts";
-import Pagination from "@/app/ui/dashboard/pagination";
+import GroupDetails from "./group-details";
 
 export default async function Page(
   {
@@ -28,11 +26,6 @@ export default async function Page(
 ) {
   const user = await fetchUser();
   const group = await fetchGroup(searchParams?.id) as Group;
-  const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = await fetchPageNumber("/group/posts", `ID=${group.id}`);
-
-  console.log("TotalPages", totalPages);
-  console.log(`ID=${group.id}`);
 
   return (
     <>
@@ -71,16 +64,16 @@ export default async function Page(
           )}
         </div>
       </div>
-      <>
-        <Form user={user?.uuid} group={group.id} />
-        <Posts
-          page={currentPage}
-          urlSegment="/group/posts"
-          user={user || undefined}
-          group={group.id}
-        />
-        <Pagination totalPages={totalPages ?? 0} />
-      </>
+      <div className="flex flex-wrap flex-row justify-around mt-8 w-full h-auto p-5">
+        {group.events?.length === 0 ? (
+          <p>No events</p>
+        ) : (
+          group.events?.map((event, index) => (
+            <EventCard event={event} key={index} user={user?.uuid} />
+          ))
+        )}
+        <GroupDetails user={user} group={group} searchParams={searchParams}/>
+      </div>
     </>
   );
 }

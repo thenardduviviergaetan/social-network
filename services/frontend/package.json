@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
+    "@nextui-org/dropdown": "^2.1.17",
     "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.0",

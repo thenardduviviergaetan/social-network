@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 import { useState } from "react";
-import { boolean } from "zod";
+import { emojis } from "@/app/lib/constants";
+// import EmojiSelector from "./emojiselector";
+// import { boolean } from "zod";
 
 class Message {
   msg_type: string;
@@ -106,7 +108,7 @@ class Groupe {
 export default function Chat({ user }: { user: string | null }) {
   let listUser = new ListUser();
   const userUuid = user;
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<string>("");
   const [socket, setsocket] = useState(Object);
   const [userList, setUserList] = useState(listUser.tab);
   const [groupList, setGroupList] = useState(Array<Groupe>);
@@ -319,6 +321,7 @@ export default function Chat({ user }: { user: string | null }) {
           })}
         </div>
         <div className="sender bg-zinc-500 flex flex-col p-4 mb-2 h-25 rounded-lg">
+          {/* <div> */}
           <div className={typing ? "" : "hidden"}>
             <p>Typing</p>
           </div>
@@ -366,6 +369,15 @@ export default function Chat({ user }: { user: string | null }) {
             >Send
             </button>
           </form>
+          <div className="flex flex-wrap">
+            {
+              emojis.map((emoji: string) => {
+                return (
+                  <button onClick={() => setContent(content + emoji)}>{emoji}</button>
+                )
+              })
+            }
+          </div>
         </div>
       </div>
     </div>

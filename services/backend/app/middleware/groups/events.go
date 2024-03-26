@@ -28,6 +28,7 @@ func GetEvents(db *sql.DB, groupId string) (events []models.Event) {
 	var candidate = struct {
 		User   string
 		Choice string
+		Id     int
 	}{}
 	for rows.Next() {
 		rows.Scan(
@@ -41,7 +42,7 @@ func GetEvents(db *sql.DB, groupId string) (events []models.Event) {
 			&event.Creator,
 		)
 
-		rows, err := db.Query(`SELECT candidate_id,choice FROM event_candidates WHERE event_id = ?`, event.ID)
+		rows, err := db.Query(`SELECT candidate_id,choice,event_id FROM event_candidates WHERE event_id = ?`, event.ID)
 
 		if err != nil {
 			fmt.Println(err)
@@ -49,7 +50,7 @@ func GetEvents(db *sql.DB, groupId string) (events []models.Event) {
 		}
 
 		for rows.Next() {
-			rows.Scan(&candidate.User, &candidate.Choice)
+			rows.Scan(&candidate.User, &candidate.Choice, &candidate.Id)
 			event.Candidates = append(event.Candidates, candidate)
 		}
 		events = append(events, event)

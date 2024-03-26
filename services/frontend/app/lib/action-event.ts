@@ -3,6 +3,8 @@ import axios, { AxiosError } from "axios";
 import { CADDY_URL } from "./constants";
 import { z } from "zod";
 import { fetchUser } from "./data";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const eventFormSchema = z.object({
     date: z.string().refine((value) => value.trim() !== "", {
@@ -51,7 +53,8 @@ export const createEventRequest = async (prevState: State | undefined, formData:
             `${CADDY_URL}/group/event/create`,
                 eventData
         );
-
+            revalidatePath(`/dashboard/groups/group?id=${group_id}`);
+            redirect(`/dashboard/groups/group?id=${group_id}`);
         return res.data;
     } catch (error) {
         if ((error as AxiosError).response && (error as AxiosError).response?.status === 409) {

@@ -31,7 +31,7 @@ export default async function Page(
           group={group}
           user={user?.uuid}
         />
-        <CreateEvent group={group} user={user?.uuid} />
+        <CreateEvent group={group} user={user?.uuid}/>
 
         <div className="bg-white shadow-xl h-[80px] w-auto rounded-lg p-4 flex flex-row mb-3 justify-between">
           <p className=" text-purple-700 rounded-lg p-3 w-4/12 font-bold">

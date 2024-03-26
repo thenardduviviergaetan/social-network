@@ -7,8 +7,8 @@ import {useEffect, useState } from "react";
 
 export default function EventCard({ event, user }: { event: Event, user?: string }) {
 
-    const check = event.candidates?.some(u => u.User === user && u.Choice !== "no") ||false;
-    const checkNo = event.candidates?.some(u=>u.User === user && u.Choice === "no") || false;
+    const check = event.candidates?.some(u => u.User === user && u.Choice !== "no" && u.Id === event.event_id) ||false;
+    const checkNo = event.candidates?.some(u=>u.User === user && u.Choice === "no" && u.Id === event.event_id) || false;
 
     const [stateCheck,setStateCheck] = useState([check,checkNo])
     // const [stateCheckNo,setStateCheckNo] = useState(false)

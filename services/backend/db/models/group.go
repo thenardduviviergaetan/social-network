@@ -35,6 +35,7 @@ type Event struct {
 	Candidates       []struct {
 		User   string
 		Choice string
+		Id     int
 	} `json:"candidates"`
 }
 

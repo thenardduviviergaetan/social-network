@@ -197,8 +197,6 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 
 	db := r.Context().Value("database").(*sql.DB)
 
-	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAA")
-
 	groupID, err := db.Query("SELECT id FROM social_groups WHERE creator_id = ?", currentUser)
 	if err != nil {
 		fmt.Println(err)
@@ -213,7 +211,6 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
 		rows, err := db.Query("SELECT member_id FROM group_members WHERE group_id = ? AND pending = 1", group)
 		if err != nil {
@@ -228,9 +225,7 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				return
 			}
-			fmt.Println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
-			fmt.Println("MEMBER:" + member.UUID)
 			err = db.QueryRow("SELECT first_name, last_name FROM users WHERE uuid = ?", member.UUID).Scan(&member.FirstName, &member.LastName)
 			if err != nil {
 				fmt.Println(err)
@@ -479,8 +474,10 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&msg)
 
 	db := r.Context().Value("database").(*sql.DB)
-
-	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ?)", msg.Candidate).Scan(&check)
+	fmt.Println(msg)
+	fmt.Println("======================")
+	fmt.Println(msg.EventID)
+	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ? AND event_id = ?)", msg.Candidate, msg.EventID).Scan(&check)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -499,7 +496,7 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 		if !check {
 			_, err = db.Exec("INSERT INTO event_candidates(candidate_id,event_id,choice) VALUES(?,?,?)", msg.Candidate, msg.EventID, msg.Type)
 		} else {
-			_, err = db.Exec("UPDATE event_candidates SET candidate_id = ? , event_id = ? , choice = ?", msg.Candidate, msg.EventID, msg.Type)
+			_, err = db.Exec("UPDATE event_candidates SET choice = ? WHERE candidate_id = ? AND event_id = ?", msg.Type, msg.Candidate, msg.EventID)
 		}
 		if err != nil {
 			fmt.Println(err)

@@ -337,3 +337,12 @@ export function InviteNotifications({ user }: NotificationsProps) {
     </div>
   );
 }
+
+export function EventNotifications({ user }: NotificationsProps) {
+  const [showNotif, setShowNotif] = useState("");
+  const { data: pending, mutate } = useSWR(
+    `/api/groups/groupREFACTOR:`,
+    fetcher,
+    { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
+  );
+}

@@ -22,7 +22,7 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
 
     const [showCreateEventState, setShowCreateEventState] = useState(false)
     return (
-        <div className={"bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5"}>
+        <div className={"bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5 mb-5"}>
             <Button
                 className="w-auto"
                 onClick={() => { setShowCreateEventState(showCreateEventState ? false : true) }}

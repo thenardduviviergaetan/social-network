@@ -108,7 +108,7 @@ export type Event = {
   creator_last_name:string;
   creation_date: string;
   date: string;
-  candidates:Array<{User:string,Choice:string}>;
+  candidates:Array<{User:string,Choice:string,Id:number}>;
 }
 export interface JoinStatus{
     joined:boolean;

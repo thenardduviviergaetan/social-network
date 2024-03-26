@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { emojis } from "@/app/lib/constants";
+import toast from "react-hot-toast";
 
 class Message {
   msg_type: string;
@@ -216,6 +217,7 @@ export default function Chat({ user }: { user: string | null }) {
             ]);
           } else {
             /// TODO : ADD notif ici
+            toast.success(message.sender_name+" sent a message !\n"+message.content)
           }
           break;
         case "typing":

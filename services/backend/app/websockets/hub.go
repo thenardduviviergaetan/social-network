@@ -1,6 +1,7 @@
 package livechat
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -24,6 +25,7 @@ type Message struct {
 	TypeTarget string `json:"type_target"`
 	Target     string `json:"target"`
 	Sender     string `json:"sender"`
+	SenderName string `json:"sender_name"`
 	Date       string `json:"date"`
 	Image      string `json:"image"`
 }
@@ -31,6 +33,7 @@ type StatusMessage struct {
 	Msg_type string    `json:"msg_type"`
 	Target   string    `json:"target"`
 	Status   []*Client `json:"status"`
+	Groupe   []*Groupe `json:"groupe"`
 }
 type HistoryMessage struct {
 	Msg_type   string     `json:"msg_type"`
@@ -39,10 +42,9 @@ type HistoryMessage struct {
 }
 
 func InitHub(app *app.App) *Hub {
-	users := middleware.GetAllUsers(app.DB.DB) // TODO Get all users from db ?
+	users := middleware.GetAllUsers(app.DB.DB)
 	offlineInit := make([]*Client, 0)
 	for _, user := range users {
-		// client := &Client{Username: user, send: make(chan []byte)}
 		client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}
 		offlineInit = append(offlineInit, client)
 	}
@@ -93,9 +95,6 @@ func (h *Hub) Run(app *app.App) {
 				jsonTyping, _ := json.Marshal(typing)
 				h.SendMessageToTarget(app, msg.Target, jsonTyping)
 			case "history":
-				log.Println("msg :", string(message))
-				log.Println("msg :", msg)
-				// log.Println("msg.TypeTarget :", msg.TypeTarget)
 				if msg.TypeTarget == "user" {
 					tabmsg, err := GetOldMessages(app, "chat_users", msg.Sender, msg.Target, 100, 0)
 					if err != nil {
@@ -105,9 +104,16 @@ func (h *Hub) Run(app *app.App) {
 					sendmsg := &HistoryMessage{Msg_type: "history", Target: msg.Target, TabMessage: tabmsg}
 					jsonMessage, _ := json.Marshal(sendmsg)
 					h.clients[msg.Sender].send <- jsonMessage
+				} else if msg.TypeTarget == "group" {
+					tabmsg, err := GetOldMessages(app, "chat_groups", msg.Sender, msg.Target, 100, 0)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+					sendmsg := &HistoryMessage{Msg_type: "history", Target: msg.Target, TabMessage: tabmsg}
+					jsonMessage, _ := json.Marshal(sendmsg)
+					h.clients[msg.Sender].send <- jsonMessage
 				}
-				// default:
-				// 	h.SendMessageToTarget(app, msg.Target, message)
 			}
 		}
 	}
@@ -116,9 +122,10 @@ func (h *Hub) Run(app *app.App) {
 func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 	h.clients[current.UUID].LastMsg = []string{}
 	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
-	msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status}
-	jsonClients, _ := json.Marshal(msg)
 	for c := range h.clients {
+		h.clients[c].reloadGroup(app.DB.DB)
+		msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: h.clients[c].tabgroup}
+		jsonClients, _ := json.Marshal(msg)
 		h.clients[c].send <- jsonClients
 	}
 }
@@ -126,17 +133,24 @@ func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	msg := &Message{}
 	json.Unmarshal(message, msg)
+	msg.SenderName = middleware.GetUsersname(app.DB.DB, msg.Sender)
+	message, _ = json.Marshal(msg)
 	if msg.Msg_type == "chat" {
-		// log.Println("Preview")
-		// if client, ok := h.clients[UUID]; ok {
-		for _, client := range h.clients {
-			// log.Println("Next")
-			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				// SavePrivateMessage(app, msg)
-				client.send <- message
+		if msg.TypeTarget == "user" {
+			for _, client := range h.clients {
+				if client.UUID == msg.Target || client.UUID == msg.Sender {
+					client.send <- message
+				}
 			}
+			SavePrivateMessage(app, msg, "chat_users")
+		} else if msg.TypeTarget == "group" {
+			for _, client := range h.clients {
+				if client.group[msg.Target] != nil {
+					client.send <- message
+				}
+			}
+			SavePrivateMessage(app, msg, "chat_groups")
 		}
-		SavePrivateMessage(app, msg)
 	}
 	if msg.Msg_type == "notification" {
 		if client, ok := h.clients[UUID]; ok {
@@ -168,7 +182,7 @@ func Remove(clients []*Client, c *Client) []*Client {
 	return append(clients[:index], clients[index+1:]...)
 }
 
-func SavePrivateMessage(app *app.App, message *Message) error {
+func SavePrivateMessage(app *app.App, message *Message, table string) error {
 	var image []byte
 	if message.Image != "" {
 		dataURLParts := strings.Split(message.Image, ",")
@@ -178,26 +192,38 @@ func SavePrivateMessage(app *app.App, message *Message) error {
 		image, _ = base64.StdEncoding.DecodeString(dataURLParts[1])
 	}
 	_, err := app.DB.Exec(
-		"INSERT INTO chat_users(sender, target, message_content, creation_date, link_image) VALUES (?,?,?,datetime(),?)",
+		"INSERT INTO "+table+"(sender, target, message_content, creation_date, link_image) VALUES (?,?,?,datetime(),?)",
 		message.Sender,
 		message.Target,
 		message.Content,
 		image,
 	)
-	log.Println(err)
 	return err
 }
 
 func GetOldMessages(app *app.App, table, sender, target string, limit, offset int) ([]*Message, error) {
-	rows, err := app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM "+table+" WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation_date ASC LIMIT ? OFFSET ?",
-		target,
-		sender,
-		sender,
-		target,
-		limit,
-		offset)
-	if err != nil {
-		return nil, err
+	var rows *sql.Rows
+	var err error
+	if table == "chat_users" {
+		rows, err = app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM chat_users WHERE ((target = ? AND sender = ?) OR (target = ? AND sender = ?)) ORDER BY creation_date ASC LIMIT ? OFFSET ?",
+			target,
+			sender,
+			sender,
+			target,
+			limit,
+			offset)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		rows, err = app.DB.Query("SELECT sender, target, message_content, creation_date,link_image FROM chat_groups WHERE target = ? ORDER BY creation_date ASC LIMIT ? OFFSET ?",
+			target,
+			limit,
+			offset)
+		if err != nil {
+			log.Println("Error get old message groupe", err)
+			return nil, err
+		}
 	}
 	defer rows.Close()
 	messages := []*Message{}
@@ -207,6 +233,7 @@ func GetOldMessages(app *app.App, table, sender, target string, limit, offset in
 		if err := rows.Scan(&message.Sender, &message.Target, &message.Content, &message.Date, &blob); err != nil {
 			return nil, err
 		}
+		message.SenderName = middleware.GetUsersname(app.DB.DB, message.Sender)
 		message.Image = base64.StdEncoding.EncodeToString(blob)
 		messages = append(messages, message)
 	}

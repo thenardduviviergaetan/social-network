@@ -10,10 +10,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type Groupe struct {
+	Name string `json:"name"`
+	Id   string `json:"id"`
+}
+
 type Client struct {
 	hub      *Hub
 	conn     *websocket.Conn
 	send     chan []byte
+	group    map[string]*Groupe
+	tabgroup []*Groupe
 	Username string   `json:"username"`
 	UUID     string   `json:"uuid"`
 	Online   bool     `json:"online"`
@@ -28,6 +35,15 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
+}
+
+func GetGroupe(db *sql.DB, userUUID string) map[string]*Groupe {
+	tab := middleware.GetAllGroupUsers(db, userUUID)
+	tabGroup := make(map[string]*Groupe)
+	for _, group := range tab {
+		tabGroup[group[0]] = &Groupe{Name: group[1], Id: group[0]}
+	}
+	return tabGroup
 }
 
 func (c *Client) Read() {
@@ -80,6 +96,7 @@ func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Reque
 	client := &Client{
 		UUID:     string(msg), // TODO: handle user first name / lastname /username ?
 		Username: middleware.GetUsersname(db, string(msg)),
+		group:    GetGroupe(db, string(msg)),
 		hub:      hub,
 		conn:     conn,
 		send:     make(chan []byte, 256),
@@ -88,4 +105,14 @@ func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Reque
 	client.hub.register <- client
 	go client.Write()
 	go client.Read()
+}
+
+func (c *Client) reloadGroup(db *sql.DB) {
+	groupe := GetGroupe(db, c.UUID)
+	c.group = groupe
+	tab := []*Groupe{}
+	for _, group := range groupe {
+		tab = append(tab, group)
+	}
+	c.tabgroup = tab
 }

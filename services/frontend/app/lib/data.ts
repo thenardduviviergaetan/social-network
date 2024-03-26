@@ -64,7 +64,7 @@ export const fetchPosts = async (
 ) => {
   try {
     const res = await axios.get(
-      `${CADDY_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`,
+      `${CADDY_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`, 
     );
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data;
@@ -128,6 +128,7 @@ export const fetchFollowUser = async (user: string, author: string) => {
   const res = await axios.post(`${API_BASE_URL}/user/follow`, { user, author });
   return { followed: res.data.followed, pending: res.data.pending };
 };
+
 /////////////////>- GROUPS -</////////////////
 
 // TODO this function could be used to shorten every function in this page.
@@ -165,3 +166,17 @@ export const fetchGroup = async (groupeID?: string) => {
     )
 }
 
+export const participateEvent = async (event_id:number,type:string, user?:string) => {
+    try {
+      console.log("event",event_id)
+      const res = await axios.post(`${API_BASE_URL}/group/event/join`,
+      {
+        type,
+        event_id,
+        user
+      })
+      return res.data
+    } catch (error) {
+      console.error(error)
+    }
+}

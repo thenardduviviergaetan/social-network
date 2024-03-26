@@ -159,4 +159,8 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleCreateEvent(w, r.WithContext(ctx))
 	})
+	http.HandleFunc("/api/group/event/join", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleEvent(w, r.WithContext(ctx))
+	})
 }

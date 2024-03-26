@@ -17,13 +17,12 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
     }
 
     const initialState = { message: null, errors: {}, id: group.id };
-    console.log("🚀 ~ CreateEvent ~ initialState:", initialState);
 
     const [state, setFormState] = useFormState(sendReq, initialState);
 
     const [showCreateEventState, setShowCreateEventState] = useState(false)
     return (
-        <div className={user !== group.creator_id ? "hidden" : "bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5"}>
+        <div className={"bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5"}>
             <Button
                 className="w-auto"
                 onClick={() => { setShowCreateEventState(showCreateEventState ? false : true) }}

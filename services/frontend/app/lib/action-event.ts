@@ -43,7 +43,7 @@ export const createEventRequest = async (prevState: State | undefined, formData:
         date: validatedData.data.date,
         name: validatedData.data.name,
         description: validatedData.data.description,
-        creator:user?.uuid,
+        creator_id:user?.uuid,
         group_id:group_id
     };
     try {

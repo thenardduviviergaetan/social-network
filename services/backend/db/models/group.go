@@ -20,12 +20,21 @@ type Group struct {
 	Name             string    `json:"name"`
 	Description      string    `json:"description"`
 	Members          []User    `json:"members"`
+	Events           []Event   `json:"events"`
 }
 
 type Event struct {
-	Date        string `json:"date"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Creator     string `json:"creator"`
-	Group       int    `json:"group_id"`
+	ID               int    `json:"event_id"`
+	Date             string `json:"date"`
+	CreationDate     string `json:"creation_date"`
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+	Creator          string `json:"creator_id"`
+	CreatorFirstName string `json:"creator_first_name"`
+	CreatorLastName  string `json:"creator_last_name"`
+	Group            int    `json:"group_id"`
+	Candidates       []struct {
+		User   string
+		Choice string
+	} `json:"candidates"`
 }

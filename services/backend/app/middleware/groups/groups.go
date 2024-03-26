@@ -105,5 +105,3 @@ func GetMembers(id string, db *sql.DB) (members []models.User) {
 	}
 	return
 }
-
-// JoinGroup()

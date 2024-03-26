@@ -91,8 +91,9 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 		&group.Name,
 		&group.Description,
 	)
-	fmt.Println(group)
 	group.Members = groups.GetMembers(groupId, db)
+	group.Events = groups.GetEvents(db, groupId)
+	fmt.Println("group.Events", group.Events)
 	json.NewEncoder(w).Encode(group)
 
 }
@@ -126,20 +127,77 @@ func HandleCreateEvent(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&event)
 
 	if groups.CheckEventName(db, event.Name) {
-		fmt.Println("oups")
 		http.Error(w, "This Event Name already exist", http.StatusConflict)
 		return
 	}
 	_, err := db.Exec(
-		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id) VALUES (?,?,?,?,?)",
+		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id,description) VALUES (?,?,?,?,?,?)",
 		time.Now(),
 		event.Date,
 		event.Name,
 		event.Group,
 		event.Creator,
+		event.Description,
 	)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	errSelect := db.QueryRow("SELECT id FROM events WHERE name = ?", event.Name).Scan(&event.ID)
+	if errSelect != nil {
+		fmt.Println(errSelect)
+		return
+	}
+
+	_, err = db.Exec("INSERT INTO event_candidates(candidate_id,event_id,choice) VALUES(?,?,?)", event.Creator, event.ID, "join")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func HandleEvent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var msg = struct {
+		Type      string `json:"type"`
+		EventID   int    `json:"event_id"`
+		Candidate string `json:"user"`
+	}{}
+	var check bool
+	json.NewDecoder(r.Body).Decode(&msg)
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ?)", msg.Candidate).Scan(&check)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	switch msg.Type {
+	case "leave":
+		_, err := db.Exec("DELETE FROM event_candidates WHERE event_id = ? AND candidate_id = ? ", msg.EventID, msg.Candidate)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	default:
+		var err error
+		if !check {
+			_, err = db.Exec("INSERT INTO event_candidates(candidate_id,event_id,choice) VALUES(?,?,?)", msg.Candidate, msg.EventID, msg.Type)
+		} else {
+			_, err = db.Exec("UPDATE event_candidates SET candidate_id = ? , event_id = ? , choice = ?", msg.Candidate, msg.EventID, msg.Type)
+		}
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
 }

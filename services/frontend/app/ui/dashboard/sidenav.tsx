@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { auth } from "@/auth";
-import Notifications, { GroupNotifications } from "@/app/ui/dashboard/notifications";
+import Notifications, { GroupNotifications, InviteNotifications } from "@/app/ui/dashboard/notifications";
 
 export default async function SideNav() {
   const session = await auth();
@@ -28,6 +28,7 @@ export default async function SideNav() {
         </div>
       <Notifications user={session?.user?.uuid}/>
       <GroupNotifications user={session?.user?.uuid}/>
+      <InviteNotifications user={session?.user?.uuid}/>
     </div>
   );
 }

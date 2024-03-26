@@ -16,7 +16,6 @@ export default async function Page(
   },
 ) {
 
-
   return (
     // <div className="flex flex-col justify-around items-start w-7/12">
       <div className="grid md:grid-cols-1 xl:grid-cols-2 gap-4 w-full m-auto mt-10 ">

@@ -2,6 +2,9 @@ import { fetchGroup, fetchUser } from "@/app/lib/data";
 import { Group, User } from "@/app/lib/definitions";
 import JoinGroupButton from "@/app/ui/groups/join";
 import { GroupMembers } from "@/app/ui/groups/group-members";
+import InviteComponent from "@/app/ui/groups/invite";
+import { useState } from "react";
+import Manager from "@/app/ui/groups/manager";
 
 export default async function Page(
   {
@@ -24,7 +27,6 @@ export default async function Page(
         user={user?.uuid}
       />
 
-      {/* TODO Add button to invite followers to group */}
 
       <div className="bg-white shadow-xl h-[80px] w-auto rounded-lg p-4 flex flex-row mb-3 justify-between">
         <p className=" text-purple-700 rounded-lg p-3 w-4/12 font-bold">
@@ -40,8 +42,10 @@ export default async function Page(
           {group.description}
         </div>
       </div>
-      
-     <GroupMembers group={group} />
+      <div className="flex">
+        <GroupMembers group={group} />
+        <InviteComponent group={group} user={user?.uuid} />
+      </div>
     </div>
   );
 }

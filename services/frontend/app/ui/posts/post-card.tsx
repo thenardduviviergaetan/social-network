@@ -27,12 +27,15 @@ import {
   fetchLikePost,
   fetchLikes,
 } from "@/app/lib/data";
+import toast from "react-hot-toast";
 
 export default function PostsCard({
   post,
   user,
   current,
 }: PostCardProps) {
+
+  console.log("PostCardProps", post, "USER ",user, current);
 
   const { data: commentsCounter, mutate: mutateCommentsCounter } = useSWR(
     `${API_BASE_URL}/comments/count?post_id=${post.id}`,
@@ -96,9 +99,13 @@ export default function PostsCard({
   };
 
   const handleFollow = async () => {
+    if (followStatus?.followed) {
+      toast.error("Unfollow User")
+    }
     try {
       const res = await followUser(user, post.author_id);
       mutateFollow(res);
+      
     } catch (error) {
       console.error(error);
     }
@@ -315,6 +322,7 @@ function FollowButton({
   followStatus,
   handleFollow,
 }: FollowButtonProps) {
+  console.log("FollowButtonProps", post, user, followStatus, handleFollow);
   return (
     <Button
       onClick={handleFollow}

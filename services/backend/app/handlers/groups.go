@@ -193,6 +193,8 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 
 	db := r.Context().Value("database").(*sql.DB)
 
+	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAA")
+
 	groupID, err := db.Query("SELECT id FROM social_groups WHERE creator_id = ?", currentUser)
 	if err != nil {
 		fmt.Println(err)
@@ -207,6 +209,7 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 			return
 		}
+		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
 		rows, err := db.Query("SELECT member_id FROM group_members WHERE group_id = ? AND pending = 1", group)
 		if err != nil {
@@ -221,7 +224,9 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				return
 			}
+			fmt.Println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
+			fmt.Println("MEMBER:" + member.UUID)
 			err = db.QueryRow("SELECT first_name, last_name FROM users WHERE uuid = ?", member.UUID).Scan(&member.FirstName, &member.LastName)
 			if err != nil {
 				fmt.Println(err)
@@ -283,6 +288,134 @@ func HandleRejectMember(w http.ResponseWriter, r *http.Request) {
 	_, err = db.Exec("DELETE FROM group_members WHERE group_id = ? AND member_id = ?", ctx.Group, ctx.User)
 	if err != nil {
 		http.Error(w, "Failed to reject member", http.StatusInternalServerError)
+		return
+	}
+}
+
+func HandleInviteMember(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := struct {
+		Target string `json:"target"`
+		Group  int    `json:"group"`
+		Sender string `json:"sender"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&ctx)
+	if err != nil {
+		http.Error(w, "Failed to invite member", http.StatusInternalServerError)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	_, err = db.Exec("INSERT INTO invite (target, group_id, sender) VALUES (?, ?, ?)", ctx.Target, ctx.Group, ctx.Sender)
+	if err != nil {
+		http.Error(w, "Failed to invite member", http.StatusInternalServerError)
+		return
+	}
+}
+
+func HandleGetPendingInvite(w http.ResponseWriter, r *http.Request) {
+	var invite models.Invite
+	var invites []models.Invite
+
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	currentUser := r.URL.Query().Get("user")
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	rows, err := db.Query("SELECT target, group_id, sender FROM invite WHERE target = ?", currentUser)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&invite.Target, &invite.GroupID, &invite.Sender)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = db.QueryRow("SELECT name FROM social_groups WHERE id = ?", invite.GroupID).Scan(&invite.GroupName)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = db.QueryRow("SELECT first_name, last_name FROM users WHERE uuid = ?", invite.Sender).Scan(&invite.SenderFirstName, &invite.SenderLastName)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		invites = append(invites, invite)
+	}
+	json.NewEncoder(w).Encode(invites)
+}
+
+func HandleAcceptInvite(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := struct {
+		Target string `json:"target"`
+		Group  int    `json:"groupId"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&ctx)
+	if err != nil {
+		http.Error(w, "Failed to accept invite", http.StatusInternalServerError)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	_, err = db.Exec("INSERT INTO group_members (group_id, member_id, pending) VALUES (?, ?, 0)", ctx.Group, ctx.Target)
+	if err != nil {
+		http.Error(w, "Failed to accept invite", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = db.Exec("DELETE FROM invite WHERE target = ? AND group_id = ?", ctx.Target, ctx.Group)
+	if err != nil {
+		http.Error(w, "Failed to accept invite", http.StatusInternalServerError)
+		return
+	}
+}
+
+func HandleRejectInvite(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := struct {
+		Target string `json:"target"`
+		Group  int    `json:"groupId"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&ctx)
+	if err != nil {
+		http.Error(w, "Failed to reject invite", http.StatusInternalServerError)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	_, err = db.Exec("DELETE FROM invite WHERE target = ? AND group_id = ?", ctx.Target, ctx.Group)
+	if err != nil {
+		http.Error(w, "Failed to reject invite", http.StatusInternalServerError)
 		return
 	}
 }

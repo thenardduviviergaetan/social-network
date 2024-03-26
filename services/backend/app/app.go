@@ -178,4 +178,25 @@ func (a *App) ServeHTTP(database *sql.DB) {
 			w.WriteHeader(http.StatusNotFound)
 		}
 	})
+
+	http.HandleFunc("/api/group/invite", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleInviteMember(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/group/invite/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		segments := strings.Split(r.URL.Path, "/")
+
+		switch segments[4] {
+		case "pending":
+			h.HandleGetPendingInvite(w, r.WithContext(ctx))
+		case "accept":
+			h.HandleAcceptInvite(w, r.WithContext(ctx))
+		case "reject":
+			h.HandleRejectInvite(w, r.WithContext(ctx))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	})
 }

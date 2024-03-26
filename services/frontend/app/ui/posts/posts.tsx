@@ -11,6 +11,7 @@ import PostCard from "@/app/ui/posts/post-card";
 export default function Posts({
   page,
   urlSegment,
+  param,
   user,
 }: {
   page: number;
@@ -18,8 +19,9 @@ export default function Posts({
   param?: string;
   user?: User;
 }) {
+
   const { data: posts, mutate } = useSWR(
-    `${API_BASE_URL}/${urlSegment}?page=${page}&limit=${ITEMS_PER_PAGE}`,
+    `${API_BASE_URL}/${urlSegment}?page=${page}&limit=${ITEMS_PER_PAGE}&${param}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 5000 },
   );
@@ -27,14 +29,14 @@ export default function Posts({
   useEffect(() => {
     const fetchPostsData = async () => {
       try {
-        const res = await fetchPosts(page, urlSegment);
+        const res = await fetchPosts(page, urlSegment, param);
         mutate(res);
       } catch (error) {
         console.error(error);
       }
     };
     fetchPostsData();
-  }, [page, urlSegment, mutate]);
+  }, [page, urlSegment,param, mutate]);
   
 
   if (!posts) {
@@ -49,13 +51,14 @@ export default function Posts({
     )
   }
 
+
   return (
     <>
       {posts?.map((post: Post) => (
         <PostCard
           key={post.id}
           post={post}
-          user={user?.uuid || ""}
+          user={user?.uuid}
           current={user?.name}
         />
       ))}
@@ -63,28 +66,3 @@ export default function Posts({
   );
 }
 
-// export default async function Posts(
-//   { page, urlSegment, param }: {
-//     page: number;
-//     urlSegment: string;
-//     param?: string;
-//   },
-// ) {
-//   const session = await auth();
-//   const posts = await fetchPosts(page, urlSegment, param);
-
-//   return (
-//     posts.map((post: Post) => {
-//       return (
-//         <>
-//             <PostCard
-//               key={post.id}
-//               post={post}
-//               user={session?.user?.uuid}
-//               current={session?.user?.name}
-//             />
-//         </>
-//       );
-//     })
-//   );
-// }

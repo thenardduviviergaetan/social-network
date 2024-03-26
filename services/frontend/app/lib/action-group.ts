@@ -79,3 +79,23 @@ export async function joinGroup(user: string | undefined, group: string) {
     console.error(error);
   }
 }
+
+export const inviteToGroup = async (
+  target: string,
+  group: number,
+  sender: string,
+) => {
+  console.log(`${sender} inviting ${target} to group ${group}`);
+  try {
+    const res = await axios.post(
+      `${CADDY_URL}/group/invite`,
+      {
+        target: target,
+        group: group,
+        sender: sender,
+      },
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};

@@ -62,10 +62,11 @@ export const fetchPageNumber = async (urlSegment: string, param?: string) => {
 export const fetchPosts = async (
   pageNumber: number,
   urlSegment: string,
+  param?: string,
 ) => {
   try {
     const res = await axios.get(
-      `${API_BASE_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}`,
+      `${API_BASE_URL}/${urlSegment}?page=${pageNumber}&limit=${ITEMS_PER_PAGE}&${param}`,
     );
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return res.data;

@@ -28,3 +28,12 @@ type Member struct {
 	Avatar         string `json:"avatar"`
 	GroupRequested int    `json:"group_requested"`
 }
+
+type Invite struct {
+	GroupID         int    `json:"groupId"`
+	GroupName       string `json:"groupName"`
+	Sender          string `json:"sender"`
+	SenderFirstName string `json:"senderFirstName"`
+	SenderLastName  string `json:"senderLastName"`
+	Target          string `json:"target"`
+}

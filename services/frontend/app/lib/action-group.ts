@@ -7,11 +7,11 @@ import { CADDY_URL } from "./constants";
 import { redirect } from "next/navigation";
 
 const groupFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters long"),
-  description: z.string().refine((value) => value.trim() !== "", {
-    message: "The groupe requires a description",
-  }),
-});
+    name: z.string().min(3, "Name must be at least 3 characters long"),
+    description: z.string().refine(value => value.trim() !== "", {
+        message: "The group requires a description"
+    })
+})
 
 export type State = {
   errors?: {

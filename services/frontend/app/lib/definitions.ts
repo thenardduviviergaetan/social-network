@@ -12,31 +12,31 @@ export type User = {
 }
 
 export type Follower = {
-    uuid: string
-    firstName: string
-    lastName: string
+  uuid: string
+  firstName: string
+  lastName: string
 }
 export type Param = {
-    page?: string
-    user?: string
-    id?:string
+  page?: string
+  user?: string
+  id?: string
 }
 
 export type TokenUser = {
-    id: string
-    email: string
-    name: string
-    uuid: string
+  id: string
+  email: string
+  name: string
+  uuid: string
 }
 
 export type Comment = {
-    id: number
-    author_id: string
-    author: string
-    post_id: number
-    content: string
-    image: File | null
-    date: string
+  id: number
+  author_id: string
+  author: string
+  post_id: number
+  content: string
+  image: File | null
+  date: string
 }
 
 export interface Post {
@@ -83,22 +83,33 @@ export interface FollowButtonProps {
   followStatus: FollowStatus;
   handleFollow: () => void;
 }
-export interface JoinButtonProps{
-    group:Group;
-    user?:string;
-    // joinGroupRequest:()=>void
+export interface GroupButtonProps {
+  group: Group;
+  user?: string;
 }
 export type Group = {
-    id: number
-    creation_date: string
-    creator_id : string
-    creator_first_name:string
-    creator_last_name:string
-    name:string
-    description:string
-    members:Array<User>
+  id: number;
+  creation_date: string;
+  creator_id: string;
+  creator_first_name: string;
+  creator_last_name: string;
+  name: string;
+  description: string;
+  members: Array<User>;
+  events:Array<Event>;
 }
 
+export type Event = {
+  event_id:number;
+  name: string;
+  description:string;
+  creator_id: string;
+  creator_first_name: string;
+  creator_last_name:string;
+  creation_date: string;
+  date: string;
+  candidates:Array<{User:string,Choice:string}>;
+}
 export interface JoinStatus{
     joined:boolean;
     pending:boolean;

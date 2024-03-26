@@ -173,3 +173,17 @@ export const fetchGroup = async (groupeID?: string) => {
     )
 }
 
+export const participateEvent = async (event_id:number,type:string, user?:string) => {
+    try {
+      console.log("event",event_id)
+      const res = await axios.post(`${API_BASE_URL}/group/event/join`,
+      {
+        type,
+        event_id,
+        user
+      })
+      return res.data
+    } catch (error) {
+      console.error(error)
+    }
+}

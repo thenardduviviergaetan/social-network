@@ -55,7 +55,7 @@ export default function Form({
 
 
   return (
-    <div className="w-11/12 m-auto shadow-md p-5">
+    <div className="w-auto m-auto shadow-md p-5 bg-white rounded-md">
       <h1 className="text-2xl font-bold mb-4">Create a new post</h1>
       <form action={setState} className="space-y-4">
         <div>

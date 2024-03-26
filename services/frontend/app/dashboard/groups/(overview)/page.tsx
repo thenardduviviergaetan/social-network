@@ -7,7 +7,6 @@ export default async function Page(
   { searchParams }: { searchParams?: { page?: string; type?: string } },
 ) {
   const currentPage = Number(searchParams?.page) || 1;
-  console.log(searchParams?.type);
   return (
     <div className="flex flex-col h-screen">
       <Link

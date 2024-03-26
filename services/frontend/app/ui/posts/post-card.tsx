@@ -267,7 +267,7 @@ export function PublicPost({
   return (
     <div
       id={post.id}
-      className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto "
+      className="bg-white rounded-lg shadow-md p-4 mt-5 max-w-4xl m-auto"
     >
       <div className="flex justify-between">
         <div className="flex items-center">
@@ -318,12 +318,12 @@ export function PublicPost({
           className="flex flex-row justify-center text-purple-700 cursor-pointer"
           onClick={handleLike}
         >
-          {likesData?.liked
-            ? <Fill_heart className="w-10 h-10" />
-            : <Empty_heart className="w-10 h-10" />}
-          <span className="text-sm">
-            {likesData?.likecount | 0}
-          </span>
+          {likesData?.liked ? (
+            <Fill_heart className="w-10 h-10" />
+          ) : (
+            <Empty_heart className="w-10 h-10" />
+          )}
+          <span className="text-sm">{likesData?.likecount | 0}</span>
         </div>
         <div className="text-purple-700">
           <Link

@@ -5,7 +5,7 @@ export type User = {
     firstName: string
     lastName: string
     dateOfBirth: string
-    status: boolean
+    status: string
     nickname?: string
     about?: string
     picture?: string

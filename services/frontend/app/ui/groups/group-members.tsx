@@ -31,47 +31,43 @@ export const GroupMembers = ({ group }: { group: Group }) => {
   }, [group.id, mutate]);
 
   return (
-    <div className="bg-white shadow-lg w-6/12 rounded-lg mt-8 p-5">
+    <div className="border border-grey-600 w-1/2 rounded-lg mt-8 p-5 mr-4">
       <p className="text-purple-700 font-bold underline">
         Members of this group:
       </p>
 
-      {groupData
-        ? (
-          groupData.map((member: User) => (
-            <div key={member.uuid}>
-              <Link
-                href={{
-                  pathname: "/dashboard/profile",
-                  query: { user: encodeURIComponent(member.uuid) },
-                }}
-              >
-                <div className="flex flex-row w-auto h-auto shadow-lg bg-zinc-200 p-3 rounded-lg mb-2 mt-5 justify-start items-center">
-                  <Image
-                    src={`${CADDY_URL}/avatar?id=${member.uuid}`}
-                    alt="Profile Picture"
-                    width={50}
-                    height={200}
-                    className="rounded-full shadow-xl"
-                  />
-                  <p className="text-purple-700 font-bold">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{member
-                      .firstName}&nbsp;{member.lastName}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          ))
-        )
-        : (
-          <div className="flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900">
+      {groupData ? (
+        groupData.map((member: User) => (
+          <div key={member.uuid}>
+            <Link
+              href={{
+                pathname: "/dashboard/profile",
+                query: { user: encodeURIComponent(member.uuid) },
+              }}
+            >
+              <div className="flex flex-row w-auto h-auto shadow-lg bg-zinc-200 p-3 rounded-lg mb-2 mt-5 justify-start items-center">
+                <Image
+                  src={`${CADDY_URL}/avatar?id=${member.uuid}`}
+                  alt="Profile Picture"
+                  width={50}
+                  height={50}
+                  className="rounded-full shadow-xl"
+                />
+                <p className="text-purple-700 font-bold ml-2">
+                  {member.firstName} {member.lastName}
+                </p>
               </div>
-              <p className="mt-2">Loading...</p>
-            </div>
+            </Link>
           </div>
-        )}
+        ))
+      ) : (
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
+            <p className="mt-2">Loading...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

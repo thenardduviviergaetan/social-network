@@ -8,27 +8,27 @@ export default async function GroupCard(
 ) {
 
   return (
-    <>
-      <p className="p-3">
-        Group Name :{" "}
+    <div className="flex flex-col items-center">
+      <p className="p-3 text-center">
+        Group Name:{" "}
         <span className="text-purple-700 font-bold">{group?.name}</span>
       </p>
-      <p className="p-3">
-        Administrator :{" "}
+      <p className="p-3 text-center">
+        Administrator:{" "}
         <span className="text-purple-700 font-bold">
           {group.creator_id === user?.uuid
             ? `${user.firstName} ${user.lastName}(You)`
             : `${await fetchUser(group.creator_id)?.then((res) => res?.firstName + " " + res?.lastName)}`}
         </span>
       </p>
-      <p className="p-3">
-        Date :{" "}
+      <p className="p-3 text-center">
+        Date:{" "}
         <span className="text-purple-700 font-bold">
           {new Date(group.creation_date).toLocaleDateString("FR")}
         </span>
       </p>
-      <p className="p-3">
-        Description :{" "}
+      <p className="p-3 text-center">
+        Description:{" "}
         <span className="text-purple-700 font-bold">{group.description}</span>
       </p>
       <Link
@@ -40,6 +40,6 @@ export default async function GroupCard(
       >
         Go to {group.name}&apos;s Page
       </Link>
-    </>
+    </div>
   );
 }

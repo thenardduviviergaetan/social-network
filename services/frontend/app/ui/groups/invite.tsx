@@ -46,7 +46,7 @@ export default function InviteComponent({
 
   if (!groupData?.some((member: any) => member.uuid === user)) {
     return (
-      <div className="bg-white shadow-xl w-6/12 rounded-lg p-4 flex justify-center items-center">
+      <div className="border border-grey-600 w-1/2 rounded-lg p-4 flex justify-center items-center ">
         <p className="text-center text-gray-500">
           Join the group to invite users.
         </p>
@@ -55,19 +55,21 @@ export default function InviteComponent({
   }
 
   return (
-    <div className="bg-white shadow-xl w-6/12 rounded-lg p-4 ">
+    <div className="border border-grey-600 w-1/2 rounded-lg p-4 mt-8">
       <p className="text-purple-700 font-bold underline mb-3">
         Invite followers to this group:
       </p>
 
-
       {followers &&
         followers.map((follower: any, index: number) => {
-          const isFollowerInGroup = groupData?.some((member: any) =>
-            member.uuid === follower.uuid
+          const isFollowerInGroup = groupData?.some(
+            (member: any) => member.uuid === follower.uuid
           );
           return (
-            <div key={index.toString()} className="flex items-center space-x-4">
+            <div
+              key={index.toString()}
+              className="flex items-center space-x-4"
+            >
               <Image
                 className="w-10 h-10 rounded-full"
                 src={`${CADDY_URL}/avatar?id=${follower.uuid}`}
@@ -79,17 +81,18 @@ export default function InviteComponent({
                 <p className="text-sm font-medium text-gray-800">
                   {`${follower.firstName} ${follower.lastName}`}
                 </p>
-                {isFollowerInGroup
-                  ? <p className="text-sm text-gray-500">Already in group</p>
-                  : (
-                    <button
-                      className="px-2 py-1 text-sm text-white bg-purple-600 rounded hover:bg-purple-900"
-                      onClick={() =>
-                        inviteToGroup(follower.uuid, group.id, user)}
-                    >
-                      Invite
-                    </button>
-                  )}
+                {isFollowerInGroup ? (
+                  <p className="text-sm text-gray-500">Already in group</p>
+                ) : (
+                  <button
+                    className="px-2 py-1 text-sm text-white bg-purple-600 rounded hover:bg-purple-900"
+                    onClick={() =>
+                      inviteToGroup(follower.uuid, group.id, user)
+                    }
+                  >
+                    Invite
+                  </button>
+                )}
               </div>
             </div>
           );

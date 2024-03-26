@@ -22,14 +22,20 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
 
     const [showCreateEventState, setShowCreateEventState] = useState(false)
     return (
-        <div className={"bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5"}>
+        <div className="text-purple-700 mt-8 min-w-fit w-1/4 p-5">
             <Button
                 className="w-auto"
-                onClick={() => { setShowCreateEventState(showCreateEventState ? false : true) }}
-            >Create an Event for {group.name}
+                onClick={() => {
+                    setShowCreateEventState((prevState) => !prevState);
+                }}
+            >
+                Create an Event for {group.name}
             </Button>
             {showCreateEventState && (
-                <form className="flex flex-col w-full h-full p-5 justify-around shadow-xl mt-5 text-gray-500" action={setFormState}>
+                <form
+                    className="flex flex-col w-full h-full p-5 justify-around shadow-xl mt-5 text-gray-500"
+                    action={setFormState}
+                >
                     <label htmlFor="event_date"></label>
                     <div className="relative">
                         <input
@@ -40,7 +46,9 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
                         />
                         <CalendarDaysIcon className={ICON_STYLE} />
                     </div>
-                    <label htmlFor="event_name" className="text-black p-3 hover:text-purple-700 text-sm">Name of the event*</label>
+                    <label htmlFor="event_name" className="text-black p-3 hover:text-purple-700 text-sm">
+                        Name of the event*
+                    </label>
                     <div className="relative">
                         <input
                             type="text"
@@ -59,7 +67,9 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
                                 </p>
                             ))}
                     </div>
-                    <label htmlFor="event_desc" className="text-black p-3 hover:text-purple-700 text-sm">Description of the event*</label>
+                    <label htmlFor="event_desc" className="text-black p-3 hover:text-purple-700 text-sm">
+                        Description of the event*
+                    </label>
                     <div className="relative">
                         <input
                             type="text"
@@ -74,7 +84,7 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
                 </form>
             )}
         </div>
-    )
+    );
 }
 
 function CreateEventButton() {

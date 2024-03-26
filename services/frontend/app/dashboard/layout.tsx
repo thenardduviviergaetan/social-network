@@ -12,7 +12,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <SideNav />
       </div>
       <Toaster />
-        <Chat user={session?.user?.uuid} />
+        {/* <Chat user={session?.user?.uuid} /> */}
       <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
     </main>
   );

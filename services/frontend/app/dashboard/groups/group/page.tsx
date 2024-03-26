@@ -25,40 +25,41 @@ export default async function Page(
   const group = await fetchGroup(searchParams?.id) as Group;
 
   return (
-    <div className="text-white">
+    <div className="bg-white w-auto rounded-lg p-4 shadow-sm flex flex-col">
       <div>
-        <JoinGroupButton
-          group={group}
-          user={user?.uuid}
-        />
+        <JoinGroupButton group={group} user={user?.uuid} />
         <CreateEvent group={group} user={user?.uuid} />
 
-        <div className="bg-white shadow-xl h-[80px] w-auto rounded-lg p-4 flex flex-row mb-3 justify-between">
-          <p className=" text-purple-700 rounded-lg p-3 w-4/12 font-bold">
+        <div className="h-[80px] w-auto rounded-lg p-4 flex flex-row mb-3 justify-between">
+          <p className="text-purple-700 rounded-lg p-3 w-4/12 font-bold">
             {group.name}
           </p>
-          <p className="  text-purple-700 rounded-lg p-3 w-4/12 font-bold">
-            Owned by :{" "}
-            <span>{group.creator_first_name} {group.creator_last_name}</span>
+          <p className="font-bold">
+            Owned by:{" "}
+            <span className="text-purple-700">
+              {group.creator_first_name} {group.creator_last_name}
+            </span>
           </p>
         </div>
-        <div className="bg-white shadow-xl h-[80px] w-6/12 rounded-lg p-4">
-          <div className=" text-purple-700 rounded-lg p-3 w-auto font-bold">
+        <div className="border border-grey-600 p-3 rounded-md">
+          <p className="font-bold">Description:</p>
+          <div className="text-purple-700 rounded-lg p-3 w-auto font-bold">
             {group.description}
           </div>
         </div>
-        <div className="flex">
+        <div className="flex w-full m-auto justify-between">
           <GroupMembers group={group} />
           <InviteComponent group={group} user={user?.uuid} />
         </div>
       </div>
-      <div className="flex flex-wrap flex-row justify-around mt-8 bg-white rounded-lg shadow-lg w-full h-auto p-5">
-        {
-          //FIXME: no events
-          group.events?.map((event, index) => {
-            return <EventCard event={event} key={index} user={user?.uuid} />;
-          })
-        }
+      <div className="flex flex-wrap flex-row justify-around mt-8 w-full h-auto p-5">
+        {group.events?.length === 0 ? (
+          <p>No events</p>
+        ) : (
+          group.events?.map((event, index) => (
+            <EventCard event={event} key={index} user={user?.uuid} />
+          ))
+        )}
       </div>
     </div>
   );

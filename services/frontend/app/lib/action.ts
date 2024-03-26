@@ -13,7 +13,7 @@ const PostFormSchema = z.object({
     message: "Content is required",
   }),
   image: z.string().optional(),
-  status: z.enum(["public", "almost","private"], {
+  status: z.enum(["public", "almost", "private", "group"], {
     invalid_type_error: "Please select an post status.",
   }),
   authorized: z.string().optional(),
@@ -104,17 +104,21 @@ export async function createPost(
     };
   }
 
+
   const session = await auth();
 
   const { content, image, status } = validatedData.data;
   const author_id = session?.user?.uuid;
   const author = session?.user?.name;
+  const group_id = Number(formData.get("group_id"))
   const date = new Date().toISOString().split("T")[0];
   const authorized = formData.get("authorized");
+
 
   const post = {
     author_id,
     author,
+    group_id,
     content,
     status,
     date,
@@ -127,8 +131,14 @@ export async function createPost(
     console.error(error);
     return { message: "Failed to create post" };
   }
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+
+  if(status === "group") {
+    revalidatePath(`/dashboard/groups/group?id=${post.group_id}`);
+    redirect(`/dashboard/groups/group?id=${post.group_id}`);
+  }else {
+    revalidatePath("/dashboard");
+    redirect("/dashboard");
+  }
 }
 
 /**

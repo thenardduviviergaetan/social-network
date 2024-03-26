@@ -1,14 +1,13 @@
-import { fetchGroup, fetchUser } from "@/app/lib/data";
+import { fetchGroup, fetchGroupPosts, fetchPageNumber, fetchPosts, fetchUser } from "@/app/lib/data";
 import { Group, User } from "@/app/lib/definitions";
 import JoinGroupButton from "@/app/ui/groups/join";
 import { GroupMembers } from "@/app/ui/groups/group-members";
 import InviteComponent from "@/app/ui/groups/invite";
 import EventCard from "@/app/ui/groups/event-card";
 import CreateEvent from "@/app/ui/groups/event-form";
-import JoinGroup from "@/app/ui/groups/join";
-import Image from "next/image";
-import Link from "next/link";
-import { CADDY_URL } from "@/app/lib/constants";
+import Form from "@/app/ui/posts/create-form";
+import Posts from "@/app/ui/posts/posts";
+import Pagination from "@/app/ui/dashboard/pagination";
 
 export default async function Page(
   {
@@ -23,6 +22,11 @@ export default async function Page(
 ) {
   const user = await fetchUser();
   const group = await fetchGroup(searchParams?.id) as Group;
+  const currentPage = Number(searchParams?.page) || 1
+  const totalPages = await fetchPageNumber("/group/posts", `ID=${group.id}`)
+
+  console.log("TotalPages",totalPages);
+  console.log(`ID=${group.id}`);
 
   return (
     <div className="bg-white w-auto rounded-lg p-4 shadow-sm flex flex-col">
@@ -61,6 +65,13 @@ export default async function Page(
           ))
         )}
       </div>
+        <Form user={user?.uuid} group={group.id}/>
+      <div className="flex">
+        {/* //TODO Do not add creator to memberlist twice */}
+        {/* <GroupMembers group={group}/> */}
+      </div>
+      <Posts page={currentPage} urlSegment="/group/posts" user={user || undefined} group={group.id}/>
+      <Pagination totalPages={totalPages ?? 0}/>
     </div>
   );
 }

@@ -7,7 +7,6 @@ import { Group, User } from "@/app/lib/definitions";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
 import axios from "axios";
-import Chat from "../dashboard/chat";
 
 export const GroupMembers = ({ group }: { group: Group }) => {
   const { data: groupData, error, mutate } = useSWR(

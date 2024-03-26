@@ -11,7 +11,7 @@ export default async function UserPosts({param}:{param?:Param}){
     const totalPages = await fetchPageNumber('user', `UUID=${param?.user ? param?.user : user?.uuid}`);
     console.log(param);
     return(
-        <div className="overflow-y-auto max-h-auto w-full">
+      <div className="overflow-y-auto max-h-auto w-full">
         <div >
           <Posts page={currentPage} urlSegment={"user/posts"} param={`UUID=${param?.user ? param?.user : user?.uuid}`} user={session?.user} />
         </div>

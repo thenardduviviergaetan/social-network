@@ -21,7 +21,7 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(post)
 	db := r.Context().Value("database").(*sql.DB)
 
-	stmt := `INSERT INTO posts (author_id, author, content, status, image, authorized, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	stmt := `INSERT INTO posts (author_id, author, group_id, content, status, image, authorized, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
 	var img interface{}
 	if post.Image == "" {
@@ -37,15 +37,15 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		authorized = post.Authorized
 	}
 
-	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.Content, post.Status, img, authorized, time.Now())
+	_, err := db.Exec(stmt, post.AuthorID, post.Author, post.GroupID, post.Content, post.Status, img, authorized, time.Now())
 	if err != nil {
+		fmt.Println("Error while creating post", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
-
 	limit := r.URL.Query().Get("limit")
 	page := r.URL.Query().Get("page")
 	l, _ := strconv.Atoi(limit)
@@ -53,7 +53,8 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 	offset := (p - 1) * l
 
 	db := r.Context().Value("database").(*sql.DB)
-	rows, err := db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT (?) OFFSET (?)", limit, offset)
+	rows, err := db.Query(`SELECT * FROM posts ORDER BY created_at DESC LIMIT (?) OFFSET (?)`, limit, offset)
+	// rows, err := db.Query(`SELECT * FROM posts WHERE NOT status="group" ORDER BY created_at DESC LIMIT (?) OFFSET (?)`, limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -63,26 +64,30 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 	posts := []models.Post{}
 	for rows.Next() {
 		post := models.Post{}
-		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.GroupID, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 		if err != nil {
+			fmt.Println("Error while gettint post")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		posts = append(posts, post)
 	}
+
+	fmt.Println("POST", posts)
+
 	json.NewEncoder(w).Encode(posts)
 }
 
 func HandleGetPost(w http.ResponseWriter, r *http.Request) {
-
 	id := r.URL.Query().Get("id")
 
 	db := r.Context().Value("database").(*sql.DB)
 	row := db.QueryRow("SELECT * FROM posts WHERE id = ?", id)
 
 	post := models.Post{}
-	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
+	err := row.Scan(&post.ID, &post.AuthorID, &post.Author, &post.GroupID, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 	if err != nil {
+		fmt.Println("Is there an error ?", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -158,6 +158,16 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		h.HandleGetGroupMembers(w, r.WithContext(ctx))
 	})
 
+	http.HandleFunc("/api/group/posts", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroupPosts(w, r.WithContext(ctx))
+	})
+
+	http.HandleFunc("/api/group/posts/page-number", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleGetGroupPostsPageNumber(w, r.WithContext(ctx))
+	})
+
 	http.HandleFunc("/api/group/join", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleJoinGroup(w, r.WithContext(ctx))

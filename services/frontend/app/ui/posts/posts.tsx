@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import useSWR from "swr";
 import { Post } from "@/app/lib/definitions";
 import { fetcher } from "@/app/lib/utils";
@@ -13,15 +13,17 @@ export default function Posts({
   urlSegment,
   param,
   user,
+  group
 }: {
   page: number;
   urlSegment: string;
   param?: string;
+  group?: Number;
   user?: User;
 }) {
-
+  const groupID = (group) ? `&ID=${group}` : ""
   const { data: posts, mutate } = useSWR(
-    `${API_BASE_URL}/${urlSegment}?page=${page}&limit=${ITEMS_PER_PAGE}&${param}`,
+    `${API_BASE_URL}/${urlSegment}?page=${page}&limit=${ITEMS_PER_PAGE}&${param}${groupID}`,
     fetcher,
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 5000 },
   );
@@ -38,7 +40,6 @@ export default function Posts({
     fetchPostsData();
   }, [page, urlSegment,param, mutate]);
   
-
   if (!posts) {
     return (
         <div className="flex items-center justify-center h-screen">
@@ -51,15 +52,16 @@ export default function Posts({
     )
   }
 
-
   return (
     <>
+      {console.log(posts)}
       {posts?.map((post: Post) => (
         <PostCard
           key={post.id}
           post={post}
           user={user?.uuid}
           current={user?.name}
+          group={(group) ? String(group) : null}
         />
       ))}
     </>

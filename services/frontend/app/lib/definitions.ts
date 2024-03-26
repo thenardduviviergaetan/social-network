@@ -64,6 +64,7 @@ export interface PostCardProps {
   post: Post;
   user: string;
   current: string | null | undefined;
+  group?: string | null | undefined;
 }
 
 export interface PrivatePostProps extends PostCardProps {

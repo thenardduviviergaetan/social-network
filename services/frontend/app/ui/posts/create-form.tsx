@@ -1,20 +1,34 @@
 "use client";
 import { useFormState, useFormStatus } from "react-dom";
-import { createPost } from "@/app/lib/action";
+import { State, createPost } from "@/app/lib/action";
 import { Button } from "@/app/ui/button";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 import Image from "next/image";
 import { CADDY_URL, API_BASE_URL } from "@/app/lib/constants";
+import { set } from "zod";
 
 export default function Form({
   user,
+  group
 }: {
   user: string | undefined;
+  group?: Number | undefined
 }) {
+  const isGroup = group !== undefined && group !== 0
+  const checkGroup = (prevState: State | undefined, formData: FormData) => {
+    if (isGroup) {
+      formData.set('group_id', String(group))
+      formData.set('status', 'group')
+    }
+
+    return createPost(prevState, formData)
+  }
+
+
   const initialState = { message: "", error: {} };
-  const [state, setState] = useFormState(createPost, initialState);
+  const [state, setState] = useFormState(checkGroup, initialState);
 
   const [privacy, setPrivacy] = useState("");
 
@@ -37,6 +51,8 @@ export default function Form({
       setCheckedFollowers(prev => prev.filter((name) => name !== fullName));
     }
   }
+
+
 
   return (
     <div className="w-11/12 m-auto shadow-md p-5">
@@ -78,74 +94,76 @@ export default function Form({
             className="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm p-2 mt-1"
           />
         </div>
-        <fieldset>
-          <legend className="mb-2 block text-sm font-medium">
-            Choose post status
-          </legend>
-          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <input
-                  id="private"
-                  name="status"
-                  type="radio"
-                  value="private"
-                  onChange={(e) => setPrivacy(e.target.value)}
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                  aria-describedby="status-error"
-                />
-                <label
-                  htmlFor="private"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
-                >
-                  Private
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="almost"
-                  name="status"
-                  type="radio"
-                  value="almost"
-                  onChange={(e) => setPrivacy(e.target.value)}
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                  aria-describedby="status-error"
-                />
-                <label
-                  htmlFor="almost"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-500 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Almost private
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="public"
-                  name="status"
-                  type="radio"
-                  value="public"
-                  onChange={(e) => setPrivacy(e.target.value)}
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                  aria-describedby="status-error"
-                />
-                <label
-                  htmlFor="public"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Public
-                </label>
+        { !isGroup &&
+          <fieldset>
+            <legend className="mb-2 block text-sm font-medium">
+              Choose post status
+            </legend>
+            <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+              <div className="flex gap-4">
+                <div className="flex items-center">
+                  <input
+                    id="private"
+                    name="status"
+                    type="radio"
+                    value="private"
+                    onChange={(e) => setPrivacy(e.target.value)}
+                    className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                    aria-describedby="status-error"
+                  />
+                  <label
+                    htmlFor="private"
+                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                  >
+                    Private
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="almost"
+                    name="status"
+                    type="radio"
+                    value="almost"
+                    onChange={(e) => setPrivacy(e.target.value)}
+                    className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                    aria-describedby="status-error"
+                  />
+                  <label
+                    htmlFor="almost"
+                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-500 px-3 py-1.5 text-xs font-medium text-white"
+                  >
+                    Almost private
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="public"
+                    name="status"
+                    type="radio"
+                    value="public"
+                    onChange={(e) => setPrivacy(e.target.value)}
+                    className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                    aria-describedby="status-error"
+                  />
+                  <label
+                    htmlFor="public"
+                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                  >
+                    Public
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div id="status-error">
-            {state.errors?.status &&
-              state.errors.status.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500" key={error}>
-                  {error}
-                </p>
-              ))}
-          </div>
-        </fieldset>
+            <div id="status-error">
+              {state.errors?.status &&
+                state.errors.status.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
+          </fieldset>
+        }
         {privacy === "almost" && (
           <div className="text-sm">
             <h2>Select who can see this post:</h2>

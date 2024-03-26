@@ -97,6 +97,43 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(group)
 }
 
+func HandleGetGroupPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+	group_id := r.URL.Query().Get("ID")
+	limit := r.URL.Query().Get("limit")
+	page := r.URL.Query().Get("page")
+	l, _ := strconv.Atoi(limit)
+	p, _ := strconv.Atoi(page)
+	offset := (p - 1) * l
+
+	rows, err := db.Query(`SELECT * FROM posts WHERE status="group" AND group_id=? ORDER BY created_at DESC LIMIT (?) OFFSET (?)`, group_id, limit, offset)
+	if err != nil {
+		fmt.Println("Error Group Posts", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	posts := []models.Post{}
+	for rows.Next() {
+		post := models.Post{}
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.GroupID, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
+		if err != nil {
+			fmt.Println("Error fetchin groups", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		posts = append(posts, post)
+	}
+
+	json.NewEncoder(w).Encode(posts)
+}
+
 func HandleGetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -194,10 +231,7 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	currentUser := r.URL.Query().Get("user")
-
 	db := r.Context().Value("database").(*sql.DB)
-
-	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAA")
 
 	groupID, err := db.Query("SELECT id FROM social_groups WHERE creator_id = ?", currentUser)
 	if err != nil {
@@ -213,7 +247,6 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
 		rows, err := db.Query("SELECT member_id FROM group_members WHERE group_id = ? AND pending = 1", group)
 		if err != nil {
@@ -228,9 +261,7 @@ func HandleGetPendingJoin(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				return
 			}
-			fmt.Println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
-			fmt.Println("MEMBER:" + member.UUID)
 			err = db.QueryRow("SELECT first_name, last_name FROM users WHERE uuid = ?", member.UUID).Scan(&member.FirstName, &member.LastName)
 			if err != nil {
 				fmt.Println(err)

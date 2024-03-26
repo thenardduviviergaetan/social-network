@@ -1,13 +1,12 @@
 import { fetchGroups, fetchTotalGroupPages, fetchUser } from "@/app/lib/data";
-import { auth } from "@/auth";
-import Pagination from "@/app/ui/dashboard/pagination";
 import GroupCard from "./group-card";
 import { Group } from "@/app/lib/definitions";
+import Pagination from "@/app/ui/dashboard/pagination";
 
 export default async function Groups({ page, type }: { page: number, type?: string }) {
     const groups = await fetchGroups(page, type);
     const user = await fetchUser();
-    const totalPages = await fetchTotalGroupPages();
+    const totalPages = await fetchTotalGroupPages()
     
     if (!groups) {
         return (

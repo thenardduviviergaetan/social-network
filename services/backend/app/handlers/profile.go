@@ -333,6 +333,7 @@ func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 	db := r.Context().Value("database").(*sql.DB)
 	rows, err := db.Query("SELECT * FROM posts WHERE author_id = ? ORDER BY created_at DESC LIMIT (?) OFFSET (?) ", uuid, limit, offset)
 	if err != nil {
+		fmt.Println("Error fecthing posts", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -341,8 +342,9 @@ func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 	posts := []models.Post{}
 	for rows.Next() {
 		post := models.Post{}
-		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
+		err := rows.Scan(&post.ID, &post.AuthorID, &post.Author, &post.GroupID, &post.Content, &post.Status, &post.Image, &post.Authorized, &post.Date)
 		if err != nil {
+			fmt.Println("Error scanning posts", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

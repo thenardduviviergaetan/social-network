@@ -93,7 +93,7 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 	)
 	group.Members = groups.GetMembers(groupId, db)
 	group.Events = groups.GetEvents(db, groupId)
-	fmt.Println("group.Events", group.Events)
+
 	json.NewEncoder(w).Encode(group)
 }
 
@@ -433,7 +433,7 @@ func HandleCreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err := db.Exec(
-		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id,description) VALUES (?,?,?,?,?,?)",
+		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id,description,pending) VALUES (?,?,?,?,?,?,1)",
 		time.Now(),
 		event.Date,
 		event.Name,
@@ -474,9 +474,7 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&msg)
 
 	db := r.Context().Value("database").(*sql.DB)
-	fmt.Println(msg)
-	fmt.Println("======================")
-	fmt.Println(msg.EventID)
+
 	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ? AND event_id = ?)", msg.Candidate, msg.EventID).Scan(&check)
 	if err != nil {
 		fmt.Println(err)
@@ -504,4 +502,60 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func HandleEventNotif(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var currentUser string
+
+	if r.Method == http.MethodPost {
+		//FIXME: la requete passe pas
+		fmt.Println("=============================================================================")
+		fmt.Println("=============================================================================")
+		fmt.Println("=============================================================================")
+		fmt.Println("=============================================================================")
+		json.NewDecoder(r.Body).Decode(&currentUser)
+	} else {
+		currentUser = r.URL.Query().Get("user")
+	}
+
+	db := r.Context().Value("database").(*sql.DB)
+
+	var events []models.Event
+	var event models.Event
+	groupID, err := db.Query("SELECT group_members.group_id FROM social_groups INNER JOIN group_members ON group_members.group_id = social_groups.id WHERE group_members.member_id = ?", currentUser)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer groupID.Close()
+
+	for groupID.Next() {
+		var group int
+		err := groupID.Scan(&group)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		rows, err := db.Query(`SELECT name,users.first_name,users.last_name,creator_id FROM events
+		INNER JOIN users ON users.uuid = events.creator_id WHERE events.group_id = ? AND events.pending= 1`, group)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for rows.Next() {
+			rows.Scan(
+				&event.Name,
+				&event.CreatorFirstName,
+				&event.CreatorLastName,
+				&event.Creator,
+			)
+			events = append(events, event)
+		}
+	}
+	json.NewEncoder(w).Encode(events)
 }

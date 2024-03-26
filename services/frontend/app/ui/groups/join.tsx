@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "../button";
-import { JoinButtonProps } from "@/app/lib/definitions";
+import { JoinButtonProps } from "@/app/lib/definitions";//FIXME:
 import { API_BASE_URL } from "@/app/lib/constants";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";

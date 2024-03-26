@@ -11,7 +11,6 @@ export default function EventCard({ event, user }: { event: Event, user?: string
     const checkNo = event.candidates?.some(u=>u.User === user && u.Choice === "no" && u.Id === event.event_id) || false;
 
     const [stateCheck,setStateCheck] = useState([check,checkNo])
-    // const [stateCheckNo,setStateCheckNo] = useState(false)
     
 
     const participateReq = (opt: string) => {
@@ -34,7 +33,7 @@ export default function EventCard({ event, user }: { event: Event, user?: string
 
     return (
         <div className="bg-white shadow-lg rounded-lg w-1/2 h-auto mt-8 p-5">
-            <p className="flex text-purple-700 p-3 font-bold justify-between"><span className="text-left w-2/3">{event.name}</span> <span className="text-xs text-right w-1/3"> <i>created at {new Date(event.creation_date).toLocaleDateString("fr")}</i></span></p>
+            <p className="flex text-purple-700 p-3 font-bold justify-between break-all"><span className="text-left w-2/3">{event.name}</span> <span className="text-xs text-right w-1/3"> <i>created at {new Date(event.creation_date).toLocaleDateString("fr")}</i></span></p>
             <p className="text-black p-3"><i>Created by</i> <Link href={`/dashboard/profile?user=${event.creator_id}`} className="text-purple-700 font-bold hover:text-purple-500 p-3">{`${event.creator_first_name} ${event.creator_last_name}`}</Link></p>
             {/* TODO: event_candidate with event_id 2 buttons voting participate or no */}
             <p className="text-purple-700 hover:text-purple-500 font-bold p-3"><i className="text-black font-normal">Starting at</i> <span>{new Date(event.date).toLocaleDateString("fr")}</span></p>
@@ -44,7 +43,7 @@ export default function EventCard({ event, user }: { event: Event, user?: string
                     {stateCheck[1] ?  "" : <Button className="bg-green-500" onClick={() => { participateReq("no")}}>No thanks</Button>}
                 </div>
                 :
-                <Button onClick={()=>{participateReq("leave")}} className="bg-red-600">Leave</Button>
+                <Button onClick={()=>{participateReq("leave")}} className="bg-red-600 hover:bg-red-900">Leave</Button>
                 }
             <p className="p-3 text-black text-center break-all w-full">{event.description}</p>
         </div>

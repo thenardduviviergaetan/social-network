@@ -9,6 +9,7 @@ import JoinGroup from "@/app/ui/groups/join";
 import Image from "next/image";
 import Link from "next/link";
 import { CADDY_URL } from "@/app/lib/constants";
+import Events from "@/app/ui/groups/events";
 
 export default async function Page(
   {
@@ -53,12 +54,8 @@ export default async function Page(
         </div>
       </div>
       <div className="flex flex-wrap flex-row justify-around mt-8 bg-white rounded-lg shadow-lg w-full h-auto p-5">
-        {
-          //FIXME: no events
-          group.events?.map((event, index) => {
-            return <EventCard event={event} key={index} user={user?.uuid} />;
-          })
-        }
+        <Events group={group} user={user}/>
+        
       </div>
     </div>
   );

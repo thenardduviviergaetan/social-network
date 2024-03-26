@@ -207,4 +207,8 @@ func (a *App) ServeHTTP(database *sql.DB) {
 		ctx := context.WithValue(r.Context(), "database", database)
 		h.HandleEvent(w, r.WithContext(ctx))
 	})
+	http.HandleFunc("/api/group/event", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "database", database)
+		h.HandleEventNotif(w, r.WithContext(ctx))
+	})
 }

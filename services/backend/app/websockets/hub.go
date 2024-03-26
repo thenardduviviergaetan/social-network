@@ -42,10 +42,9 @@ type HistoryMessage struct {
 }
 
 func InitHub(app *app.App) *Hub {
-	users := middleware.GetAllUsers(app.DB.DB) // TODO Get all users from db ?
+	users := middleware.GetAllUsers(app.DB.DB)
 	offlineInit := make([]*Client, 0)
 	for _, user := range users {
-		// client := &Client{Username: user, send: make(chan []byte)}
 		client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}
 		offlineInit = append(offlineInit, client)
 	}
@@ -96,9 +95,6 @@ func (h *Hub) Run(app *app.App) {
 				jsonTyping, _ := json.Marshal(typing)
 				h.SendMessageToTarget(app, msg.Target, jsonTyping)
 			case "history":
-				log.Println("msg :", string(message))
-				log.Println("msg :", msg)
-				// log.Println("msg.TypeTarget :", msg.TypeTarget)
 				if msg.TypeTarget == "user" {
 					tabmsg, err := GetOldMessages(app, "chat_users", msg.Sender, msg.Target, 100, 0)
 					if err != nil {
@@ -118,8 +114,6 @@ func (h *Hub) Run(app *app.App) {
 					jsonMessage, _ := json.Marshal(sendmsg)
 					h.clients[msg.Sender].send <- jsonMessage
 				}
-				// default:
-				// 	h.SendMessageToTarget(app, msg.Target, message)
 			}
 		}
 	}
@@ -128,7 +122,6 @@ func (h *Hub) Run(app *app.App) {
 func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 	h.clients[current.UUID].LastMsg = []string{}
 	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
-	// current.reloadGroup(app.DB.DB)
 	for c := range h.clients {
 		h.clients[c].reloadGroup(app.DB.DB)
 		msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: h.clients[c].tabgroup}
@@ -143,12 +136,9 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 	msg.SenderName = middleware.GetUsersname(app.DB.DB, msg.Sender)
 	message, _ = json.Marshal(msg)
 	if msg.Msg_type == "chat" {
-		// log.Println("Preview")
-		// if client, ok := h.clients[UUID]; ok {
 		if msg.TypeTarget == "user" {
 			for _, client := range h.clients {
 				if client.UUID == msg.Target || client.UUID == msg.Sender {
-					// SavePrivateMessage(app, msg)
 					client.send <- message
 				}
 			}
@@ -156,7 +146,6 @@ func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
 		} else if msg.TypeTarget == "group" {
 			for _, client := range h.clients {
 				if client.group[msg.Target] != nil {
-					// SavePrivateMessage(app, msg)
 					client.send <- message
 				}
 			}
@@ -209,7 +198,6 @@ func SavePrivateMessage(app *app.App, message *Message, table string) error {
 		message.Content,
 		image,
 	)
-	log.Println(err)
 	return err
 }
 

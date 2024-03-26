@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { emojis } from "@/app/lib/constants";
-// import EmojiSelector from "./emojiselector";
-// import { boolean } from "zod";
 
 class Message {
   msg_type: string;
@@ -115,7 +113,6 @@ export default function Chat({ user }: { user: string | null }) {
   const [messageList, setmessageList] = useState(new ListMessage().tab);
   const [target, setTarget] = useState(new Target());
   const [typing, setTyping] = useState(false);
-  // const [typingTimeout,setTypingTimeout] = useState(setTimeout(()=>{},1000))
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
@@ -196,7 +193,6 @@ export default function Chat({ user }: { user: string | null }) {
               tabGroupe.push(elgroupe);
             })
           setGroupList(tabGroupe)
-          // console.log(groupList)
           break;
         case "history":
           let listMessage = new ListMessage();
@@ -206,8 +202,6 @@ export default function Chat({ user }: { user: string | null }) {
           setmessageList(listMessage.tab);
           break;
         case "chat":
-          // console.log("message target : ",message.target,"\ntarget : ", target)
-          // console.log(message.target, target.target, message.sender)
           if (message.target == target.target || message.sender == target.target) {
             setmessageList(prevMessage => [...prevMessage,
             new Message(
@@ -251,8 +245,6 @@ export default function Chat({ user }: { user: string | null }) {
                 <button
                   id={users.username}
                   onClick={(e) => {
-                    // console.log("users.uuid",users.uuid)
-                    // let t = new Target("user", users.uuid);
                     setTarget(new Target("user", users.uuid));
                     socket.send(JSON.stringify(
                       new Message(
@@ -321,7 +313,6 @@ export default function Chat({ user }: { user: string | null }) {
           })}
         </div>
         <div className="sender bg-zinc-500 flex flex-col p-4 mb-2 h-25 rounded-lg">
-          {/* <div> */}
           <div className={typing ? "" : "hidden"}>
             <p>Typing</p>
           </div>
@@ -350,7 +341,6 @@ export default function Chat({ user }: { user: string | null }) {
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
-                // console.log("target submit",target)
                 if (target.target !== "undefined") {
                   let message = new Message(
                     "chat",
@@ -361,7 +351,6 @@ export default function Chat({ user }: { user: string | null }) {
                     "",
                   );
                   let msg = JSON.stringify(message);
-                  // console.log(msg)
                   setContent("");
                   socket.send(msg);
                 }

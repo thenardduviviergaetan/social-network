@@ -13,9 +13,6 @@ import (
 type Groupe struct {
 	Name string `json:"name"`
 	Id   string `json:"id"`
-	// testing bool
-	// Message  string `json:"message"`
-	// Msg_type string `json:"msg_type"`
 }
 
 type Client struct {

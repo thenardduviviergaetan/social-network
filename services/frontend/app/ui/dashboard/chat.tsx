@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { LINK_STYLE, emojis } from "@/app/lib/constants";
 import toast from "react-hot-toast";
-import { FaceSmileIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { FaceSmileIcon, PaperAirplaneIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 class Message {
   msg_type: string;
@@ -117,7 +118,8 @@ export default function Chat({ user }: { user: string | null }) {
   const [typing, setTyping] = useState(false);
   const [emoji,setEmoji] = useState(false)
   useEffect(() => {
-    let sc = new WebSocket("ws://localhost:8000/api/ws");
+    let sc = new WebSocket("ws://45.147.98.213:8000/api/ws");
+    // let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
       console.log("WebSocket connection opened");
       sc.send(userUuid ?? "");
@@ -315,15 +317,17 @@ export default function Chat({ user }: { user: string | null }) {
       </div>
       {/* REMIND BOX CHAT HERE*/}
       {target.target !== undefined ? (
-      <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md backdrop-blur-lg bg-[rgba(255,255,255,.7)] p-4 md:h-50 fixed bottom-0 right-9 ">
-        <XCircleIcon className={"self-end mb-2"} onClick={()=>setTarget(new Target())}/>
+      <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md backdrop-blur-lg bg-[rgba(255,255,255,.3>)] p-4 md:h-50 fixed bottom-0 right-9">
+        <div className="flex w-full h-[40px] justify-end">
+        <XMarkIcon className={"self-end mb-2 w-9 hover:cursor-pointer"} onClick={()=>setTarget(new Target())}/>
+        </div>
         {/* !!! */}
-        <div className="messages overflow-y-scroll h-full TODO: faire la height grid grid-cols-1">
+        <div className="messages overflow-y-scroll h-96 grid grid-cols-1 ">
           {messageList.map((message, idx) => {
 
             return (
-              <div key={idx} className={`bg-zinc-200 shadow-xl h-auto break-words w-3/4 rounded-lg p-4 mb-3 ${message.sender === userUuid ?
-                "justify-self-end text-right" : "text-left"}`}>
+              <div key={idx} className={`shadow-lg h-auto break-words w-3/4 rounded-lg p-4 mb-3 border-purple-300 border ${message.sender === userUuid ?
+                "justify-self-end text-right bg-purple-100" : "text-left "}`}>
                 <p className="font-bold">{message.sender_name}</p>
 
                 <div>{message.content}</div>
@@ -336,9 +340,11 @@ export default function Chat({ user }: { user: string | null }) {
           <div className={typing ? "" : "hidden"}>
             <p>Typing</p>
           </div>
-          <form id="form-chat flex flex-row">
+          <form id="form-chat">
+          <div className="flex flex-row items-center justify-between">
+          <FaceSmileIcon className="w-7" onClick={()=>{setEmoji(emoji ? false : true)}}/>
             <input
-              className="shadow-xl"
+              className="shadow-xl w-3/4 rounded-lg"
               id="chat-text"
               type="text"
               value={content}
@@ -355,9 +361,8 @@ export default function Chat({ user }: { user: string | null }) {
               }}
             >
             </input>
-            <div className="flex flex-row items-center ">
-            <button
-              className={LINK_STYLE +" mb-3"}
+            <PaperAirplaneIcon
+              className={"w-7 ml-2"}
               id="submit"
               type="submit"
               onClick={(e) => {
@@ -379,8 +384,7 @@ export default function Chat({ user }: { user: string | null }) {
                 }
               }}
             >Send
-            </button>
-            <FaceSmileIcon className="w-9 ml-3 mt-1" onClick={()=>{setEmoji(emoji ? false : true)}}/>
+            </PaperAirplaneIcon>
             </div>
           </form>
           { emoji ?

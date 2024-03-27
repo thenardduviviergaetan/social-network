@@ -7,8 +7,9 @@ import CreateEvent from "./event-form"
 import { GroupMembers } from "./group-members"
 import InviteComponent from "./invite"
 import Events from "./events"
+import GroupDetails from "@/app/dashboard/groups/group/group-details"
 
-export default function GroupPage({group,user}:{group:Group,user:User | null}){
+export default function GroupPage({group,user,params}:{group:Group,user:User | null , params?: { page?: string; type?: string; id?:string}}){
   const [userState, setUserState] = useState(group.members.some((u => u.uuid === user?.uuid)))
     
     return (
@@ -42,6 +43,7 @@ export default function GroupPage({group,user}:{group:Group,user:User | null}){
             <div className="flex flex-wrap flex-row justify-around mt-8 bg-white rounded-lg shadow-lg w-full h-auto p-5">
               <Events group={group} user={user} />
             </div>
+           <GroupDetails user={user} group={group} searchParams={params} /> 
           </div>
         </div>
     )

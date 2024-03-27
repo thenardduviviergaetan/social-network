@@ -27,7 +27,7 @@ export default async function Page(
   const group = await fetchGroup(searchParams?.id) as Group;
   return (
       <div className="bg-white w-auto rounded-lg p-4 shadow-sm flex flex-col mb-8">
-        <GroupPage group={group} user={user} />
+        <GroupPage group={group} user={user} params={searchParams}/>
       </div>
   );
 }

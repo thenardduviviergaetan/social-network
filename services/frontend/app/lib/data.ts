@@ -137,7 +137,9 @@ export const fetchJoinStatus = async (user: string, groupID: number) => {
   );
   return res.data;
 };
+
 /////////////////>- GROUPS -</////////////////
+
 async function fetchGlobal(url: string, err: string) {
     try {
         const res = await axios.get(`${CADDY_URL}${url}`)

@@ -14,7 +14,7 @@ export default function GroupDetails(
         group,
         searchParams
     }: {
-        user: User,
+        user: User | null,
         group: Group,
         searchParams?: {
             page?: string;
@@ -39,7 +39,7 @@ export default function GroupDetails(
         const allowedMember = members?.some((m: User) => m.uuid === user?.uuid) 
 
     return (
-        <div>
+        <div className="mt-8 p-5">
             { allowedMember &&
                 <>  
                     <Form user={user?.uuid} group={group.id}/>

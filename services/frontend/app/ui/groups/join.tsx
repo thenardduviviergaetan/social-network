@@ -61,7 +61,7 @@ export default function JoinGroupButton({ group, user, setState }: JoinButtonPro
         )
         : (
           <>
-            {useEffect(()=>setState(false)) }
+            {useEffect(()=>setState(false))}
             <span className="mr-2">Join</span>
             <PlusIcon className="w-5 h-5" />
           </>

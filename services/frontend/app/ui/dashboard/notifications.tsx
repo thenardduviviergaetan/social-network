@@ -357,11 +357,10 @@ export function EventNotifications({ user }: NotificationsProps) {
     console.log("🚀 ~ EventNotifications ~ count:", count)
 
 
-    const handleDismiss = async () => {
-      //FIXME: la requete ne passe pas, voir pourquoi
+    const handleDismiss = async (group_id:number) => {
       try {
         await axios.post(`/api/group/event`,{
-          // group_id,
+          group_id,
           user
         });
         mutate();
@@ -375,7 +374,7 @@ export function EventNotifications({ user }: NotificationsProps) {
   return(
     <div className="flex-grow flex flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
       <div className="h-auto w-full rounded-md bg-gray-50 md:block shadow-xl">
-        {notif?.length > 0 && (
+        {count > 0 && (
           <div
             className="flex items-center justify-between h-10 px-4 cursor-pointer"
             onClick={() =>
@@ -383,9 +382,7 @@ export function EventNotifications({ user }: NotificationsProps) {
           >
             <p className="text-sm font-medium text-gray-600">
               New Event created
-              {/* TODO: faire un status pending dans la db */}
               <span className="ml-2 text-md font-bold text-purple-600">
-                {/* {count || 0} */}
                 {count || 0}
               </span>
             </p>
@@ -418,7 +415,7 @@ export function EventNotifications({ user }: NotificationsProps) {
                     <Button
                       className="text-xs  h-8"
                       onClick={() =>
-                        handleDismiss()}
+                        handleDismiss(notification.event_id)}
                     >
                       Dismiss
                     </Button>

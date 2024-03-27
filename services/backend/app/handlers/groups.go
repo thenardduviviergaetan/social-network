@@ -505,24 +505,30 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleEventNotif(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	//REMIND: // TODO: WE COULD USE A NEW TABLE WITH SENDER, TARGET AND EVENT_ID
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+	var msg struct {
+		CurrentUser string `json:"user"`
+		ID          int    `json:"group_id"`
+	}
 	var currentUser string
+	db := r.Context().Value("database").(*sql.DB)
 
 	if r.Method == http.MethodPost {
-		//FIXME: la requete passe pas
-		fmt.Println("=============================================================================")
-		fmt.Println("=============================================================================")
-		fmt.Println("=============================================================================")
-		fmt.Println("=============================================================================")
-		json.NewDecoder(r.Body).Decode(&currentUser)
+		json.NewDecoder(r.Body).Decode(&msg)
+		fmt.Println("dismissed", msg)
+		currentUser = msg.CurrentUser
+		_, err := db.Exec("UPDATE events SET pending = 0 WHERE id = ?", msg.ID)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	} else {
 		currentUser = r.URL.Query().Get("user")
 	}
-
-	db := r.Context().Value("database").(*sql.DB)
 
 	var events []models.Event
 	var event models.Event
@@ -541,7 +547,7 @@ func HandleEventNotif(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		rows, err := db.Query(`SELECT name,users.first_name,users.last_name,creator_id FROM events
+		rows, err := db.Query(`SELECT events.id,name,users.first_name,users.last_name,creator_id FROM events
 		INNER JOIN users ON users.uuid = events.creator_id WHERE events.group_id = ? AND events.pending= 1`, group)
 		if err != nil {
 			fmt.Println(err)
@@ -549,6 +555,7 @@ func HandleEventNotif(w http.ResponseWriter, r *http.Request) {
 		}
 		for rows.Next() {
 			rows.Scan(
+				&event.ID,
 				&event.Name,
 				&event.CreatorFirstName,
 				&event.CreatorLastName,

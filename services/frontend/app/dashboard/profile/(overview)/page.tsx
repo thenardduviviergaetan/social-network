@@ -3,6 +3,7 @@ import { Followers, Followed } from "@/app/ui/profile/followers";
 import UserPosts from "@/app/ui/profile/post";
 import Link from "next/link";
 import { LINK_STYLE } from "@/app/lib/constants";
+import { fetchUser } from "@/app/lib/data";
 
 
 export default async function Page(
@@ -15,9 +16,10 @@ export default async function Page(
     };
   },
 ) {
-
+const currentUser = await fetchUser();
   return (
     <div className="flex flex-col justify-center items-center w-7/12 m-auto">
+      {(searchParams?.user === undefined || searchParams?.user === currentUser?.uuid ) ? 
       <div className="flex flex-row justify-around w-full mb-8">
         <Link
           href={{
@@ -38,6 +40,8 @@ export default async function Page(
           All groups
         </Link>
       </div>
+      :""
+      }
       <Details param={searchParams} />
       <UserPosts param={searchParams} />
     </div>

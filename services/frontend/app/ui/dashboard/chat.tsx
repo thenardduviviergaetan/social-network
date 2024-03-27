@@ -216,7 +216,7 @@ export default function Chat({ user }: { user: string | null }) {
             )
             ]);
           } else {
-            /// TODO : ADD notif ici
+            /// TODO : ADD notif here
             toast.success(message.sender_name+" sent a message !\n"+message.content)
           }
           break;

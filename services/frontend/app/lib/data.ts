@@ -3,7 +3,7 @@ import { User } from "@/app/lib/definitions";
 import { auth } from "@/auth";
 import { unstable_noStore as noStore } from "next/cache";
 import { API_BASE_URL, CADDY_URL, ITEMS_PER_PAGE } from "./constants";
-const GROUPS_PER_PAGE = 10 // Number of groups per page
+export const GROUPS_PER_PAGE = 10 // Number of groups per page
 
 export const fetchUser = async (uuid?: string) => {
   uuid = uuid ?? (await auth())?.user?.uuid;
@@ -138,8 +138,6 @@ export const fetchJoinStatus = async (user: string, groupID: number) => {
   return res.data;
 };
 /////////////////>- GROUPS -</////////////////
-
-// TODO this function could be used to shorten every function in this page.
 async function fetchGlobal(url: string, err: string) {
     try {
         const res = await axios.get(`${CADDY_URL}${url}`)
@@ -165,7 +163,6 @@ export const fetchGroups = async (pageNumber: number,type?:string) => {
         'Error fetching groups')
 }
 
-//TODO: remove this fetch global
 export const fetchGroup = async (groupeID?: string) => {
     return fetchGlobal(
         `/group?id=${groupeID}`,

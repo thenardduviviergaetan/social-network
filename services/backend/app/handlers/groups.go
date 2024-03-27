@@ -13,8 +13,6 @@ import (
 )
 
 func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
-	//TODO: move this to the parent
-	//TODO: CHECK SI LE NAME EST DEJA PRIS
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -38,7 +36,6 @@ func HandleCreateGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
-	//TODO move this to the parent
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -93,7 +90,7 @@ func HandleGetGroup(w http.ResponseWriter, r *http.Request) {
 	)
 	group.Members = groups.GetMembers(groupId, db)
 	group.Events = groups.GetEvents(db, groupId)
-	fmt.Println("group.Events", group.Events)
+
 	json.NewEncoder(w).Encode(group)
 }
 
@@ -469,7 +466,7 @@ func HandleCreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err := db.Exec(
-		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id,description) VALUES (?,?,?,?,?,?)",
+		"INSERT INTO events(creation_date,event_date,name,group_id,creator_id,description,pending) VALUES (?,?,?,?,?,?,1)",
 		time.Now(),
 		event.Date,
 		event.Name,
@@ -511,7 +508,7 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 
 	db := r.Context().Value("database").(*sql.DB)
 
-	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ?)", msg.Candidate).Scan(&check)
+	err := db.QueryRow("SELECT EXISTS (SELECT 1 FROM event_candidates WHERE candidate_id = ? AND event_id = ?)", msg.Candidate, msg.EventID).Scan(&check)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -530,7 +527,7 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 		if !check {
 			_, err = db.Exec("INSERT INTO event_candidates(candidate_id,event_id,choice) VALUES(?,?,?)", msg.Candidate, msg.EventID, msg.Type)
 		} else {
-			_, err = db.Exec("UPDATE event_candidates SET candidate_id = ? , event_id = ? , choice = ?", msg.Candidate, msg.EventID, msg.Type)
+			_, err = db.Exec("UPDATE event_candidates SET choice = ? WHERE candidate_id = ? AND event_id = ?", msg.Type, msg.Candidate, msg.EventID)
 		}
 		if err != nil {
 			fmt.Println(err)
@@ -538,4 +535,67 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func HandleEventNotif(w http.ResponseWriter, r *http.Request) {
+	//REMIND: // TODO: WE COULD USE A NEW TABLE WITH SENDER, TARGET AND EVENT_ID
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var msg struct {
+		CurrentUser string `json:"user"`
+		ID          int    `json:"group_id"`
+	}
+	var currentUser string
+	db := r.Context().Value("database").(*sql.DB)
+
+	if r.Method == http.MethodPost {
+		json.NewDecoder(r.Body).Decode(&msg)
+		fmt.Println("dismissed", msg)
+		currentUser = msg.CurrentUser
+		_, err := db.Exec("UPDATE events SET pending = 0 WHERE id = ?", msg.ID)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	} else {
+		currentUser = r.URL.Query().Get("user")
+	}
+
+	var events []models.Event
+	var event models.Event
+	groupID, err := db.Query("SELECT group_members.group_id FROM social_groups INNER JOIN group_members ON group_members.group_id = social_groups.id WHERE group_members.member_id = ?", currentUser)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer groupID.Close()
+
+	for groupID.Next() {
+		var group int
+		err := groupID.Scan(&group)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		rows, err := db.Query(`SELECT events.id,name,users.first_name,users.last_name,creator_id FROM events
+		INNER JOIN users ON users.uuid = events.creator_id WHERE events.group_id = ? AND events.pending= 1`, group)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for rows.Next() {
+			rows.Scan(
+				&event.ID,
+				&event.Name,
+				&event.CreatorFirstName,
+				&event.CreatorLastName,
+				&event.Creator,
+			)
+			events = append(events, event)
+		}
+	}
+	json.NewEncoder(w).Encode(events)
 }

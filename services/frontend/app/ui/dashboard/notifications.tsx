@@ -8,6 +8,7 @@ import { Button } from "@/app/ui/button";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { CADDY_URL } from "@/app/lib/constants";
+import { Event } from "@/app/lib/definitions";
 
 interface Notification {
   uuid: string;
@@ -233,7 +234,6 @@ export function GroupNotifications({ user }: NotificationsProps) {
 
 export function InviteNotifications({ user }: NotificationsProps) {
   const [showNotif, setShowNotif] = useState("");
-
   const { data: pending, mutate } = useSWR(
     `/api/group/invite/pending?user=${user}`,
     fetcher,
@@ -336,4 +336,98 @@ export function InviteNotifications({ user }: NotificationsProps) {
       </div>
     </div>
   );
+}
+
+export function EventNotifications({ user }: NotificationsProps) {
+
+
+
+  
+  const [showNotif, setShowNotif] = useState("");
+  // const [count,setCount] = useState(0)
+  
+  const { data: notif,mutate } = useSWR(
+    `/api/group/event?user=${user}`,
+    fetcher,
+    { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
+    );
+    
+    console.log("notif:",notif)
+    const count = notif?.filter(((notification:Event) =>notification.creator_id !== user)).length
+    console.log("🚀 ~ EventNotifications ~ count:", count)
+
+
+    const handleDismiss = async (group_id:number) => {
+      try {
+        await axios.post(`/api/group/event`,{
+          group_id,
+          user
+        });
+        mutate();
+        toast.success("Notification dismissed");
+        showNotif === "pending" && setShowNotif("");
+      } catch (error) {
+        toast.error("Failed to dismiss group invitation");
+      }
+    };
+
+  return(
+    <div className="flex-grow flex flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+      <div className="h-auto w-full rounded-md bg-gray-50 md:block shadow-xl">
+        {count > 0 && (
+          <div
+            className="flex items-center justify-between h-10 px-4 cursor-pointer"
+            onClick={() =>
+              setShowNotif(showNotif === "pending" ? "" : "pending")}
+          >
+            <p className="text-sm font-medium text-gray-600">
+              New Event created
+              <span className="ml-2 text-md font-bold text-purple-600">
+                {count || 0}
+              </span>
+            </p>
+            <ArrowRightCircleIcon className="w-5 h-5 text-purple-600" />
+          </div>
+        )}
+        {showNotif === "pending" && (
+          <div className="flex flex-col space-y-2 p-4">
+            {notif?.map((notification: Event, index: number) => (
+              notification.creator_id !== user ? 
+              <div
+                key={index.toString()}
+                className="flex items-center space-x-2"
+              >
+                <Image
+                  className="w-10 h-10 rounded-full"
+                  src={`${CADDY_URL}/avatar?id=${notification.creator_id}`}
+                  alt={`${notification.creator_first_name} ${notification.creator_last_name}`}
+                  width={40}
+                  height={40}
+                />
+                <div className="flex-grow">
+                  <p className="text-sm font-medium text-gray-800">
+                    {`${notification.creator_first_name} just created a new Event !`}
+                    <span className="ml-2 text-md font-bold text-purple-600">
+                      {notification.name}
+                    </span>
+                  </p>
+                  <div className="flex space-x-2 mt-1">
+                    <Button
+                      className="text-xs  h-8"
+                      onClick={() =>
+                        handleDismiss(notification.event_id)}
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              :""
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+  
 }

@@ -94,7 +94,7 @@ func WebsocketHandler(db *sql.DB, hub *Hub, w http.ResponseWriter, r *http.Reque
 		return
 	}
 	client := &Client{
-		UUID:     string(msg), // TODO: handle user first name / lastname /username ?
+		UUID:     string(msg),
 		Username: middleware.GetUsersname(db, string(msg)),
 		group:    GetGroupe(db, string(msg)),
 		hub:      hub,

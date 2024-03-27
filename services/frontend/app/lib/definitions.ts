@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react"
 
 export type User = {
     uuid: string
@@ -88,6 +89,11 @@ export interface GroupButtonProps {
   group: Group;
   user?: string;
 }
+export interface JoinButtonProps {
+  group: Group;
+  user?: string;
+  setState:Dispatch<SetStateAction<boolean>>;
+}
 export type Group = {
   id: number;
   creation_date: string;
@@ -109,7 +115,7 @@ export type Event = {
   creator_last_name:string;
   creation_date: string;
   date: string;
-  candidates:Array<{User:string,Choice:string}>;
+  candidates:Array<{User:string,Choice:string,Id:number}>;
 }
 export interface JoinStatus{
     joined:boolean;

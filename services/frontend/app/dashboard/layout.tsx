@@ -17,3 +17,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
     </main>
   );
 }
+
+//TODO GROUPS CREATION REAL TIME
+//TODO FOLLOWERS AND FOLLOWED REAL TIME

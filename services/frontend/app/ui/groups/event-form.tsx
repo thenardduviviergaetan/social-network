@@ -9,8 +9,6 @@ import { useFormState, useFormStatus } from "react-dom";
 import { State, createEventRequest } from "@/app/lib/action-event";
 
 export default function CreateEvent({ user, group }: GroupButtonProps) {
-    //TODO: gerer pour que ce soit tous les members et pas juste le createur
-
 
     const sendReq = (prev: State, form: FormData) => {
         return createEventRequest(prev, form, group.id);
@@ -22,7 +20,7 @@ export default function CreateEvent({ user, group }: GroupButtonProps) {
 
     const [showCreateEventState, setShowCreateEventState] = useState(false)
     return (
-        <div className="text-purple-700 mt-8 min-w-fit w-1/4 p-5">
+        <div className={"bg-white rounded-lg shadow-xl text-purple-700 mt-8 min-w-fit w-1/4 p-5 mb-5"}>
             <Button
                 className="w-auto"
                 onClick={() => {

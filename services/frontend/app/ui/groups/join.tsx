@@ -5,11 +5,11 @@ import { API_BASE_URL } from "@/app/lib/constants";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { fetchJoinStatus } from "@/app/lib/data";
 import { joinGroup } from "@/app/lib/action-group";
 
-export default function JoinGroupButton({ group, user }: JoinButtonProps) {
+export default function JoinGroupButton({ group, user, setState }: JoinButtonProps) {
   const { data: joinStatus, mutate: mutateJoin } = useSWR(
     `${API_BASE_URL}/group/join?user=${user}&group=${group.id}`,
     fetcher,
@@ -23,6 +23,7 @@ export default function JoinGroupButton({ group, user }: JoinButtonProps) {
   useEffect(() => {
     if (user) {
       fetchJoinStatus(user, group.id);
+      (joinStatus?.followed && !joinStatus?.pending || group.creator_id === user) ? setState(true) : setState(false)
     }
   }, [user, group.id]);
 
@@ -46,11 +47,13 @@ export default function JoinGroupButton({ group, user }: JoinButtonProps) {
           joinStatus?.pending
             ? (
               <>
+                {useEffect(()=>setState(false)) }
                 <span className="mr-2">Pending...</span>
               </>
             )
             : (
               <>
+                {useEffect(()=>setState(true)) }
                 <span className="mr-2">Quit</span>
                 <MinusIcon className="w-5 h-5" />
               </>
@@ -58,6 +61,7 @@ export default function JoinGroupButton({ group, user }: JoinButtonProps) {
         )
         : (
           <>
+            {useEffect(()=>setState(false)) }
             <span className="mr-2">Join</span>
             <PlusIcon className="w-5 h-5" />
           </>

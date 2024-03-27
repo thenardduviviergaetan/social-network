@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
-import { emojis } from "@/app/lib/constants";
+import { LINK_STYLE, emojis } from "@/app/lib/constants";
 import toast from "react-hot-toast";
+import { FaceSmileIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 class Message {
   msg_type: string;
@@ -114,6 +115,7 @@ export default function Chat({ user }: { user: string | null }) {
   const [messageList, setmessageList] = useState(new ListMessage().tab);
   const [target, setTarget] = useState(new Target());
   const [typing, setTyping] = useState(false);
+  const [emoji,setEmoji] = useState(false)
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
@@ -217,7 +219,7 @@ export default function Chat({ user }: { user: string | null }) {
             ]);
           } else {
             /// TODO : ADD notif here
-            toast.success(message.sender_name+" sent a message !\n"+message.content)
+            toast.success(message.sender_name + " sent a message !\n" + message.content)
           }
           break;
         case "typing":
@@ -234,8 +236,17 @@ export default function Chat({ user }: { user: string | null }) {
     };
   }, [target]);
 
+  const messagesEndRef = useRef<null | HTMLDivElement>(null)
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView()
+  }
+  
+  useEffect(() => {
+    scrollToBottom()
+  }, [messageList]);
   return (
+    
     <div className="chat flex flex-col px-3 py-4 md:px-2 text-purple-700">
       <h1 className="font-bold">Chat</h1>
       <div className="chanel-list flex-row mb-2 h-50 items-end justify-center rounded-md bg-white p-4 md:h-50">
@@ -302,19 +313,26 @@ export default function Chat({ user }: { user: string | null }) {
           })}
         </div>
       </div>
-      <div className="chat-container mb-2 h-50 items-end justify-center rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-0 ">
-        <div className="messages overflow-y-scroll h-96 ">
+      {/* REMIND BOX CHAT HERE*/}
+      {target.target !== undefined ? (
+      <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md backdrop-blur-lg bg-[rgba(255,255,255,.7)] p-4 md:h-50 fixed bottom-0 right-9 ">
+        <XCircleIcon className={"self-end mb-2"} onClick={()=>setTarget(new Target())}/>
+        {/* !!! */}
+        <div className="messages overflow-y-scroll h-full TODO: faire la height grid grid-cols-1">
           {messageList.map((message, idx) => {
+
             return (
-              <div key={idx} className="bg-zinc-200 shadow-xl h-[80px] w-auto rounded-lg p-4 mb-3 justify-between">
+              <div key={idx} className={`bg-zinc-200 shadow-xl h-auto break-words w-3/4 rounded-lg p-4 mb-3 ${message.sender === userUuid ?
+                "justify-self-end text-right" : "text-left"}`}>
                 <p className="font-bold">{message.sender_name}</p>
-                <div className={message.sender === userUuid ?
-                  " right-0" : " left-0"}>{message.content}</div>
+
+                <div>{message.content}</div>
               </div>
             );
           })}
+          <div ref={messagesEndRef} />
         </div>
-        <div className="sender bg-zinc-500 flex flex-col p-4 mb-2 h-25 rounded-lg">
+        <div className="sender bg-purple-200 flex flex-col p-4 mb-2 h-25 rounded-lg">
           <div className={typing ? "" : "hidden"}>
             <p>Typing</p>
           </div>
@@ -337,13 +355,14 @@ export default function Chat({ user }: { user: string | null }) {
               }}
             >
             </input>
+            <div className="flex flex-row items-center ">
             <button
-              className="h-10 items-center rounded-lg bg-purple-700 px-4 text-sm font-medium text-white transition-colors hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 active:bg-purple-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 block"
+              className={LINK_STYLE +" mb-3"}
               id="submit"
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
-                if (target.target !== "undefined") {
+                if (target.target !== "undefined" && content!=="") {
                   let message = new Message(
                     "chat",
                     content,
@@ -355,22 +374,28 @@ export default function Chat({ user }: { user: string | null }) {
                   let msg = JSON.stringify(message);
                   setContent("");
                   socket.send(msg);
+                } else {
+                  toast.error('WARNING your message is empty')
                 }
               }}
             >Send
             </button>
+            <FaceSmileIcon className="w-9 ml-3 mt-1" onClick={()=>{setEmoji(emoji ? false : true)}}/>
+            </div>
           </form>
-          <div className="flex flex-wrap">
+          { emoji ?
+          <div className="flex flex-wrap max-w-[300px] max-h-[60px] overflow-y-auto border p-2 border-purple-700 rounded-lg">
             {
-              emojis.map((emoji: string) => {
+              emojis.map((emoji: string,idx:number) => {
                 return (
-                  <button onClick={() => setContent(content + emoji)}>{emoji}</button>
+                  <button key={idx} onClick={() => setContent(content + emoji)}>{emoji}</button>
                 )
               })
             }
-          </div>
+          </div> : ""}
         </div>
       </div>
+      ):""}
     </div>
   );
 }

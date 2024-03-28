@@ -2,9 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { auth } from "@/auth";
 import Notifications, { GroupNotifications, InviteNotifications } from "@/app/ui/dashboard/notifications";
+import Chat from "./chat";
+import Chat2 from "./chat2";
+import { fetchUser } from "@/app/lib/data";
 
 export default async function SideNav() {
   const session = await auth();
+  const user = await fetchUser();
 
   return (
     <div className="flex flex-col px-3 py-4 md:px-2">
@@ -29,6 +33,9 @@ export default async function SideNav() {
       <Notifications user={session?.user?.uuid}/>
       <GroupNotifications user={session?.user?.uuid}/>
       <InviteNotifications user={session?.user?.uuid}/>
+      {/* <Chat user={session?.user?.uuid}/> */}
+      { user && <Chat2 user={user} /> }
+      {/* <Chat user={session?.user?.uuid} u={session?.user}/> */}
     </div>
   );
 }

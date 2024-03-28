@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { EnvelopeIcon, XMarkIcon,FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { BeatLoader } from "react-spinners";
+import Link from "next/link";
 
 class Message {
   msg_type: string;
@@ -119,6 +120,7 @@ export default function Chat({ user }: { user: string | null }) {
   const [typing, setTyping] = useState(false);
   const [emoji, setEmoji] = useState(false)
   const [writer,setWriter] = useState("")
+  const [toSend, setToSend] = useState("")
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
@@ -344,6 +346,7 @@ export default function Chat({ user }: { user: string | null }) {
                   id={users.username}
                   onClick={(e) => {
                     setTarget(new Target("user", users.uuid));
+                    setToSend(users.username)
                     socket.send(JSON.stringify(
                       new Message(
                         "history",
@@ -381,6 +384,7 @@ export default function Chat({ user }: { user: string | null }) {
                   onClick={(e) => {
                     let t = new Target("group", group.id);
                     setTarget(t);
+                    setToSend(group.name)
                     socket.send(JSON.stringify(
                       new Message(
                         "history",
@@ -401,8 +405,29 @@ export default function Chat({ user }: { user: string | null }) {
       {/* REMIND BOX CHAT HERE*/}
       {target.target !== undefined ? (
         <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-9">
+          <div className="flex flex-row justify-between w-full">
+          <Link
+              href={{
+                pathname: "/dashboard/profile",
+                query: { user: encodeURIComponent(target.target) },
+              }}
+            >
+              <div className="flex flex-row w-auto h-auto items-center">
+                <Image
+                  src={`${CADDY_URL}/avatar?id=${target.target}`}
+                  alt="Profile Picture"
+                  width={50}
+                  height={50}
+                  className="rounded-full shadow-xl"
+                />
+                <p className="text-purple-700 font-bold ml-5">
+                  {toSend}
+                </p>
+              </div>
+            </Link>
           <div className="flex w-1/6 h-[30px] justify-end self-end z-50">
-            <XMarkIcon className={"self-end w-9 hover:cursor-pointer"} onClick={() => setTarget(new Target())} />
+            <XMarkIcon className={"self-end w-9 hover:cursor-pointer mb-3"} onClick={() => setTarget(new Target())} />
+          </div>
           </div>
           <div className="messages overflow-y-scroll h-[400px] grid grid-cols-1 ">
             {messageList.map((message, idx) => {

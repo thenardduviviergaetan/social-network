@@ -421,8 +421,8 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
             <Link
               onClick={() => setTarget(new Target())}
               href={{
-                pathname: "/dashboard/profile",
-                query: { user: encodeURIComponent(target.target) },
+                pathname: target.target.length !== 36 ? "/dashboard/groups/group":"/dashboard/profile",
+                query: {user : encodeURIComponent(target.target),id : encodeURIComponent(target.target)},
               }}
             >
               <div className="flex flex-row w-auto h-auto items-center">

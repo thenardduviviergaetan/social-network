@@ -352,8 +352,9 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
         <div className="user">
           {userList.map((users, idx) => {
             return (
-              <div key={"user" + idx} className="items-end justify-center rounded-md bg-zinc-200 p-3 md:h-50 mb-1">
+              <div key={"user" + idx} className="items-end justify-center rounded-md bg-white border border-purple-400 shadow-lg my-5 hover:text-purple-500 hover:font-bold p-3 md:h-50 mb-1">
                 <button
+                className="flex flex-row items-center"
                   id={users.username}
                   onClick={(e) => {
                     setTarget(new Target("user", users.uuid));
@@ -370,16 +371,16 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
                     ));
                   }}
                 >
-                  {users.username}
-                  <svg className="notification" width="10" height="10">
+                  <svg className="notification mr-2" width="10" height="10">
                     <circle
                       cx="5"
                       cy="5"
                       r="5"
                       fill={users.online ? "green" : "red"}
-                    >
+                      >
                     </circle>
                   </svg>
+                      {users.username}
                 </button>
               </div>
             );
@@ -389,7 +390,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
           <h2 className="font-bold">Groupe</h2>
           {groupList?.map((group, idx) => {
             return (
-              <div key={"groupe" + idx} className="items-end justify-center rounded-md bg-zinc-200 p-3 md:h-50  mb-1 ">
+              <div key={"groupe" + idx} className="items-end justify-center rounded-md bg-white border border-purple-400 hover:text-purple-500 hover:font-bold shadow-lg my-5 p-3 md:h-50  mb-1 ">
                 <button
                   id={group.name}
                   onClick={(e) => {
@@ -415,7 +416,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
       </div>
       {/* REMIND BOX CHAT HERE*/}
       {target.target !== undefined ? (
-        <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-9">
+        <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-9 z-50">
           <div className="flex flex-row justify-between w-full">
             <Link
               onClick={() => setTarget(new Target())}
@@ -510,7 +511,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
               </div>
             </form>
             {emoji ?
-              <div className="flex flex-wrap max-w-[300px] max-h-[60px] overflow-y-auto border p-2 border-purple-700 rounded-lg">
+              <div className="flex flex-wrap max-w-[300px] max-h-[60px] overflow-y-auto border p-2 border-purple-700 rounded-lg mt-3">
                 {
                   emojis.map((emoji: string, idx: number) => {
                     return (

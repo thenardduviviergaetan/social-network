@@ -20,7 +20,7 @@ export async function Followers({ param }: { param?: Param }) {
                                 query: { user: encodeURIComponent(follower.uuid) },
                             }}
                         >
-                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2 justify-start items-center">
+                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2 justify-start items-center overflow-x-auto">
                                 <Image
                                     src={`${CADDY_URL}/avatar?id=${follower.uuid}`}
                                     alt="Profile Picture"
@@ -57,7 +57,7 @@ export async function Followed({param}: {param?: Param}){
                                 query: { user: encodeURIComponent(follower.uuid) },
                             }}
                         >
-                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2 justify-start items-center">
+                            <div className=" flex flex-row w-auto h-auto bg-white p-3 rounded-lg mb-2 justify-start items-center overflow-x-auto">
                                 <Image
                                     src={`${CADDY_URL}/avatar?id=${follower.uuid}`}
                                     alt="Profile Picture"

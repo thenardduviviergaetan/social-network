@@ -18,7 +18,7 @@ export default async function Details({ param }: { param?: Param }) {
 
   return (
     <>
-      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl text-center divide-y divide-dashed divide-black w-full mb-8">
+      <div className="flex flex-col items-center font-bold bg-white p-4 rounded-lg shadow-xl text-center divide-y divide-dashed divide-black w-full mb-8 md:w-[400px] ">
         <Image
           src={param?.user ? `${CADDY_URL}/avatar?id=${param?.user}` : session?.user?.picture}
           alt="Profile Picture"
@@ -26,8 +26,8 @@ export default async function Details({ param }: { param?: Param }) {
           height={200}
           className="rounded-full shadow-xl m-5"
         />
-        <div className="flex flex-col w-3/4 justify-center m-auto">
-          <div className="flex flex-row flex-wrap mt-5 justify-center">
+        <div className="flex flex-col w-3/4 justify-center m-auto ">
+          <div className="flex flex-col flex-wrap mt-5 justify-center sm:flex-row md:flex-col md:items-center lg:flex-row xl:flex-row ">
             {user?.nickname && (
               <h3 className="p-5 w-4/12">
                 Nickname:{" "}
@@ -36,14 +36,14 @@ export default async function Details({ param }: { param?: Param }) {
                 </p>
               </h3>
             )}
-            <h3 className="p-5 w-4/12">
+            <h3 className="p-5 w-4/12 ">
               Date of birth:
               <p className="text-center text-purple-700 hover:text-purple-400">
                 {user?.dateOfBirth}
               </p>
             </h3>
           </div>
-          <div className="flex flex-row flex-wrap justify-center mt-5">
+          <div className="flex flex-col flex-wrap justify-center mt-5 sm:flex-row md:flex-col md:items-center lg:flex-row xl:flex-row text-center">
             <h3 className="p-5 w-4/12">
               Followers:
               <p className="text-center text-purple-700 hover:text-purple-400">
@@ -59,15 +59,15 @@ export default async function Details({ param }: { param?: Param }) {
           </div>
         </div>
         {user?.about && (
-          <h3 className="font-bold p-5 break-all">
+          <h3 className="font-bold p-5 break-words">
             About: <p className="text-purple-700">{user?.about}</p>
           </h3>
         )}
       </div>
       {showDetails && (
-        <div className="flex flex-col md:flex-row justify-evenly items-center rounded-lg bg-white shadow-xl p-3 m-auto w-full h-auto">
-          <div className="w-full md:w-1/3 text-center">
-            <h3 className="font-bold mt-1 p-3 break-all">
+        <div className="flex flex-col lg:flex-row justify-evenly items-center rounded-lg bg-white shadow-xl p-3 m-auto w-full h-auto">
+          <div className="w-full xl:w-1/3 text-center">
+            <h3 className="font-bold mt-1 p-3 break-normal">
               Email:{" "}
               <p className="text-purple-700 hover:text-purple-400 mt-1">
                 {user?.email}

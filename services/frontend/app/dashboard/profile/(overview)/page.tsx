@@ -1,9 +1,9 @@
 import Details from "@/app/ui/profile/details";
-import { Followers, Followed } from "@/app/ui/profile/followers";
 import UserPosts from "@/app/ui/profile/post";
 import Link from "next/link";
 import { LINK_STYLE } from "@/app/lib/constants";
 import { fetchUser } from "@/app/lib/data";
+import FollowButtonProfile from "@/app/ui/profile/follow";
 
 
 export default async function Page(
@@ -19,8 +19,10 @@ export default async function Page(
 const currentUser = await fetchUser();
   return (
     <div className="flex flex-col justify-center items-center w-7/12 m-auto">
-      {(searchParams?.user === undefined || searchParams?.user === currentUser?.uuid ) ? 
       <div className="flex flex-row justify-around w-full mb-8">
+      {
+      (searchParams?.user === undefined || searchParams?.user === currentUser?.uuid ) ? 
+        <>
         <Link
           href={{
             pathname: '/dashboard/groups',
@@ -39,11 +41,12 @@ const currentUser = await fetchUser();
         >
           All groups
         </Link>
-      </div>
-      :""
-      }
+      </>: "" }
+      <FollowButtonProfile  user={currentUser?.uuid} param={searchParams}/>
+    </div>
       <Details param={searchParams} />
       <UserPosts param={searchParams} />
     </div>
   );
 }
+

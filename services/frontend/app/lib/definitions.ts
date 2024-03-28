@@ -85,6 +85,12 @@ export interface FollowButtonProps {
   followStatus: FollowStatus;
   handleFollow: () => void;
 }
+export interface FollowButtonProfileProps {
+  user?: string |undefined;
+  followStatus: FollowStatus;
+  param?:Param;
+  handleFollow: () => void;
+}
 export interface GroupButtonProps {
   group: Group;
   user?: string;

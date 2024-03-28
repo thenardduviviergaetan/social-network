@@ -1,10 +1,10 @@
 "use client";
 
-import {useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { CADDY_URL, emojis } from "@/app/lib/constants";
 import toast from "react-hot-toast";
-import { EnvelopeIcon, XMarkIcon,FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, XMarkIcon, FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { BeatLoader } from "react-spinners";
 import Link from "next/link";
@@ -119,7 +119,7 @@ export default function Chat({ user }: { user: string | null }) {
   const [target, setTarget] = useState(new Target());
   const [typing, setTyping] = useState(false);
   const [emoji, setEmoji] = useState(false)
-  const [writer,setWriter] = useState("")
+  const [writer, setWriter] = useState("")
   const [toSend, setToSend] = useState("")
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
@@ -195,8 +195,8 @@ export default function Chat({ user }: { user: string | null }) {
               icon: <EnvelopeIcon className="w-9 m-2" />, position: "top-right", style: {
                 display: "flex",
                 flexDirection: "row-reverse",
-                boxShadow:"0 2px 6px rgba(0,0,0,.5)"
-            },duration:3000
+                boxShadow: "0 2px 6px rgba(0,0,0,.5)"
+              }, duration: 3000
             });
           }
           break
@@ -304,8 +304,8 @@ export default function Chat({ user }: { user: string | null }) {
               icon: <EnvelopeIcon className="w-9 m-2" />, position: "top-right", style: {
                 display: "flex",
                 flexDirection: "row-reverse",
-                boxShadow:"0 2px 6px rgba(0,0,0,.5)"
-            },duration:3000
+                boxShadow: "0 2px 6px rgba(0,0,0,.5)"
+              }, duration: 3000
             });
           }
           break;
@@ -406,7 +406,8 @@ export default function Chat({ user }: { user: string | null }) {
       {target.target !== undefined ? (
         <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-9">
           <div className="flex flex-row justify-between w-full">
-          <Link
+            <Link
+              onClick={() => setTarget(new Target())}
               href={{
                 pathname: "/dashboard/profile",
                 query: { user: encodeURIComponent(target.target) },
@@ -425,9 +426,9 @@ export default function Chat({ user }: { user: string | null }) {
                 </p>
               </div>
             </Link>
-          <div className="flex w-1/6 h-[30px] justify-end self-end z-50">
-            <XMarkIcon className={"self-end w-9 hover:cursor-pointer mb-3"} onClick={() => setTarget(new Target())} />
-          </div>
+            <div className="flex w-1/6 h-[30px] justify-end self-end z-50">
+              <XMarkIcon className={"self-end w-9 hover:cursor-pointer mb-3"} onClick={() => setTarget(new Target())} />
+            </div>
           </div>
           <div className="messages overflow-y-scroll h-[400px] grid grid-cols-1 ">
             {messageList.map((message, idx) => {
@@ -446,10 +447,10 @@ export default function Chat({ user }: { user: string | null }) {
           <div className="sender bg-purple-200 flex flex-col p-4 mb-2 h-25 rounded-lg">
             <div className={typing ? "" : "hidden"}>
               <div className="w-full flex flex-row items-baseline justify-start mb-1">
-              <p><span className="font-bold">{writer}</span> is typing</p>
-              <BeatLoader size={5} className="ml-1" />
+                <p><span className="font-bold">{writer}</span> is typing</p>
+                <BeatLoader size={5} className="ml-1" />
               </div>
-              
+
             </div>
             <form id="form-chat">
               <div className="flex flex-row items-center justify-between">
@@ -458,7 +459,7 @@ export default function Chat({ user }: { user: string | null }) {
                   className="shadow-xl w-3/4 rounded-lg resize-none h-7 focus:px-3"
                   id="chat-text"
                   value={content}
-                  onChange={(e)=>{
+                  onChange={(e) => {
                     socket.send(JSON.stringify(new Message(
                       "typing",
                       content,

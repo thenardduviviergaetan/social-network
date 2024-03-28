@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
 import Image from "next/image";
 import { inviteToGroup } from "@/app/lib/action-group";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function InviteComponent({
@@ -42,7 +42,7 @@ export default function InviteComponent({
     fetchGroupMembers();
   }, [group.id, mutate]);
 
-//   const isMember = groupData?.some((member: any) => member.uuid === user);
+  const [inviteState, setInviteState] = useState(false)
 
   if (!groupData?.some((member: any) => member.uuid === user)) {
     return (
@@ -86,11 +86,14 @@ export default function InviteComponent({
                 ) : (
                   <button
                     className="px-2 py-1 text-sm text-white bg-purple-600 rounded hover:bg-purple-900"
-                    onClick={() =>
+                    onClick={() =>{
+                      setInviteState(false ? true : true);
+                      (inviteState === false) ?
                       inviteToGroup(follower.uuid, group.id, user)
-                    }
+                      :""
+                    }}
                   >
-                    Invite
+                    {inviteState ? "Pending..." : "Invite"}
                   </button>
                 )}
               </div>

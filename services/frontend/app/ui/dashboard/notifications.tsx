@@ -352,9 +352,7 @@ export function EventNotifications({ user }: NotificationsProps) {
     { revalidateOnMount: true, revalidateOnFocus: true, refreshInterval: 1000 },
     );
     
-    console.log("notif:",notif)
     const count = notif?.filter(((notification:Event) =>notification.creator_id !== user)).length
-    console.log("🚀 ~ EventNotifications ~ count:", count)
 
 
     const handleDismiss = async (group_id:number) => {

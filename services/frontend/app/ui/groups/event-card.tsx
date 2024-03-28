@@ -16,9 +16,7 @@ export default function EventCard({ event, user }: { event: Event, user?: string
     const participateReq = (opt: string) => {
         switch (opt) {
             case "join":
-                console.log("check avant",check)
                 setStateCheck([true,true]);
-                console.log("check apres",check)
                 participateEvent(event.event_id, "join", user)
                 break
             case "no":

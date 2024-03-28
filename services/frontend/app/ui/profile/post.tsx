@@ -9,7 +9,6 @@ export default async function UserPosts({param}:{param?:Param}){
     const session = await auth();
     const currentPage = Number(param?.page) || 1;
     const totalPages = await fetchPageNumber('user', `UUID=${param?.user ? param?.user : user?.uuid}`);
-    console.log(param);
     return(
       <div className="overflow-y-auto max-h-auto w-full">
         <div >

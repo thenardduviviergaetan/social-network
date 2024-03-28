@@ -109,7 +109,7 @@ class Groupe {
     this.id = id;
   }
 }
-export default function Chat({ user, followers, followed, followerUUIDS }: { user: string | null, followers: Follower[], followed: Follower[],followerUUIDS:string[] }) {
+export default function Chat({ user, followers, followed, followerUUIDS }: { user: string | null, followers: Follower[], followed: Follower[], followerUUIDS: string[] }) {
   let listUser = new ListUser();
   const userUuid = user;
   const [content, setContent] = useState<string>("");
@@ -122,6 +122,8 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
   const [emoji, setEmoji] = useState(false)
   const [writer, setWriter] = useState("")
   const [toSend, setToSend] = useState("")
+
+
   useEffect(() => {
     let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
@@ -131,15 +133,14 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
 
     followers?.forEach((elem: Follower) => followerUUIDS.push(elem.uuid))
     const users = followed?.filter((val: Follower) => followerUUIDS.includes(val.uuid));
-    let usersInCommon:string[];
-    usersInCommon = [] 
-    users?.forEach((u:Follower)=>usersInCommon.push(u.uuid))
+    let usersInCommon: string[];
+    usersInCommon = []
+    users?.forEach((u: Follower) => usersInCommon.push(u.uuid))
 
     sc.onmessage = (event) => {
       let message: any;
       try {
         message = JSON.parse(event.data);
-        console.log("Message send", message);
       } catch {
         console.error("WebSocket message error:", event.data);
       }
@@ -154,10 +155,8 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
             .forEach((el: ConnBtn) => {
               listUser.new(el.username, el.uuid, el.online);
             });
-            setUserList(listUser.tab);
-          //   .filter((el: ConnBtn) => {
-          //     return el.uuid != userUuid;
-          //   })
+          setUserList(listUser.tab);
+
           let tabGroupe = new Array<Groupe>
           message.groupe
             .forEach((elgroupe: Groupe) => {
@@ -166,13 +165,14 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
           setGroupList(tabGroupe)
           break;
         case "chat":
-          if (message.target === user) {
+          if (message.target === user || message.type_target === "group") {
             toast((t) => (
               <div
                 className="hover:cursor-pointer w-full h-auto p-2 flex flex-row justify-around items-center"
                 id={message.sender_name}
                 onClick={() => {
-                  setTarget(new Target("user", message.sender));
+                  (message.type_target === "user" ? setTarget(new Target("user", message.sender)) : setTarget(new Target("group", message.groupe.id)))
+                    ;
                   sc.send(JSON.stringify(
                     new Message(
                       "history",
@@ -197,7 +197,9 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
                   <span className="text-purple-700 font-medium">
                     {message.sender_name}&nbsp;
                   </span>
-                  <span>sent you a message !</span>
+                  
+                  <span>sent {message.type_target === "user" ? "you" : ""} a message {message.type_target === "group" ? `to group chat` : ""}  !</span>
+
                 </div>
               </div>
             ), {
@@ -306,7 +308,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
                   <span className="text-purple-700 font-medium">
                     {message.sender_name}&nbsp;
                   </span>
-                  <span>sent you a message !</span>
+                  <span>sent {message.type_target === "user" ? "you" : ""} a message {message.type_target === "group" ? `to group chat` : ""}  !</span>
                 </div>
               </div>
             ), {

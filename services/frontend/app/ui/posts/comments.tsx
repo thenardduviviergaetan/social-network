@@ -5,7 +5,6 @@ import { CADDY_URL } from "@/app/lib/constants";
 
 export default async function Comments({ postID }: { postID: string }) {
   const comments = await fetchComments(postID);
-  console.log(comments);
   return (
     <div>
       <h4 className="mt-5 mb-2">Comments:</h4>

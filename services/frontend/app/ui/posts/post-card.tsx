@@ -35,7 +35,6 @@ export default function PostsCard({
   current,
 }: PostCardProps) {
 
-  console.log("PostCardProps", post, "USER ",user, current);
 
   const { data: commentsCounter, mutate: mutateCommentsCounter } = useSWR(
     `${API_BASE_URL}/comments/count?post_id=${post.id}`,
@@ -342,7 +341,6 @@ function FollowButton({
   followStatus,
   handleFollow,
 }: FollowButtonProps) {
-  console.log("FollowButtonProps", post, user, followStatus, handleFollow);
   return (
     <Button
       onClick={handleFollow}

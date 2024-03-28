@@ -54,7 +54,6 @@ export default function Posts({
 
   return (
     <>
-      {console.log(posts)}
       {posts?.map((post: Post) => (
         <PostCard
           key={post.id}

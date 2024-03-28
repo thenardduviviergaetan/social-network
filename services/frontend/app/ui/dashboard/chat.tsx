@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {useEffect, useRef } from "react";
 import { useState } from "react";
-import { LINK_STYLE, emojis } from "@/app/lib/constants";
+import { CADDY_URL, emojis } from "@/app/lib/constants";
 import toast from "react-hot-toast";
-import { FaceSmileIcon, PaperAirplaneIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, XMarkIcon,FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { BeatLoader } from "react-spinners";
 
 class Message {
   msg_type: string;
@@ -116,10 +117,10 @@ export default function Chat({ user }: { user: string | null }) {
   const [messageList, setmessageList] = useState(new ListMessage().tab);
   const [target, setTarget] = useState(new Target());
   const [typing, setTyping] = useState(false);
-  const [emoji,setEmoji] = useState(false)
+  const [emoji, setEmoji] = useState(false)
+  const [writer,setWriter] = useState("")
   useEffect(() => {
-    let sc = new WebSocket("ws://45.147.98.213:8000/api/ws");
-    // let sc = new WebSocket("ws://localhost:8000/api/ws");
+    let sc = new WebSocket("ws://localhost:8000/api/ws");
     sc.onopen = (event) => {
       console.log("WebSocket connection opened");
       sc.send(userUuid ?? "");
@@ -134,7 +135,7 @@ export default function Chat({ user }: { user: string | null }) {
         console.error("WebSocket message error:", event.data);
       }
 
-      switch (message.msg_type) {
+      switch (message?.msg_type) {
         case "status":
           listUser = new ListUser();
           message.status
@@ -153,6 +154,50 @@ export default function Chat({ user }: { user: string | null }) {
           setGroupList(tabGroupe)
           // console.log(groupList)
           break;
+        case "chat":
+          if (message.target === user) {
+            toast((t) => (
+              <div
+                className="hover:cursor-pointer w-full h-auto p-2 flex flex-row justify-around items-center"
+                id={message.sender_name}
+                onClick={() => {
+                  setTarget(new Target("user", message.sender));
+                  sc.send(JSON.stringify(
+                    new Message(
+                      "history",
+                      "",
+                      message.sender,
+                      "user",
+                      userUuid ?? "",
+                      "",
+                    ),
+                  ));
+                  toast.dismiss(t.id)
+                }}
+              >
+                <Image
+                  src={`${CADDY_URL}/avatar?id=${message.sender}`}
+                  alt="Profile Picture"
+                  width={50}
+                  height={50}
+                  className="rounded-full shadow-xl mr-5 border-4 border-purple-400"
+                />
+                <div className="text-center">
+                  <span className="text-purple-700 font-medium">
+                    {message.sender_name}&nbsp;
+                  </span>
+                  <span>sent you a message !</span>
+                </div>
+              </div>
+            ), {
+              icon: <EnvelopeIcon className="w-9 m-2" />, position: "top-right", style: {
+                display: "flex",
+                flexDirection: "row-reverse",
+                boxShadow:"0 2px 6px rgba(0,0,0,.5)"
+            },duration:3000
+            });
+          }
+          break
       }
     };
 
@@ -176,7 +221,6 @@ export default function Chat({ user }: { user: string | null }) {
       let message: any;
       try {
         message = JSON.parse(event.data);
-        console.log("Message send", message);
       } catch {
         console.error("WebSocket message error:", event.data);
       }
@@ -207,6 +251,7 @@ export default function Chat({ user }: { user: string | null }) {
           setmessageList(listMessage.tab);
           break;
         case "chat":
+
           if (message.target == target.target || message.sender == target.target) {
             setmessageList(prevMessage => [...prevMessage,
             new Message(
@@ -220,16 +265,54 @@ export default function Chat({ user }: { user: string | null }) {
             )
             ]);
           } else {
-            /// TODO : ADD notif here
-            toast.success(message.sender_name + " sent a message !\n" + message.content)
+            toast((t) => (
+              <div
+                className="hover:cursor-pointer w-full h-auto p-2 flex flex-row justify-around items-center"
+                id={message.sender_name}
+                onClick={() => {
+                  setTarget(new Target("user", message.sender));
+                  socket.send(JSON.stringify(
+                    new Message(
+                      "history",
+                      "",
+                      message.sender,
+                      "user",
+                      userUuid ?? "",
+                      "",
+                    ),
+                  ));
+                  toast.dismiss(t.id)
+                }}
+              >
+                <Image
+                  src={`${CADDY_URL}/avatar?id=${message.sender}`}
+                  alt="Profile Picture"
+                  width={50}
+                  height={50}
+                  className="rounded-full shadow-xl mr-5 border-4 border-purple-400"
+                />
+                <div className="text-center">
+                  <span className="text-purple-700 font-medium">
+                    {message.sender_name}&nbsp;
+                  </span>
+                  <span>sent you a message !</span>
+                </div>
+              </div>
+            ), {
+              icon: <EnvelopeIcon className="w-9 m-2" />, position: "top-right", style: {
+                display: "flex",
+                flexDirection: "row-reverse",
+                boxShadow:"0 2px 6px rgba(0,0,0,.5)"
+            },duration:3000
+            });
           }
           break;
         case "typing":
           if (message.target == target.target || message.sender == target.target) {
             setTyping(true);
+            setWriter(message.sender_name);
             clearTimeout(timeout)
             timeout = setTimeout(() => {
-              console.log("Typing off")
               setTyping(false)
             }, 1000);
           }
@@ -243,12 +326,12 @@ export default function Chat({ user }: { user: string | null }) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView()
   }
-  
+
   useEffect(() => {
     scrollToBottom()
   }, [messageList]);
   return (
-    
+
     <div className="chat flex flex-col px-3 py-4 md:px-2 text-purple-700">
       <h1 className="font-bold">Chat</h1>
       <div className="chanel-list flex-row mb-2 h-50 items-end justify-center rounded-md bg-white p-4 md:h-50">
@@ -317,89 +400,91 @@ export default function Chat({ user }: { user: string | null }) {
       </div>
       {/* REMIND BOX CHAT HERE*/}
       {target.target !== undefined ? (
-      <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md backdrop-blur-lg bg-[rgba(255,255,255,.3>)] p-4 md:h-50 fixed bottom-0 right-9">
-        <div className="flex w-full h-[40px] justify-end">
-        <XMarkIcon className={"self-end mb-2 w-9 hover:cursor-pointer"} onClick={()=>setTarget(new Target())}/>
-        </div>
-        {/* !!! */}
-        <div className="messages overflow-y-scroll h-96 grid grid-cols-1 ">
-          {messageList.map((message, idx) => {
-
-            return (
-              <div key={idx} className={`shadow-lg h-auto break-words w-3/4 rounded-lg p-4 mb-3 border-purple-300 border ${message.sender === userUuid ?
-                "justify-self-end text-right bg-purple-100" : "text-left "}`}>
-                <p className="font-bold">{message.sender_name}</p>
-
-                <div>{message.content}</div>
-              </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="sender bg-purple-200 flex flex-col p-4 mb-2 h-25 rounded-lg">
-          <div className={typing ? "" : "hidden"}>
-            <p>Typing</p>
+        <div className="chat-container flex flex-col shadow-xl mb-2 h-[560px] w-[360px] justify-between rounded-md bg-white p-4 md:h-50 fixed bottom-0 right-9">
+          <div className="flex w-1/6 h-[30px] justify-end self-end z-50">
+            <XMarkIcon className={"self-end w-9 hover:cursor-pointer"} onClick={() => setTarget(new Target())} />
           </div>
-          <form id="form-chat">
-          <div className="flex flex-row items-center justify-between">
-          <FaceSmileIcon className="w-7" onClick={()=>{setEmoji(emoji ? false : true)}}/>
-            <input
-              className="shadow-xl w-3/4 rounded-lg"
-              id="chat-text"
-              type="text"
-              value={content}
-              onChange={(e) => {
-                socket.send(JSON.stringify(new Message(
-                  "typing",
-                  content,
-                  target?.target ?? "",
-                  target?.type_target ?? "",
-                  userUuid ?? "",
-                  "",
-                )))
-                setContent(e.target.value);
-              }}
-            >
-            </input>
-            <PaperAirplaneIcon
-              className={"w-7 ml-2"}
-              id="submit"
-              type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                if (target.target !== "undefined" && content!=="") {
-                  let message = new Message(
-                    "chat",
-                    content,
-                    target?.target ?? "",
-                    target?.type_target ?? "",
-                    userUuid ?? "",
-                    "",
-                  );
-                  let msg = JSON.stringify(message);
-                  setContent("");
-                  socket.send(msg);
-                } else {
-                  toast.error('WARNING your message is empty')
-                }
-              }}
-            >Send
-            </PaperAirplaneIcon>
+          <div className="messages overflow-y-scroll h-[400px] grid grid-cols-1 ">
+            {messageList.map((message, idx) => {
+
+              return (
+                <div key={idx} className={`shadow-lg h-fit break-words w-3/4 rounded-lg p-4 mb-3 border-purple-300 border ${message.sender === userUuid ?
+                  "justify-self-end text-right bg-purple-100" : "text-left "}`}>
+                  <p className="font-bold">{message.sender_name}</p>
+
+                  <div>{message.content}</div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="sender bg-purple-200 flex flex-col p-4 mb-2 h-25 rounded-lg">
+            <div className={typing ? "" : "hidden"}>
+              <div className="w-full flex flex-row items-baseline justify-start mb-1">
+              <p><span className="font-bold">{writer}</span> is typing</p>
+              <BeatLoader size={5} className="ml-1" />
+              </div>
+              
             </div>
-          </form>
-          { emoji ?
-          <div className="flex flex-wrap max-w-[300px] max-h-[60px] overflow-y-auto border p-2 border-purple-700 rounded-lg">
-            {
-              emojis.map((emoji: string,idx:number) => {
-                return (
-                  <button key={idx} onClick={() => setContent(content + emoji)}>{emoji}</button>
-                )
-              })
-            }
-          </div> : ""}
+            <form id="form-chat">
+              <div className="flex flex-row items-center justify-between">
+                <FaceSmileIcon className="w-7" onClick={() => { setEmoji(emoji ? false : true) }} />
+                <textarea
+                  className="shadow-xl w-3/4 rounded-lg resize-none h-7 focus:px-3"
+                  id="chat-text"
+                  value={content}
+                  onChange={(e)=>{
+                    socket.send(JSON.stringify(new Message(
+                      "typing",
+                      content,
+                      target?.target ?? "",
+                      target?.type_target ?? "",
+                      userUuid ?? "",
+                      "",
+                    )))
+                    setContent(e.target.value);
+                  }}
+                >
+                </textarea>
+                <PaperAirplaneIcon
+                  className={"w-7 ml-2"}
+                  id="submit"
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (target.target !== "undefined" && content !== "") {
+                      let message = new Message(
+                        "chat",
+                        content,
+                        target?.target ?? "",
+                        target?.type_target ?? "",
+                        userUuid ?? "",
+                        "",
+                      );
+                      let msg = JSON.stringify(message);
+                      setContent("");
+                      socket.send(msg);
+                    } else {
+                      toast.error('WARNING your message is empty')
+                    }
+                  }}
+                >Send
+                </PaperAirplaneIcon>
+              </div>
+            </form>
+            {emoji ?
+              <div className="flex flex-wrap max-w-[300px] max-h-[60px] overflow-y-auto border p-2 border-purple-700 rounded-lg">
+                {
+                  emojis.map((emoji: string, idx: number) => {
+                    return (
+                      <button key={idx} onClick={() => setContent(content + emoji)}>{emoji}</button>
+                    )
+                  })
+                }
+              </div> : ""}
+          </div>
         </div>
-      </div>
-      ):""}
+      ) : ""}
     </div>
   );
 }

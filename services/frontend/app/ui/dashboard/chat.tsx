@@ -8,6 +8,7 @@ import { EnvelopeIcon, XMarkIcon, FaceSmileIcon, PaperAirplaneIcon } from "@hero
 import Image from "next/image";
 import { BeatLoader } from "react-spinners";
 import Link from "next/link";
+import { Follower } from "@/app/lib/definitions";
 
 class Message {
   msg_type: string;
@@ -108,7 +109,7 @@ class Groupe {
     this.id = id;
   }
 }
-export default function Chat({ user }: { user: string | null }) {
+export default function Chat({ user, followers, followed, followerUUIDS }: { user: string | null, followers: Follower[], followed: Follower[],followerUUIDS:string[] }) {
   let listUser = new ListUser();
   const userUuid = user;
   const [content, setContent] = useState<string>("");
@@ -128,6 +129,12 @@ export default function Chat({ user }: { user: string | null }) {
       sc.send(userUuid ?? "");
     };
 
+    followers?.forEach((elem: Follower) => followerUUIDS.push(elem.uuid))
+    const users = followed?.filter((val: Follower) => followerUUIDS.includes(val.uuid));
+    let usersInCommon:string[];
+    usersInCommon = [] 
+    users?.forEach((u:Follower)=>usersInCommon.push(u.uuid))
+
     sc.onmessage = (event) => {
       let message: any;
       try {
@@ -141,20 +148,22 @@ export default function Chat({ user }: { user: string | null }) {
         case "status":
           listUser = new ListUser();
           message.status
-            .filter((el: ConnBtn) => {
-              return el.uuid != userUuid;
+            .filter((elem: ConnBtn) => {
+              return usersInCommon.includes(elem.uuid)
             })
             .forEach((el: ConnBtn) => {
               listUser.new(el.username, el.uuid, el.online);
             });
-          setUserList(listUser.tab);
+            setUserList(listUser.tab);
+          //   .filter((el: ConnBtn) => {
+          //     return el.uuid != userUuid;
+          //   })
           let tabGroupe = new Array<Groupe>
           message.groupe
             .forEach((elgroupe: Groupe) => {
               tabGroupe.push(elgroupe);
             })
           setGroupList(tabGroupe)
-          // console.log(groupList)
           break;
         case "chat":
           if (message.target === user) {

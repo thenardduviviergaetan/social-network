@@ -30,7 +30,7 @@ export default function EventCard({ event, user }: { event: Event, user?: string
     }
 
     return (
-        <div className="bg-white shadow-lg rounded-lg w-1/2 h-auto mt-8 p-5">
+        <div className="bg-white shadow-lg rounded-lg w-full lg:w-1/2 h-auto mt-8 p-5">
             <p className="flex text-purple-700 p-3 font-bold justify-between break-all"><span className="text-left w-2/3">{event.name}</span> <span className="text-xs text-right w-1/3"> <i>created at {new Date(event.creation_date).toLocaleDateString("fr")}</i></span></p>
             <p className="text-black p-3"><i>Created by</i> <Link href={`/dashboard/profile?user=${event.creator_id}`} className="text-purple-700 font-bold hover:text-purple-500 p-3">{`${event.creator_first_name} ${event.creator_last_name}`}</Link></p>
             <p className="text-purple-700 hover:text-purple-500 font-bold p-3"><i className="text-black font-normal">Starting at</i> <span>{new Date(event.date).toLocaleDateString("fr")}</span></p>

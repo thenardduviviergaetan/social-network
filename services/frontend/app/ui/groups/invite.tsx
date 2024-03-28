@@ -46,7 +46,7 @@ export default function InviteComponent({
 
   if (!groupData?.some((member: any) => member.uuid === user)) {
     return (
-      <div className="border border-grey-600 w-1/2 rounded-lg p-4 flex justify-center items-center ">
+      <div className="border border-grey-600 w-full lg:w-1/2 rounded-lg p-4 flex justify-center items-center ">
         <p className="text-center text-gray-500">
           Join the group to invite users.
         </p>
@@ -55,7 +55,7 @@ export default function InviteComponent({
   }
 
   return (
-    <div className="border border-grey-600 w-1/2 rounded-lg p-4 mt-8">
+    <div className="border border-grey-600 w-full lg:w-1/2 rounded-lg p-4 mt-8">
       <p className="text-purple-700 font-bold underline mb-3">
         Invite followers to this group:
       </p>

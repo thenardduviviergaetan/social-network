@@ -30,7 +30,7 @@ export const GroupMembers = ({ group }: { group: Group }) => {
   }, [group.id, mutate]);
 
   return (
-    <div className="border border-grey-600 w-1/2 rounded-lg mt-8 p-5 mr-4">
+    <div className="border border-grey-600 w-full lg:w-1/2 rounded-lg mt-8 p-5 mr-4">
       <p className="text-purple-700 font-bold underline">
         Members of this group:
       </p>

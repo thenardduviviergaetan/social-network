@@ -36,7 +36,7 @@ export default function GroupPage({ group, user, params }: { group: Group, user:
             {group.description}
           </div>
         </div>
-        <div className="flex w-full m-auto justify-between">
+        <div className="flex flex-col lg:flex-row w-full m-auto justify-between">
           <GroupMembers group={group} />
           <InviteComponent group={group} user={user?.uuid} />
         </div>

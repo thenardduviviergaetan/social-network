@@ -57,6 +57,7 @@ func HandleGetGroupList(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("ERROR =", errGetGroups)
 			http.Error(w, "Failed to retrieve the groups", http.StatusInternalServerError)
 		}
+		//TODO WE COULD USE AN INTERFACE TO ADD PAGINATION WITH A SELECT COUNT(*)
 		json.NewEncoder(w).Encode(groupList)
 	case "all":
 		groupList, errGetGroups := groups.GetAllGroups(db, limit, offset)

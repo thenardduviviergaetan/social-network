@@ -151,6 +151,7 @@ async function fetchGlobal(url: string, err: string) {
     }
 }
 
+//TODO WE COULD MAKE A GOOD PAGINATION FOR GROUPS TOO
 export const fetchTotalGroupPages = async () => {
     return fetchGlobal(
         `/groups?totalPages=true`,

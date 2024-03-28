@@ -33,7 +33,7 @@ type StatusMessage struct {
 	Msg_type string    `json:"msg_type"`
 	Target   string    `json:"target"`
 	Status   []*Client `json:"status"`
-	Groupe   []*Groupe `json:"groupe"`
+	Group    []*Groupe `json:"group"`
 }
 type HistoryMessage struct {
 	Msg_type   string     `json:"msg_type"`
@@ -124,7 +124,7 @@ func (h *Hub) SendStatusMessage(app *app.App, current *Client) {
 	h.clients[current.UUID].LastMsg = GetLastestMessages(app, current.UUID)
 	for c := range h.clients {
 		h.clients[c].reloadGroup(app.DB.DB)
-		msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Groupe: h.clients[c].tabgroup}
+		msg := &StatusMessage{Msg_type: "status", Target: current.UUID, Status: h.status, Group: h.clients[c].tabgroup}
 		jsonClients, _ := json.Marshal(msg)
 		h.clients[c].send <- jsonClients
 	}

@@ -48,7 +48,7 @@ func GetUsersname(db *sql.DB, uuid string) (users string) {
 }
 
 func GetAllGroupUsers(db *sql.DB, userUuid string) (Groupe [][2]string) {
-	rows, err := db.Query("SELECT social_groups.name, social_groups.id FROM social_groups JOIN group_members ON social_groups.id = group_members.group_id where group_members.member_id = ?", userUuid)
+	rows, err := db.Query("SELECT social_groups.name, social_groups.id FROM social_groups JOIN group_members ON social_groups.id = group_members.group_id WHERE group_members.member_id = ?", userUuid)
 	if err != nil {
 		return
 	}

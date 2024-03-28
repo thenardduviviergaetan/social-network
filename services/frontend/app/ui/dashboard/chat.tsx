@@ -263,7 +263,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
           break;
         case "chat":
 
-          if (message.target == target.target || message.sender == target.target) {
+          if ((message.target == target.target || message.sender == target.target) && target.type_target === message.type_target) {
             setmessageList(prevMessage => [...prevMessage,
             new Message(
               message.msg_type,

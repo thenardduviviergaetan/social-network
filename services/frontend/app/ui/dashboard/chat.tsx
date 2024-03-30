@@ -238,7 +238,7 @@ export default function Chat({ user, followers, followed, followerUUIDS }: { use
         console.error("WebSocket message error:", event.data);
       }
 
-      switch (message.msg_type) {
+      switch (message?.msg_type) {
         case "status":
           listUser = new ListUser();
           message.status

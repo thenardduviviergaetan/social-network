@@ -61,8 +61,8 @@ export async function createGroup(
       return state;
     }
   }
-  revalidatePath("/dashboard/groups?type=all");
-  redirect("/dashboard/groups?type=all");
+  revalidatePath("/dashboard/groups?type=member");
+  redirect("/dashboard/groups?type=member");
 }
 
 export async function joinGroup(user: string | undefined, group: string) {
